@@ -1,0 +1,5 @@
+use_frameworks!
+
+target 'RealmPop' do
+  pod 'RealmSwift', '~> 2.4'
+end
