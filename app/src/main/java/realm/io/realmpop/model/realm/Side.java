@@ -1,4 +1,4 @@
-package realm.io.realmpop.model;
+package realm.io.realmpop.model.realm;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
