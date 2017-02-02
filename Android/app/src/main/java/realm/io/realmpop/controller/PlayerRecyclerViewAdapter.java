@@ -10,14 +10,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import io.realm.OrderedRealmCollection;
+import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.realm.Player;
 
 public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, PlayerRecyclerViewAdapter.ViewHolder> {
 
-    public PlayerRecyclerViewAdapter(@NonNull Context context, @NonNull OrderedRealmCollection<Player> players) {
-        super(context, players, true);
+    private GameRoomActivity gameRoomActivity;
+
+    public PlayerRecyclerViewAdapter(@NonNull GameRoomActivity gameRoomActivity, @NonNull OrderedRealmCollection<Player> players) {
+        super(gameRoomActivity, players, true);
+        this.gameRoomActivity = gameRoomActivity;
     }
 
     @Override
@@ -28,17 +32,17 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        Player player = getData().get(position);
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
+        final Player player = getData().get(position);
         holder.playerId = player.getId();
         holder.titleView.setText(player.getName());
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, GameActivity.class);
-                context.startActivity(intent);
+            if(player.isAvailable()) {
+                gameRoomActivity.challengePlayer(Player player);
+            }
             }
         });
     }

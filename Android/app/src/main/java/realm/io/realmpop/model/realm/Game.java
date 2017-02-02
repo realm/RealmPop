@@ -3,6 +3,7 @@ package realm.io.realmpop.model.realm;
 import io.realm.RealmObject;
 
 public class Game extends RealmObject {
+
     private Side player1;
     private Side player2;
 
