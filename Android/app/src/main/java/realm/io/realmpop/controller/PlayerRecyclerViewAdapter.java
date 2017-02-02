@@ -41,7 +41,7 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
             @Override
             public void onClick(View v) {
             if(player.isAvailable()) {
-                gameRoomActivity.challengePlayer(Player player);
+                gameRoomActivity.challengePlayer(player);
             }
             }
         });

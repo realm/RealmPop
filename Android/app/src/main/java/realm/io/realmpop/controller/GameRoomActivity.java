@@ -59,7 +59,7 @@ public class GameRoomActivity extends AppCompatActivity {
                     handleInvite(myself.getChallenger());
                 }
                 if(myself.getCurrentgame() != null) {
-                    moveToGame(myself.getChallenger());
+                    moveToGame();
                 }
             }
         });
@@ -169,13 +169,9 @@ public class GameRoomActivity extends AppCompatActivity {
         });
     }
 
-    private void moveToGame(Player challenger) {
-        // do we need to set these to false or will the Game do that for us once started.
-        me.setAvailable(false);
-        challenger.setAvailable(false);
-
+    private void moveToGame() {
         Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra(Player.class.getName(), challenger.getId());
+        intent.putExtra(Player.class.getName(), me.getId());
         startActivity(intent);
     }
 
