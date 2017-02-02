@@ -1,11 +1,11 @@
-package realm.io.realmpop;
+package realm.io.realmpop.controller;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -15,18 +15,25 @@ import io.realm.Realm;
 import io.realm.SyncConfiguration;
 import io.realm.SyncCredentials;
 import io.realm.SyncUser;
+import realm.io.realmpop.R;
+import realm.io.realmpop.model.GameModel;
+import realm.io.realmpop.model.realm.Player;
 
-import static realm.io.realmpop.RealmConstants.AUTH_URL;
-import static realm.io.realmpop.RealmConstants.ID;
-import static realm.io.realmpop.RealmConstants.PASSWORD;
-import static realm.io.realmpop.RealmConstants.REALM_URL;
+import static realm.io.realmpop.util.RealmConstants.AUTH_URL;
+import static realm.io.realmpop.util.RealmConstants.ID;
+import static realm.io.realmpop.util.RealmConstants.PASSWORD;
+import static realm.io.realmpop.util.RealmConstants.REALM_URL;
 
 public class PreGameRoomActivity extends AppCompatActivity {
 
+    private static final String TAG = PreGameRoomActivity.class.getName();
+
     private Realm realm;
+    private GameModel gameModel;
+    private Player me;
 
     @BindView(R.id.playerNameEditText)
-    private EditText playerNameEditText;
+    public EditText playerNameEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,19 +41,34 @@ public class PreGameRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pregameroom);
         ButterKnife.bind(this);
 
-        final SyncCredentials syncCredentials = SyncCredentials.usernamePassword(ID, PASSWORD, true);
+        final SyncCredentials syncCredentials = SyncCredentials.usernamePassword(ID, PASSWORD, false);
         SyncUser.loginAsync(syncCredentials, AUTH_URL, new SyncUser.Callback() {
             @Override
             public void onSuccess(SyncUser user) {
                 final SyncConfiguration syncConfiguration = new SyncConfiguration.Builder(user, REALM_URL).build();
                 Realm.setDefaultConfiguration(syncConfiguration);
                 realm = Realm.getDefaultInstance();
+                gameModel = new GameModel(realm);
+
+                me = gameModel.currentPlayer();
+                playerNameEditText.setText(me.getName());
+                gameModel.makePlayerUnavailableWithNoChallenger(me.getId());
             }
 
             @Override
             public void onError(ObjectServerError error) {
+                Log.e(TAG, error.getErrorMessage());
+                error.getException().printStackTrace();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        gameModel = null;
+        realm.close();
+        realm = null;
     }
 
     @OnClick(R.id.playerEnteredButton)
@@ -59,8 +81,18 @@ public class PreGameRoomActivity extends AppCompatActivity {
     }
 
     private void moveToGameRoom() {
-        Intent gameRoomIntent = new Intent(this, GameRoomActivity.class);
-        startActivity(gameRoomIntent);
+
+        if(realm != null) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgRealm) {
+                    me.setName(playerNameEditText.getText().toString());
+                }
+            });
+
+            Intent gameRoomIntent = new Intent(PreGameRoomActivity.this, GameRoomActivity.class);
+            startActivity(gameRoomIntent);
+        }
     }
 
     private void shakeText() {

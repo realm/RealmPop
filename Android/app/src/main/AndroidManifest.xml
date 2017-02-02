@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".PreGameRoomActivity"
+            android:name=".controller.PreGameRoomActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,7 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GameRoomActivity"></activity>
+        <activity android:name=".controller.GameRoomActivity" />
+        <activity android:name=".controller.GameActivity"></activity>
     </application>
 
 </manifest>

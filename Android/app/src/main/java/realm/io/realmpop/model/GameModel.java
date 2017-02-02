@@ -4,18 +4,19 @@ import java.util.List;
 
 import io.realm.Realm;
 import realm.io.realmpop.model.realm.Player;
+import realm.io.realmpop.util.SharedPrefsUtils;
 
-class GameModel {
+public class GameModel {
 
     private Realm realm;
 
-    public GameModel() {
-       realm = Realm.getDefaultInstance();
+    public GameModel(Realm realmInstance) {
+        realm = realmInstance;
     }
 
     public Player currentPlayer() {
 
-        String currentId = ""; // UserDefaults.idForCurrentPlayer()
+        String currentId = SharedPrefsUtils.getInstance().idForCurrentPlayer();
 
         Player player = realm.where(Player.class).equalTo("id", currentId).findFirst();
 
@@ -24,6 +25,7 @@ class GameModel {
                 realm.beginTransaction();
                 player = new Player();
                 player.setId(currentId);
+                player.setName("Anonymous");
                 player = realm.copyToRealm(player);
                 realm.commitTransaction();
             } catch (Exception e) {
@@ -35,19 +37,18 @@ class GameModel {
         return player;
     }
 
-    private List<Player> otherPlayers() {
-        String myId = "foo";
-        return realm.where(Player.class)
-                .equalTo("available", true)
-                .notEqualTo("id", myId)
-                .findAllSorted("name");
+    public void makePlayerUnavailableWithNoChallenger(final String id) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm r) {
+                Player player = r.where(Player.class).equalTo("id", id).findFirst();
+                if(player != null) {
+                    player.setChallenger(null);
+                    player.setAvailable(false);
+                }
+            }
+        });
     }
 
-    func otherPlayers(than me: Player) -> Results<Player> {
-        return realm.objects(Player.self)
-            .filter("available = true")
-            //.filter("id != %@", me.id)
-            .sorted(byKeyPath: "name")
-    }
 
 }
