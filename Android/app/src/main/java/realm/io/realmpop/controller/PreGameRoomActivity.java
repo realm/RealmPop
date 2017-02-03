@@ -1,15 +1,18 @@
 package realm.io.realmpop.controller;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 import io.realm.ObjectServerError;
 import io.realm.Realm;
 import io.realm.SyncConfiguration;
@@ -49,10 +52,15 @@ public class PreGameRoomActivity extends AppCompatActivity {
                 Realm.setDefaultConfiguration(syncConfiguration);
                 realm = Realm.getDefaultInstance();
                 gameModel = new GameModel(realm);
-
                 me = gameModel.currentPlayer();
                 playerNameEditText.setText(me.getName());
-                gameModel.makePlayerUnavailableWithNoChallenger(me.getId());
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        me.setAvailable(false);
+                        me.setChallenger(null);
+                    }
+                });
             }
 
             @Override
@@ -63,12 +71,30 @@ public class PreGameRoomActivity extends AppCompatActivity {
         });
     }
 
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         gameModel = null;
         realm.close();
         realm = null;
+    }
+
+    @OnLongClick(R.id.player_name_prompt)
+    public boolean clearAll() {
+        if(realm != null) {
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgrealm) {
+                    bgrealm.deleteAll();
+                }
+            });
+            Toast.makeText(this, "Reset", Toast.LENGTH_SHORT).show();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @OnClick(R.id.playerEnteredButton)
@@ -85,7 +111,7 @@ public class PreGameRoomActivity extends AppCompatActivity {
         if(realm != null) {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
-                public void execute(Realm bgRealm) {
+                public void execute(Realm r) {
                     me.setName(playerNameEditText.getText().toString());
                 }
             });

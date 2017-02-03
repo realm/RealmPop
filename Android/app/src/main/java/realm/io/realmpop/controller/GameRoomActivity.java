@@ -5,25 +5,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmModel;
 import io.realm.RealmResults;
-import okhttp3.Challenge;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
 import realm.io.realmpop.model.realm.Bubble;
 import realm.io.realmpop.model.realm.Game;
 import realm.io.realmpop.model.realm.Player;
 import realm.io.realmpop.model.realm.Side;
+
+import static realm.io.realmpop.R.style.AppTheme_RealmPopDialog;
 
 public class GameRoomActivity extends AppCompatActivity {
 
@@ -48,7 +48,10 @@ public class GameRoomActivity extends AppCompatActivity {
 
         gameModel = new GameModel(realm);
         me = gameModel.currentPlayer();
-        otherPlayers = realm.where(Player.class).equalTo("available", true).findAllSortedAsync("name");
+        otherPlayers = realm.where(Player.class)
+                            .equalTo("available", true)
+                            .notEqualTo("id", me.getId())
+                            .findAllSortedAsync("name");
         recyclerView.setAdapter(new PlayerRecyclerViewAdapter(this, otherPlayers));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
@@ -108,19 +111,19 @@ public class GameRoomActivity extends AppCompatActivity {
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("You were invited to a game by " + challenger.getName() + "").setPositiveButton("Accept", dialogClickListener)
-                .setNegativeButton("No, thanks", dialogClickListener).show();
-
-        builder.show();
-
+        ContextThemeWrapper themedContext = new ContextThemeWrapper( this, AppTheme_RealmPopDialog );
+        AlertDialog.Builder builder = new AlertDialog.Builder(themedContext);
+        builder.setMessage("You were invited to a game by " + challenger.getName() + "")
+                .setPositiveButton("Accept", dialogClickListener)
+                .setNegativeButton("No, thanks", dialogClickListener)
+                .show();
     }
 
     public void challengePlayer(final Player player) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                me.setChallenger(player);
+                player.setChallenger(me);
             }
         });
     }
@@ -161,10 +164,10 @@ public class GameRoomActivity extends AppCompatActivity {
                     bubble.setNumber(numbers[i]);
                     player2.getBubbles().add(bubble);
                 }
+                game.setPlayer2(player2);
 
                 me.setCurrentgame(game);
                 challenger.setCurrentgame(game);
-
             }
         });
     }

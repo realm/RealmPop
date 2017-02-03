@@ -58,6 +58,8 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
     compile 'io.realm:android-adapters:1.4.0'
+
+    compile 'joda-time:joda-time:2.9.4'
 }
 
 

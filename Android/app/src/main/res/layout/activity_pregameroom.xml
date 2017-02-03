@@ -13,6 +13,7 @@
     tools:context="realm.io.realmpop.controller.PreGameRoomActivity">
 
     <TextView
+        android:id="@+id/player_name_prompt"
         style="@style/Text.SalmonTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

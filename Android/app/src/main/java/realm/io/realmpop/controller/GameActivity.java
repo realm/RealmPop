@@ -5,6 +5,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.Minutes;
+import org.joda.time.Period;
+import org.joda.time.Seconds;
+
 import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
@@ -44,7 +50,7 @@ public class GameActivity extends AppCompatActivity {
     private Side otherSide;
 
     private Timer timer;
-    private Date startedAt = new Date();
+    private Date startedAt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,8 +111,15 @@ public class GameActivity extends AppCompatActivity {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                long intervalSinceStarted = System.currentTimeMillis() - startedAt.getTime();
-                timerLabel.setText(String.format("%02.2d", intervalSinceStarted));
+                Interval interval = new Interval(startedAt.getTime(), new Date().getTime());
+                Period period = interval.toPeriod();
+                final String timerText = String.format("%02d:%02d", period.getMinutes(), period.getSeconds());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        timerLabel.setText(timerText);
+                    }
+                });
             }
         }, now(), 1000);
 
@@ -155,9 +168,6 @@ public class GameActivity extends AppCompatActivity {
                         mySide.setTime(System.currentTimeMillis());
                     }
                 });
-                // timer.invalidate??
-                message.setText(String.format("Your time: %.2fs", mySide.getTime()));
-                timerLabel.setText(String.format("%02.2f", mySide.getTime()));
                 message.setVisibility(View.VISIBLE);
 
             }
