@@ -13,7 +13,8 @@ android {
     }
     buildTypes {
 
-        def host = InetAddress.getLocalHost().getCanonicalHostName() // "192.168.1.79"
+        //def host = InetAddress.getLocalHost().getCanonicalHostName() // "192.168.1.79"
+        def host = getIP()
 
         debug {
             // This will automatically detect the IP address of the machine building RealmTasks.
@@ -57,4 +58,24 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 
     compile 'io.realm:android-adapters:1.4.0'
+}
+
+
+def getIP() {
+    InetAddress result = null;
+    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+    while (interfaces.hasMoreElements()) {
+        Enumeration<InetAddress> addresses = interfaces.nextElement().getInetAddresses();
+        while (addresses.hasMoreElements()) {
+            InetAddress address = addresses.nextElement();
+            if (!address.isLoopbackAddress()) {
+                if (address.isSiteLocalAddress()) {
+                    return address.getHostAddress();
+                } else if (result == null) {
+                    result = address;
+                }
+            }
+        }
+    }
+    return (result != null ? result : InetAddress.getLocalHost()).getHostAddress();
 }
