@@ -25,7 +25,9 @@
         android:layout_height="wrap_content"
         android:hint=""
         tools:text="Anonymous"
-        />
+        android:textAppearance="@style/Text.EditText"
+        android:imeOptions="flagNoExtractUi"
+        android:inputType="text" />
 
     <Button
         style="@style/Text.Button"
