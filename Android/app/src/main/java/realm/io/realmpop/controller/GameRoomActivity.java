@@ -3,6 +3,7 @@ package realm.io.realmpop.controller;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.SyncStateContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
@@ -22,8 +23,10 @@ import realm.io.realmpop.model.realm.Bubble;
 import realm.io.realmpop.model.realm.Game;
 import realm.io.realmpop.model.realm.Player;
 import realm.io.realmpop.model.realm.Side;
+import realm.io.realmpop.util.BubbleConstants;
 
 import static realm.io.realmpop.R.style.AppTheme_RealmPopDialog;
+import static realm.io.realmpop.util.RandomUtils.generateNumbersArray;
 
 public class GameRoomActivity extends AppCompatActivity {
 
@@ -128,21 +131,12 @@ public class GameRoomActivity extends AppCompatActivity {
         });
     }
 
-    private int[] generateNumbersArray(int count, int min, int max) {
-        Random rand = new Random(System.currentTimeMillis());
-        int[] numbers = new int[count];
-        for(int i = 0; i < count; i++) {
-            numbers[i] = rand.nextInt((max - min) + 1) + min;
-        }
-        return numbers;
-    }
-
     private void createGame(final Player challenger) {
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
 
-                int [] numbers = generateNumbersArray(15, 1, 50);
+                int [] numbers = generateNumbersArray(BubbleConstants.bubbleCount, 1, 50);
                 Game game = realm.createObject(Game.class);
 
                 Side player1 = new Side();

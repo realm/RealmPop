@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".controller.GameRoomActivity" />
-        <activity android:name=".controller.GameActivity"></activity>
+        <activity android:name=".controller.GameActivity" />
     </application>
 
 </manifest>

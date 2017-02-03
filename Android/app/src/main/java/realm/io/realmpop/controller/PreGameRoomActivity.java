@@ -2,7 +2,6 @@ package realm.io.realmpop.controller;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,10 +21,10 @@ import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
 import realm.io.realmpop.model.realm.Player;
 
-import static realm.io.realmpop.util.RealmConstants.AUTH_URL;
-import static realm.io.realmpop.util.RealmConstants.ID;
-import static realm.io.realmpop.util.RealmConstants.PASSWORD;
-import static realm.io.realmpop.util.RealmConstants.REALM_URL;
+import static realm.io.realmpop.util.BubbleConstants.AUTH_URL;
+import static realm.io.realmpop.util.BubbleConstants.ID;
+import static realm.io.realmpop.util.BubbleConstants.PASSWORD;
+import static realm.io.realmpop.util.BubbleConstants.REALM_URL;
 
 public class PreGameRoomActivity extends AppCompatActivity {
 

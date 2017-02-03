@@ -1,9 +1,13 @@
 package realm.io.realmpop.controller;
 
+import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -18,15 +22,19 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmModel;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
+import realm.io.realmpop.model.realm.Bubble;
 import realm.io.realmpop.model.realm.Game;
 import realm.io.realmpop.model.realm.Player;
 import realm.io.realmpop.model.realm.Score;
 import realm.io.realmpop.model.realm.Side;
+
+import static realm.io.realmpop.util.RandomUtils.generateNumber;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -42,9 +50,14 @@ public class GameActivity extends AppCompatActivity {
     @BindView(R.id.timer)
     public TextView timerLabel;
 
+    @BindView(R.id.bubbleBoard)
+    public RelativeLayout bubbleBoard;
+
     private Realm realm;
     private GameModel gameModel;
     private Game challenge;
+
+    private Player me;
 
     private Side mySide;
     private Side otherSide;
@@ -61,9 +74,17 @@ public class GameActivity extends AppCompatActivity {
 
         realm = Realm.getDefaultInstance();
         gameModel = new GameModel(realm);
+        me = gameModel.currentPlayer();
+        me.addChangeListener(new RealmChangeListener<Player>() {
+            @Override
+            public void onChange(Player me) {
+                if(me.getCurrentgame() == null) {
+                    finish();
+                }
+            }
+        });
 
-        String myId = getIntent().getStringExtra(Player.class.getName());
-        challenge = realm.where(Player.class).equalTo("id", myId).findFirst().getCurrentgame();
+        challenge = me.getCurrentgame();
 
         mySide = challenge.getPlayer1();
         mySide.addChangeListener(new RealmChangeListener<Side>() {
@@ -81,23 +102,19 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-//        //build UI
-//        let playRect = view.bounds.insetBy(dx: 40, dy: 70).offsetBy(dx: 0, dy: 30)
-
-//        for bubble in mySide.bubbles {
-//            let bubbleView = BubbleView.bubble(number: bubble.number, inRect: playRect)
-//            bubbleView.tap = {[weak self] number in
-//            self?.didPop(number: number)
-//            }
-//            view.addSubview(bubbleView)
-//        }
 
 //
-//        view.bringSubview(toFront: player1)
-//        view.bringSubview(toFront: player2)
-//        view.bringSubview(toFront: message)
+// Some existing RelativeLayout from your layout xml
+//        RelativeLayout rl = (RelativeLayout) findViewById(R.id.my_relative_layout);
+//
+//        ImageView iv = new ImageView(this);
+//
+//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(30, 40);
+//        params.leftMargin = 50;
+//        params.topMargin = 60;
+//        rl.addView(iv, params);
 
-        update();
+//        update();
 
     }
 
@@ -124,6 +141,29 @@ public class GameActivity extends AppCompatActivity {
         }, now(), 1000);
 
 
+        for(final Bubble bubble : mySide.getBubbles()) {
+            View bubbleView = getLayoutInflater().inflate(R.layout.bubble, bubbleBoard, false);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) bubbleView.getLayoutParams();
+            DisplayMetrics metrics = new DisplayMetrics();
+
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            params.leftMargin = bubbleView.getWidth() + generateNumber(0, metrics.widthPixels  -  bubbleView.getWidth());
+            params.topMargin = bubbleView.getHeight() + generateNumber(0, metrics.heightPixels -  bubbleView.getHeight());
+
+
+            ((TextView) bubbleView.findViewById(R.id.bubbleValue)).setText(bubble.getNumber() + "");
+            bubbleView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBubbleTap(bubble.getNumber());
+                }
+            });
+
+            bubbleBoard.addView(bubbleView, params);
+        }
+
+        update();
+
     }
 
     @Override
@@ -140,6 +180,55 @@ public class GameActivity extends AppCompatActivity {
         realm.close();
         realm = null;
         gameModel = null;
+    }
+
+    @OnClick(R.id.exitGameLabel)
+    public void exitGame() {
+        if(gameModel != null && realm != null) {
+
+            final String myId = me.getId();
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgRealm) {
+
+                    Player me = bgRealm.where(Player.class).equalTo("id", myId).findFirst();
+                    Player challenger = me.getChallenger();
+                    Game game = me.getCurrentgame();
+                    Side s1 = game.getPlayer1();
+                    Side s2 = game.getPlayer2();
+
+                    s1.getBubbles().deleteAllFromRealm();
+                    s1.deleteFromRealm();
+                    s2.getBubbles().deleteAllFromRealm();
+                    s2.deleteFromRealm();
+                    game.deleteFromRealm();
+
+                    if(challenger != null) {
+                        challenger.setCurrentgame(null);
+                        challenger.setChallenger(null);
+                    }
+
+                    me.setCurrentgame(null);
+                    me.setChallenger(null);
+                }
+            });
+        }
+    }
+
+    public void onBubbleTap(long number) {
+
+        Toast.makeText(this, "" + number, Toast.LENGTH_LONG).show();
+//        try! challenge.realm?.write {
+//            if let bubble = mySide.bubbles.last, bubble.number == number {
+//                mySide.bubbles.removeLast()
+//            } else {
+//                message.isHidden = false
+//                message.text = "You tapped \(number) instead of \(mySide.bubbles.last?.number ?? 0)"
+//                mySide.failed = true
+//                endGame()
+//            }
+//        }
+//
     }
 
     private Date now() {

@@ -10,7 +10,30 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="realm.io.realmpop.controller.GameActivity">
 
+    <TextView
+        style="@style/Text"
+        android:id="@+id/message"
+        android:layout_width="400dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        android:textColor="@color/colorBlack"
+        android:background="@color/textBackground"
+        android:gravity="center"
+        android:textSize="50sp"
+        android:visibility="invisible"
+        tools:text="You Win"
+        />
+
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+    <LinearLayout
+        android:id="@+id/headerDisplay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -26,7 +49,7 @@
             android:padding="6dp"
             android:textSize="18sp"
             android:layout_weight="1"
-            android:gravity="left"
+            android:gravity="start"
             android:textAppearance="?attr/textAppearanceListItem"
             tools:text="Player 1"
             />
@@ -62,20 +85,23 @@
 
     </LinearLayout>
 
-    <TextView
-        style="@style/Text"
-        android:id="@+id/message"
-        android:layout_width="400dp"
-        android:layout_height="100dp"
-        android:layout_centerInParent="true"
-        android:textColor="@color/colorBlack"
-        android:background="@color/textBackground"
-        android:gravity="center"
-        android:textSize="50sp"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        tools:text="You Win"
+    <RelativeLayout
+        android:id="@+id/bubbleBoard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         />
 
+    <Button
+        style="@style/Text.Button"
+        android:id="@+id/exitGameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/textBackground"
+        android:textSize="18sp"
+        android:text="@string/end_game_button_label"
+        />
+
+    </LinearLayout>
 
 </RelativeLayout>
