@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
 
-        connect {[unowned self] in
+        connect { [unowned self] in
             if let splash = self.window?.rootViewController,
                 let nav = splash.storyboard?.instantiateViewController(withIdentifier: "Navigation") {
                 self.window!.rootViewController = nav

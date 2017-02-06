@@ -12,6 +12,7 @@
 		9C40C2591E40A52200045987 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C40C2581E40A52200045987 /* Game.swift */; };
 		9C40C25B1E40A6C800045987 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C40C25A1E40A6C800045987 /* GameViewController.swift */; };
 		9C40C2601E40A8A700045987 /* BubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C40C25F1E40A8A700045987 /* BubbleView.swift */; };
+		9CA8C4991E494112005111F3 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA8C4981E494112005111F3 /* Side.swift */; };
 		9CB75DB91E389C9C003482C2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB75DB81E389C9C003482C2 /* AppDelegate.swift */; };
 		9CB75DBB1E389C9C003482C2 /* GameRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB75DBA1E389C9C003482C2 /* GameRoomViewController.swift */; };
 		9CB75DBE1E389C9C003482C2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CB75DBC1E389C9C003482C2 /* Main.storyboard */; };
@@ -35,6 +36,7 @@
 		9C40C2581E40A52200045987 /* Game.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		9C40C25A1E40A6C800045987 /* GameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		9C40C25F1E40A8A700045987 /* BubbleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BubbleView.swift; sourceTree = "<group>"; };
+		9CA8C4981E494112005111F3 /* Side.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Side.swift; sourceTree = "<group>"; };
 		9CB75DB51E389C9C003482C2 /* RealmPop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmPop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CB75DB81E389C9C003482C2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9CB75DBA1E389C9C003482C2 /* GameRoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameRoomViewController.swift; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 			children = (
 				9CB82BA51E38A3DA00785399 /* Player.swift */,
 				9C40C2581E40A52200045987 /* Game.swift */,
+				9CA8C4981E494112005111F3 /* Side.swift */,
 				9CF6B6731E40FEAA006FB848 /* Score.swift */,
 			);
 			name = Objects;
@@ -328,6 +331,7 @@
 				9CB82BAA1E38A49100785399 /* GameModel.swift in Sources */,
 				9C40C2601E40A8A700045987 /* BubbleView.swift in Sources */,
 				9C40C2571E40998000045987 /* UIViewController+.swift in Sources */,
+				9CA8C4991E494112005111F3 /* Side.swift in Sources */,
 				9CB82BB21E38CB4200785399 /* RealmConnect.swift in Sources */,
 				9C40C25B1E40A6C800045987 /* GameViewController.swift in Sources */,
 				9CB82BA81E38A40300785399 /* UserDefaults+.swift in Sources */,

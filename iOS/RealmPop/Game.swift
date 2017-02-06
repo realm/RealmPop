@@ -9,13 +9,6 @@
 import Foundation
 import RealmSwift
 
-class Side: Object {
-    dynamic var name = ""
-    dynamic var left = 0
-    dynamic var time = 0.0
-    dynamic var failed = false
-}
-
 class Game: Object {
     dynamic var player1: Side?
     dynamic var player2: Side?
