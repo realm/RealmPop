@@ -10,5 +10,5 @@ public class BubbleConstants {
     public static final String PASSWORD = "password";
 
 
-    public static final int bubbleCount = 15;
+    public static final int bubbleCount = 3;
 }

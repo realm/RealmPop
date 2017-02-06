@@ -87,7 +87,7 @@ public class GameActivity extends AppCompatActivity {
 
         challenge = me.getCurrentgame();
 
-        mySide = challenge.getPlayer1();
+        mySide = challenge.getPlayer2();
         mySide.addChangeListener(new RealmChangeListener<Side>() {
             @Override
             public void onChange(Side me) {
@@ -95,7 +95,7 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-        otherSide = challenge.getPlayer2();
+        otherSide = challenge.getPlayer1();
         otherSide.addChangeListener(new RealmChangeListener<Side>() {
             @Override
             public void onChange(Side other) {
@@ -169,9 +169,11 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.removeAllChangeListeners();
-        realm.close();
-        realm = null;
+        if(realm != null) {
+            realm.removeAllChangeListeners();
+            realm.close();
+            realm = null;
+        }
         gameModel = null;
     }
 
@@ -227,22 +229,10 @@ public class GameActivity extends AppCompatActivity {
                         public void run() {
                             exitGame();
                         }
-                    }, 2000);
+                    }, 3000);
                 }
             }
         });
-
-
-//        try! challenge.realm?.write {
-//            if let bubble = mySide.bubbles.last, bubble.number == number {
-//                mySide.bubbles.removeLast()
-//            } else {
-//                message.isHidden = false
-//                message.text = "You tapped \(number) instead of \(mySide.bubbles.last?.number ?? 0)"
-//                mySide.failed = true
-//                endGame()
-//            }
-//        }
 
     }
 
@@ -263,13 +253,13 @@ public class GameActivity extends AppCompatActivity {
             message.setVisibility(View.VISIBLE);
         }
 
-        if(mySide.getBubbles().size() > 0) {
+        if(mySide.getBubbles().size() == 0) {
 
             if(mySide.getTime() == 0) {
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        mySide.setTime(System.currentTimeMillis());
+                        mySide.setTime(startedAt.getTime());
                     }
                 });
                 message.setVisibility(View.VISIBLE);

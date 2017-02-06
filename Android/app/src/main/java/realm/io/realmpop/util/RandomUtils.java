@@ -14,7 +14,7 @@ public class RandomUtils {
 
         int[] numbers = new int[count];
         for(int i = 0; i < count; i++) {
-            numbers[i] = generateNumber(prevNum, maxNum);
+            numbers[i] = generateNumber(prevNum + 1, maxNum);
             prevNum = numbers[i];
             maxNum = prevNum + eachNumberRange;
         }

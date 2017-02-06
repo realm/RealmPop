@@ -89,9 +89,11 @@ public class GameRoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.removeAllChangeListeners();
-        realm.close();
-        realm = null;
+        if(realm != null) {
+            realm.removeAllChangeListeners();
+            realm.close();
+            realm = null;
+        }
         gameModel = null;
     }
 
