@@ -7,9 +7,16 @@ public class RandomUtils {
     private static Random rand = new Random(System.currentTimeMillis());
 
     public static int[] generateNumbersArray(int count, int min, int max) {
+
+        int eachNumberRange = Math.round(((float) max) / ((float) count));
+        int prevNum = min;
+        int maxNum = eachNumberRange;
+
         int[] numbers = new int[count];
         for(int i = 0; i < count; i++) {
-            numbers[i] = generateNumber(min, max);
+            numbers[i] = generateNumber(prevNum, maxNum);
+            prevNum = numbers[i];
+            maxNum = prevNum + eachNumberRange;
         }
         return numbers;
     }

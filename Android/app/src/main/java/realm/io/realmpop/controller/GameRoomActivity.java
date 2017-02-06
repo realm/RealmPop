@@ -139,7 +139,7 @@ public class GameRoomActivity extends AppCompatActivity {
             @Override
             public void execute(Realm realm) {
 
-                int [] numbers = generateNumbersArray(BubbleConstants.bubbleCount, 1, 50);
+                int [] numbers = generateNumbersArray(BubbleConstants.bubbleCount, 1, 80);
                 Game game = realm.createObject(Game.class);
 
                 Side player1 = new Side();
