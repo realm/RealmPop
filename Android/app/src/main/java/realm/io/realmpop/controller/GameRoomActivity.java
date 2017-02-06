@@ -64,11 +64,13 @@ public class GameRoomActivity extends AppCompatActivity {
         me.addChangeListener(new RealmChangeListener<Player>() {
             @Override
             public void onChange(Player myself) {
-                if(myself.getChallenger() != null) {
-                    handleInvite(myself.getChallenger());
-                }
-                if(myself.getCurrentgame() != null) {
-                    moveToGame();
+                if(!inGame.get()) {
+                    if(myself.getChallenger() != null) {
+                        handleInvite(myself.getChallenger());
+                    }
+                    if(myself.getCurrentgame() != null) {
+                        moveToGame();
+                    }
                 }
             }
         });

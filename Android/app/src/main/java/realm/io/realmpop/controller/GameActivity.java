@@ -2,6 +2,7 @@ package realm.io.realmpop.controller;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -87,6 +88,8 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
+        message.setText("");
+
         challenge = me.getCurrentgame();
 
         mySide = challenge.getPlayer1().getName().equals(me.getName()) ? challenge.getPlayer1() : challenge.getPlayer2();
@@ -126,9 +129,6 @@ public class GameActivity extends AppCompatActivity {
 
             bubbleBoard.addView(bubbleView, params);
         }
-
-        update();
-
     }
 
     @Override
@@ -150,6 +150,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }, new Date(), 1000);
 
+        update();
     }
 
     @Override
@@ -251,7 +252,6 @@ public class GameActivity extends AppCompatActivity {
                         mySide.setTime(timeElapsed().getSeconds());
                     }
                 });
-                stopTimer();
                 message.setText(String.format("Your time: %s", timeElapsedString()));
                 message.setVisibility(View.VISIBLE);
             }
@@ -278,10 +278,14 @@ public class GameActivity extends AppCompatActivity {
         }
 
         if(otherSide.isFailed()) {
+            stopTimer();
             message.setText("You win! Congrats");
             message.setVisibility(View.VISIBLE);
         } else if(mySide.isFailed()) {
-            message.setText("You lost!");
+            stopTimer();
+            if(TextUtils.isEmpty(message.getText())) {
+                message.setText("You lost!");
+            }
             message.setVisibility(View.VISIBLE);
         }
 
