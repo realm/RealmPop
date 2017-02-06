@@ -1,8 +1,6 @@
 package realm.io.realmpop.controller;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -10,14 +8,11 @@ import android.view.Display;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.Interval;
 import org.joda.time.Period;
 
-import java.lang.ref.WeakReference;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,7 +22,6 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
-import io.realm.Sort;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
 import realm.io.realmpop.model.realm.Bubble;
@@ -150,7 +144,7 @@ public class GameActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        timerLabel.setText(timerTextAtThisMoment());
+                        timerLabel.setText(timeElapsedString());
                     }
                 });
             }
@@ -208,10 +202,13 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public String timerTextAtThisMoment() {
-        Interval interval = new Interval(startedAt.getTime(), new Date().getTime());
-        Period period = interval.toPeriod();
-        return String.format("%02d:%02d", period.getMinutes(), period.getSeconds());
+    public Period timeElapsed() {
+        return new Interval(startedAt.getTime(), new Date().getTime()).toPeriod();
+    }
+
+    public String timeElapsedString() {
+        Period period = timeElapsed();
+        return String.format("%02d:%02d", period.getMinutes(), (period.getSeconds() % 60));
     }
 
     public void stopTimer() {
@@ -251,11 +248,11 @@ public class GameActivity extends AppCompatActivity {
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        mySide.setTime(startedAt.getTime());
+                        mySide.setTime(timeElapsed().getSeconds());
                     }
                 });
                 stopTimer();
-                message.setText(String.format("Your time: %s", timerTextAtThisMoment()));
+                message.setText(String.format("Your time: %s", timeElapsedString()));
                 message.setVisibility(View.VISIBLE);
             }
 
@@ -265,7 +262,7 @@ public class GameActivity extends AppCompatActivity {
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        if( otherSide.getTime() > mySide.getTime() ) {
+                        if( otherSide.getTime() < mySide.getTime() ) {
                             mySide.setFailed(true);
                         } else {
                             otherSide.setFailed(true);
