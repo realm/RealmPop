@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -66,6 +67,13 @@ public class GameActivity extends AppCompatActivity {
     private Timer timer;
     private Date startedAt;
 
+    private RealmChangeListener<Side> onSideChangeListener = new RealmChangeListener<Side>() {
+        @Override
+        public void onChange(Side element) {
+            update();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,22 +95,16 @@ public class GameActivity extends AppCompatActivity {
 
         challenge = me.getCurrentgame();
 
-        mySide = challenge.getPlayer2();
-        mySide.addChangeListener(new RealmChangeListener<Side>() {
-            @Override
-            public void onChange(Side me) {
-                update();
-            }
-        });
+        mySide = challenge.getPlayer1().getName().equals(me.getName()) ? challenge.getPlayer1() : challenge.getPlayer2();
+        mySide.addChangeListener(onSideChangeListener);
 
-        otherSide = challenge.getPlayer1();
-        otherSide.addChangeListener(new RealmChangeListener<Side>() {
-            @Override
-            public void onChange(Side other) {
-                update();
-            }
-        });
+        otherSide = challenge.getPlayer1().getName().equals(me.getName()) ? challenge.getPlayer2() : challenge.getPlayer1();
+        otherSide.addChangeListener(onSideChangeListener);
 
+        //TODO: Need a distinct way other than name to determine player 1 vs player 2.
+        Log.d("PLAYER_IDs: ", "[myId]" + me.getName());
+        Log.d("PLAYER_IDs: ", "[mySideId]" + mySide.getName());
+        Log.d("PLAYER_IDs: ", "[myOtherId]" + otherSide.getName());
 
 
         float density  = 3.5f; //TODO: Clean up magic numbers
@@ -145,25 +147,21 @@ public class GameActivity extends AppCompatActivity {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Interval interval = new Interval(startedAt.getTime(), new Date().getTime());
-                Period period = interval.toPeriod();
-                final String timerText = String.format("%02d:%02d", period.getMinutes(), period.getSeconds());
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        timerLabel.setText(timerText);
+                        timerLabel.setText(timerTextAtThisMoment());
                     }
                 });
             }
-        }, now(), 1000);
+        }, new Date(), 1000);
 
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        timer.cancel();
-        timer = null;
+        stopTimer();
     }
 
     @Override
@@ -210,6 +208,19 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    public String timerTextAtThisMoment() {
+        Interval interval = new Interval(startedAt.getTime(), new Date().getTime());
+        Period period = interval.toPeriod();
+        return String.format("%02d:%02d", period.getMinutes(), period.getSeconds());
+    }
+
+    public void stopTimer() {
+        if(timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
     public void onBubbleTap(final long number) {
 
         realm.executeTransaction(new Realm.Transaction() {
@@ -223,35 +234,16 @@ public class GameActivity extends AppCompatActivity {
                     message.setText("You tapped " + number + " instead of " + (bubble == null ? 0 : bubble.getNumber()));
                     mySide.setFailed(true);
                     message.setVisibility(View.VISIBLE);
-                    Handler handler = new Handler(GameActivity.this.getMainLooper());
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            exitGame();
-                        }
-                    }, 3000);
                 }
             }
         });
 
     }
 
-    private Date now() {
-        return new Date();
-    }
-
     private void update() {
 
         player1.setText(challenge.getPlayer1().getName() + " : " + challenge.getPlayer1().getBubbles().size());
         player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getBubbles().size());
-
-        if(otherSide.isFailed()) {
-            message.setText("You win! Congrats");
-            message.setVisibility(View.VISIBLE);
-        } else if(mySide.isFailed()) {
-            message.setText("You lost!");
-            message.setVisibility(View.VISIBLE);
-        }
 
         if(mySide.getBubbles().size() == 0) {
 
@@ -262,15 +254,18 @@ public class GameActivity extends AppCompatActivity {
                         mySide.setTime(startedAt.getTime());
                     }
                 });
+                stopTimer();
+                message.setText(String.format("Your time: %s", timerTextAtThisMoment()));
                 message.setVisibility(View.VISIBLE);
-
             }
 
             if( otherSide.getTime() > 0 && mySide.getTime() > 0) {
+                mySide.removeChangeListeners();
+                otherSide.removeChangeListeners();
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        if( otherSide.getTime() < mySide.getTime() ) {
+                        if( otherSide.getTime() > mySide.getTime() ) {
                             mySide.setFailed(true);
                         } else {
                             otherSide.setFailed(true);
@@ -284,6 +279,15 @@ public class GameActivity extends AppCompatActivity {
             }
 
         }
+
+        if(otherSide.isFailed()) {
+            message.setText("You win! Congrats");
+            message.setVisibility(View.VISIBLE);
+        } else if(mySide.isFailed()) {
+            message.setText("You lost!");
+            message.setVisibility(View.VISIBLE);
+        }
+
     }
 }
 

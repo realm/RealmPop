@@ -145,7 +145,7 @@ public class GameRoomActivity extends AppCompatActivity {
                 Game game = realm.createObject(Game.class);
 
                 Side player1 = new Side();
-                player1.setName(challenger.getName());
+                player1.setName(me.getName());
                 player1 = realm.copyToRealm(player1);
                 for(int i = 0; i < numbers.length; i++) {
                     Bubble bubble = realm.createObject(Bubble.class);
@@ -156,7 +156,7 @@ public class GameRoomActivity extends AppCompatActivity {
 
 
                 Side player2 = new Side();
-                player2.setName(me.getName());
+                player2.setName(challenger.getName());
                 player2 = realm.copyToRealm(player2);
                 for(int i = 0; i < numbers.length; i++) {
                     Bubble bubble = realm.createObject(Bubble.class);
