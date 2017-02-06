@@ -2,12 +2,13 @@ package realm.io.realmpop.controller;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.Interval;
 import org.joda.time.Period;
@@ -21,6 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
 import realm.io.realmpop.model.realm.Bubble;
@@ -60,6 +62,13 @@ public class GameActivity extends AppCompatActivity {
     private Timer timer;
     private Date startedAt;
 
+    private RealmChangeListener<Side> onSideChangeListener = new RealmChangeListener<Side>() {
+        @Override
+        public void onChange(Side element) {
+            update();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,47 +88,20 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
+        message.setText("");
+
         challenge = me.getCurrentgame();
 
-        mySide = challenge.getPlayer1();
-        mySide.addChangeListener(new RealmChangeListener<Side>() {
-            @Override
-            public void onChange(Side me) {
-                update();
-            }
-        });
+        mySide = challenge.getPlayer1().getName().equals(me.getName()) ? challenge.getPlayer1() : challenge.getPlayer2();
+        mySide.addChangeListener(onSideChangeListener);
 
-        otherSide = challenge.getPlayer2();
-        otherSide.addChangeListener(new RealmChangeListener<Side>() {
-            @Override
-            public void onChange(Side other) {
-                update();
-            }
-        });
+        otherSide = challenge.getPlayer1().getName().equals(me.getName()) ? challenge.getPlayer2() : challenge.getPlayer1();
+        otherSide.addChangeListener(onSideChangeListener);
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        startedAt = new Date();
-
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Interval interval = new Interval(startedAt.getTime(), new Date().getTime());
-                Period period = interval.toPeriod();
-                final String timerText = String.format("%02d:%02d", period.getMinutes(), period.getSeconds());
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        timerLabel.setText(timerText);
-                    }
-                });
-            }
-        }, now(), 1000);
+        //TODO: Need a distinct way other than name to determine player 1 vs player 2.
+        Log.d("PLAYER_IDs: ", "[myId]" + me.getName());
+        Log.d("PLAYER_IDs: ", "[mySideId]" + mySide.getName());
+        Log.d("PLAYER_IDs: ", "[myOtherId]" + otherSide.getName());
 
 
         float density  = 3.5f; //TODO: Clean up magic numbers
@@ -140,30 +122,51 @@ public class GameActivity extends AppCompatActivity {
             bubbleView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    bubbleBoard.removeView(v);
                     onBubbleTap(bubble.getNumber());
                 }
             });
 
             bubbleBoard.addView(bubbleView, params);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        startedAt = new Date();
+
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        timerLabel.setText(timeElapsedString());
+                    }
+                });
+            }
+        }, new Date(), 1000);
 
         update();
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        timer.cancel();
-        timer = null;
+        stopTimer();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.removeAllChangeListeners();
-        realm.close();
-        realm = null;
+        if(realm != null) {
+            realm.removeAllChangeListeners();
+            realm.close();
+            realm = null;
+        }
         gameModel = null;
     }
 
@@ -200,24 +203,39 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void onBubbleTap(long number) {
-
-        Toast.makeText(this, "" + number, Toast.LENGTH_LONG).show();
-//        try! challenge.realm?.write {
-//            if let bubble = mySide.bubbles.last, bubble.number == number {
-//                mySide.bubbles.removeLast()
-//            } else {
-//                message.isHidden = false
-//                message.text = "You tapped \(number) instead of \(mySide.bubbles.last?.number ?? 0)"
-//                mySide.failed = true
-//                endGame()
-//            }
-//        }
-//
+    public Period timeElapsed() {
+        return new Interval(startedAt.getTime(), new Date().getTime()).toPeriod();
     }
 
-    private Date now() {
-        return new Date();
+    public String timeElapsedString() {
+        Period period = timeElapsed();
+        return String.format("%02d:%02d", period.getMinutes(), (period.getSeconds() % 60));
+    }
+
+    public void stopTimer() {
+        if(timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    public void onBubbleTap(final long number) {
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<Bubble> sortedBubbles = mySide.getBubbles().sort("number");
+                Bubble bubble = sortedBubbles.last();
+                if(bubble != null && bubble.getNumber() == number) {
+                    mySide.getBubbles().remove(bubble);
+                } else {
+                    message.setText("You tapped " + number + " instead of " + (bubble == null ? 0 : bubble.getNumber()));
+                    mySide.setFailed(true);
+                    message.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
     }
 
     private void update() {
@@ -225,28 +243,22 @@ public class GameActivity extends AppCompatActivity {
         player1.setText(challenge.getPlayer1().getName() + " : " + challenge.getPlayer1().getBubbles().size());
         player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getBubbles().size());
 
-        if(otherSide.isFailed()) {
-            message.setText("You win! Congrats");
-            message.setVisibility(View.VISIBLE);
-        } else if(mySide.isFailed()) {
-            message.setText("You lost!");
-            message.setVisibility(View.VISIBLE);
-        }
-
-        if(mySide.getBubbles().size() > 0) {
+        if(mySide.getBubbles().size() == 0) {
 
             if(mySide.getTime() == 0) {
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
-                        mySide.setTime(System.currentTimeMillis());
+                        mySide.setTime(timeElapsed().getSeconds());
                     }
                 });
+                message.setText(String.format("Your time: %s", timeElapsedString()));
                 message.setVisibility(View.VISIBLE);
-
             }
 
             if( otherSide.getTime() > 0 && mySide.getTime() > 0) {
+                mySide.removeChangeListeners();
+                otherSide.removeChangeListeners();
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -264,6 +276,19 @@ public class GameActivity extends AppCompatActivity {
             }
 
         }
+
+        if(otherSide.isFailed()) {
+            stopTimer();
+            message.setText("You win! Congrats");
+            message.setVisibility(View.VISIBLE);
+        } else if(mySide.isFailed()) {
+            stopTimer();
+            if(TextUtils.isEmpty(message.getText())) {
+                message.setText("You lost!");
+            }
+            message.setVisibility(View.VISIBLE);
+        }
+
     }
 }
 

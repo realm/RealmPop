@@ -75,9 +75,12 @@ public class PreGameRoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(realm != null) {
+            realm.removeAllChangeListeners();
+            realm.close();
+            realm = null;
+        }
         gameModel = null;
-        realm.close();
-        realm = null;
     }
 
     @OnLongClick(R.id.player_name_prompt)

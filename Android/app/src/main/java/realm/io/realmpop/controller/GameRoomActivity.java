@@ -11,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +42,8 @@ public class GameRoomActivity extends AppCompatActivity {
 
     private PlayerRecyclerViewAdapter adapter;
 
+    private AtomicBoolean inGame = new AtomicBoolean(false);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,11 +64,13 @@ public class GameRoomActivity extends AppCompatActivity {
         me.addChangeListener(new RealmChangeListener<Player>() {
             @Override
             public void onChange(Player myself) {
-                if(myself.getChallenger() != null) {
-                    handleInvite(myself.getChallenger());
-                }
-                if(myself.getCurrentgame() != null) {
-                    moveToGame();
+                if(!inGame.get()) {
+                    if(myself.getChallenger() != null) {
+                        handleInvite(myself.getChallenger());
+                    }
+                    if(myself.getCurrentgame() != null) {
+                        moveToGame();
+                    }
                 }
             }
         });
@@ -86,9 +91,11 @@ public class GameRoomActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.removeAllChangeListeners();
-        realm.close();
-        realm = null;
+        if(realm != null) {
+            realm.removeAllChangeListeners();
+            realm.close();
+            realm = null;
+        }
         gameModel = null;
     }
 
@@ -136,11 +143,11 @@ public class GameRoomActivity extends AppCompatActivity {
             @Override
             public void execute(Realm realm) {
 
-                int [] numbers = generateNumbersArray(BubbleConstants.bubbleCount, 1, 50);
+                int [] numbers = generateNumbersArray(BubbleConstants.bubbleCount, 1, 80);
                 Game game = realm.createObject(Game.class);
 
                 Side player1 = new Side();
-                player1.setName(challenger.getName());
+                player1.setName(me.getName());
                 player1 = realm.copyToRealm(player1);
                 for(int i = 0; i < numbers.length; i++) {
                     Bubble bubble = realm.createObject(Bubble.class);
@@ -151,7 +158,7 @@ public class GameRoomActivity extends AppCompatActivity {
 
 
                 Side player2 = new Side();
-                player2.setName(me.getName());
+                player2.setName(challenger.getName());
                 player2 = realm.copyToRealm(player2);
                 for(int i = 0; i < numbers.length; i++) {
                     Bubble bubble = realm.createObject(Bubble.class);
@@ -167,9 +174,17 @@ public class GameRoomActivity extends AppCompatActivity {
     }
 
     private void moveToGame() {
-        Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra(Player.class.getName(), me.getId());
-        startActivity(intent);
+        if(inGame.compareAndSet(false, true)) {
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra(Player.class.getName(), me.getId());
+            startActivityForResult(intent, 1);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        inGame.set(false);
     }
 
     private void setMyAvailability(final boolean isAvail) {

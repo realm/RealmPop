@@ -10,8 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".controller.PreGameRoomActivity"
-            android:screenOrientation="landscape">
+            android:name=".controller.PreGameRoomActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

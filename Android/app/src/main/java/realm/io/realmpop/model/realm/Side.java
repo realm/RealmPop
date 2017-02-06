@@ -25,6 +25,6 @@ public class Side extends RealmObject {
 
     public RealmList<Bubble> getBubbles() { return bubbles; }
 
-    public void setBubbles(RealmList<Bubble> bubbles) { this.bubbles = bubbles; } 
+    public void setBubbles(RealmList<Bubble> bubbles) { this.bubbles = bubbles; }
 
 }

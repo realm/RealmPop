@@ -6,9 +6,9 @@ public class BubbleConstants {
 
     public static final String REALM_URL = "realm://" + BuildConfig.OBJECT_SERVER_IP + ":9080/~/game";
     public static final String AUTH_URL = "http://" + BuildConfig.OBJECT_SERVER_IP + ":9080/auth";
-    public static final String ID = "default@realm.io";
+    public static final String ID = "demo@realm.io";
     public static final String PASSWORD = "password";
 
 
-    public static final int bubbleCount = 5;
+    public static final int bubbleCount = 15;
 }
