@@ -16,6 +16,7 @@ import org.joda.time.Period;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,6 +25,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
+import io.realm.Sort;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
 import realm.io.realmpop.model.realm.Bubble;
@@ -120,6 +123,7 @@ public class GameActivity extends AppCompatActivity {
             bubbleView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    bubbleBoard.removeView(v);
                     onBubbleTap(bubble.getNumber());
                 }
             });
@@ -206,12 +210,11 @@ public class GameActivity extends AppCompatActivity {
 
     public void onBubbleTap(final long number) {
 
-        Toast.makeText(this, "" + number, Toast.LENGTH_LONG).show();
-
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                Bubble bubble = mySide.getBubbles().last();
+                RealmResults<Bubble> sortedBubbles = mySide.getBubbles().sort("number");
+                Bubble bubble = sortedBubbles.last();
                 if(bubble != null && bubble.getNumber() == number) {
                     mySide.getBubbles().remove(bubble);
                 } else {
