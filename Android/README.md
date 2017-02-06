@@ -1,6 +1,6 @@
 # Realm Pop Demo
 
-<span style="color:red">This is a Work in Progress.  The code has been quickly put together, and will be cleaned up before the tour.</span>
+<span style="color:red">This demo is fully functional, but rather thrown together quickly for demo.  The code will be cleaned up soon, including using async tx.</span>
 
 Realm Pop is a simple game app designed to show off the collaborative features of the [Realm Mobile Platform](https://realm.io/news/introducing-realm-mobile-platform/).
 
