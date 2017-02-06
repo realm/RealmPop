@@ -1,22 +1,18 @@
 package realm.io.realmpop.controller;
 
-import android.graphics.Rect;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.joda.time.DateTime;
 import org.joda.time.Interval;
-import org.joda.time.Minutes;
 import org.joda.time.Period;
-import org.joda.time.Seconds;
 
 import java.util.Date;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,7 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmModel;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
 import realm.io.realmpop.model.realm.Bubble;
@@ -102,20 +97,6 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-
-//
-// Some existing RelativeLayout from your layout xml
-//        RelativeLayout rl = (RelativeLayout) findViewById(R.id.my_relative_layout);
-//
-//        ImageView iv = new ImageView(this);
-//
-//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(30, 40);
-//        params.leftMargin = 50;
-//        params.topMargin = 60;
-//        rl.addView(iv, params);
-
-//        update();
-
     }
 
     @Override
@@ -141,17 +122,21 @@ public class GameActivity extends AppCompatActivity {
         }, now(), 1000);
 
 
+        float density  = 3.5f; //TODO: Clean up magic numbers
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+        final int MAX_X_MARGIN =  Math.round(outMetrics.widthPixels - (100f * density));
+        final int MAX_Y_MARGIN =  Math.round(outMetrics.heightPixels - (180f * density));
+
         for(final Bubble bubble : mySide.getBubbles()) {
             View bubbleView = getLayoutInflater().inflate(R.layout.bubble, bubbleBoard, false);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) bubbleView.getLayoutParams();
-            DisplayMetrics metrics = new DisplayMetrics();
 
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            params.leftMargin = bubbleView.getWidth() + generateNumber(0, metrics.widthPixels  -  bubbleView.getWidth());
-            params.topMargin = bubbleView.getHeight() + generateNumber(0, metrics.heightPixels -  bubbleView.getHeight());
+            params.leftMargin = generateNumber(0, MAX_X_MARGIN);
+            params.topMargin = generateNumber(0, MAX_Y_MARGIN);
 
-
-            ((TextView) bubbleView.findViewById(R.id.bubbleValue)).setText(bubble.getNumber() + "");
+            ((TextView) bubbleView.findViewById(R.id.bubbleValue)).setText(String.valueOf(bubble.getNumber()));
             bubbleView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
