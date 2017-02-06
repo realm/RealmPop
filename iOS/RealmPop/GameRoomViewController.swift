@@ -37,10 +37,10 @@ class GameRoomViewController: UIViewController {
 
     func handleInvite(from: Player) {
         alert = UIAlertController(title: "You were invited", message: "to a game by \(from.name)", preferredStyle: .alert)
-        alert?.addAction(UIAlertAction(title: "Accept", style: .default, handler: {[weak self] _ in
+        alert?.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
             self?.createGame(vs: from)
         }))
-        alert?.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: {[weak self] _ in
+        alert?.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
             try! self?.me.realm?.write {
                 self?.me.challenger = nil
             }
@@ -63,30 +63,31 @@ class GameRoomViewController: UIViewController {
                     self?.showGameViewController(with: challenge)
                 }
 
-
-            case .error, .deleted:
+            case .error(let error):
+                NSLog("error: \(error)")
+                _ = self?.navigationController?.popViewController(animated: true)
+            case .deleted:
                 _ = self?.navigationController?.popViewController(animated: true)
             }
         }
-        playersToken = players.addNotificationBlock {[weak self] changes in
+
+        playersToken = players.addNotificationBlock { [weak self] changes in
             guard let strongSelf = self else { return }
 
             switch changes {
-            case .update(_, let del, let ins, let mod):
-                strongSelf.tableView.applyChanges(deletions: del, insertions: ins, updates: mod)
+            case .update://(_, let del, let ins, let mod):
+                //strongSelf.tableView.applyChanges(deletions: del, insertions: ins, updates: mod)
+                strongSelf.tableView.reloadData()
             default:
                 strongSelf.tableView.reloadData()
             }
         }
 
-        try! me.realm?.write {
-            me.available = true
-        }
+        me.resetState(available: true)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-
         meToken?.stop()
         playersToken?.stop()
 
@@ -109,7 +110,9 @@ class GameRoomViewController: UIViewController {
 
     private func showGameViewController(with challenge: Game) {
         let gameVC = storyboard!.instantiateViewController(withIdentifier: "GameViewController") as! GameViewController
+        gameVC.game = game
         gameVC.challenge = challenge
+        gameVC.haveChallenged = (me.challenger == nil)
         navigationController!.pushViewController(gameVC, animated: true)
     }
 }
@@ -124,7 +127,7 @@ extension GameRoomViewController: UITableViewDataSource {
 
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")!
         cell.textLabel?.text = opponent.name
-        cell.textLabel?.textColor = opponent.available ? UIColor.white : UIColor.darkGray
+        cell.textLabel?.textColor = opponent.available ? UIColor.white : UIColor.gray
         return cell
     }
 

@@ -36,9 +36,23 @@ class GameModel {
 
     func otherPlayers(than me: Player) -> Results<Player> {
         return realm.objects(Player.self)
-            .filter("available = true")
-            //.filter("id != %@", me.id)
+            .filter("id != %@", me.id)
             .sorted(byKeyPath: "name")
     }
 
+    func determineOutcome(mine mySide: Side, theirs otherSide: Side) {
+        if otherSide.time > 0 && mySide.time > 0 {
+            try! mySide.realm?.write {
+                if otherSide.time < mySide.time {
+                    mySide.failed = true
+                } else {
+                    otherSide.failed = true
+                }
+            }
+        }
+    }
+
+    func logTime(for side: Side) {
+        realm.add(Score(name: side.name, time: side.time))
+    }
 }

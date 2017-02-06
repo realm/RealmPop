@@ -16,9 +16,9 @@ class GameViewController: UIViewController {
     @IBOutlet var player2: UILabel!
     @IBOutlet var message: UILabel!
 
-    fileprivate var game: GameModel!
-
+    var game: GameModel!
     var challenge: Game!
+    var numbers: [Int]!
 
     var haveChallenged = false
 
@@ -29,30 +29,24 @@ class GameViewController: UIViewController {
     private var otherSideToken: NotificationToken?
 
     private var staredAt: Date!
+    private var timer: Timer!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if haveChallenged {
-            mySide = challenge.player1
-            otherSide = challenge.player2
-        } else {
-            otherSide = challenge.player2
-            mySide = challenge.player1
-        }
+        numbers = challenge.numbers.components(separatedBy: ",")
+            .map {
+                return Int($0)!
+            }
 
-        mySideToken = mySide.addNotificationBlock {[weak self] _ in
-            self?.update()
-        }
-        otherSideToken = mySide.addNotificationBlock {[weak self] _ in
-            self?.update()
-        }
+        mySide = haveChallenged ? challenge.player1 : challenge.player2
+        otherSide = haveChallenged ? challenge.player2 : challenge.player1
 
         //build UI
         let playRect = view.bounds.insetBy(dx: 40, dy: 70).offsetBy(dx: 0, dy: 30)
 
-        for bubble in mySide.bubbles {
-            let bubbleView = BubbleView.bubble(number: bubble.number, inRect: playRect)
+        for number in numbers {
+            let bubbleView = BubbleView.bubble(number: number, inRect: playRect)
             bubbleView.tap = {[weak self] number in
                 self?.didPop(number: number)
             }
@@ -67,77 +61,110 @@ class GameViewController: UIViewController {
         view.bringSubview(toFront: message)
     }
 
-    var timer: Timer!
-
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         staredAt = Date()
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) {[weak self] timer in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] timer in
             guard let strongSelf = self else { return }
 
             let myTime = Date().timeIntervalSince(strongSelf.staredAt)
             strongSelf.elapsed.text = String(format: "%02.2f", myTime)
         }
+
+        mySideToken = mySide.addNotificationBlock { [weak self] _ in
+            self?.update()
+        }
+        otherSideToken = otherSide.addNotificationBlock { [weak self] _ in
+            self?.update()
+        }
     }
 
     func didPop(number: Int) {
         try! challenge.realm?.write {
-            if let bubble = mySide.bubbles.last, bubble.number == number {
-                mySide.bubbles.removeLast()
+            if let last = numbers.last, last == number {
+                numbers.removeLast()
+                mySide.left = numbers.count
             } else {
                 message.isHidden = false
-                message.text = "You tapped \(number) instead of \(mySide.bubbles.last?.number ?? 0)"
+                message.text = "You tapped \(number) instead of \(numbers.last ?? 0)"
                 mySide.failed = true
-                endGame()
+                stopGame()
             }
         }
     }
 
     func update() {
-        player1.text = challenge.player1!.name + " : \(challenge.player1!.bubbles.count)"
-        player2.text = "\(challenge.player2!.bubbles.count) : "+challenge.player2!.name
+        player1.text = challenge.player1!.name + " : \(challenge.player1!.left)"
+        player2.text = "\(challenge.player2!.left) : "+challenge.player2!.name
 
         if otherSide.failed {
-            message.isHidden = false
             message.text = "You win! Congrats"
+            endGame()
+            return
         } else if mySide.failed {
-            message.isHidden = false
-            message.text = "You lost!"
+            if message.isHidden {
+                message.text = "You lost!"
+            }
+            endGame()
+            return
         }
 
-        if mySide.bubbles.count == 0 {
+        if mySide.left == 0 {
 
             if mySide.time == 0 {
+                //store the time for current player
                 let myTime = Date().timeIntervalSince(staredAt)
                 try! mySide.realm?.write {
                     mySide.time = myTime
-                }
-                timer.invalidate()
-                message.isHidden = false
-                message.text = String(format: "Your time: %.2fs", myTime)
-                elapsed.text = String(format: "%02.2f", myTime)
-            }
-
-            if otherSide.time > 0 && mySide.time > 0 {
-                if otherSide.time < mySide.time {
-                    mySide.failed = true
-                } else {
-                    otherSide.failed = true
-                    try! challenge.realm?.write {
-                        challenge.realm!.add(Score(name: mySide.name, time: mySide.time))
+                    elapsed.text = String(format: "%02.2f", myTime)
+                    
+                    if otherSide.time < myTime {
+                        game.logTime(for: mySide)
                     }
                 }
+
+                message.text = String(format: "Your time: %.2fs", myTime)
+                stopGame()
+
+                //timeout if other player doesn't finish
+                DispatchQueue.main.asyncAfter(deadline: .now() + 20) { [weak self] in
+                    guard let strongSelf = self, strongSelf.navigationController != nil else {
+                        return
+                    }
+                    if strongSelf.challenge.isActive() {
+                        try! strongSelf.otherSide.realm?.write {
+                            strongSelf.otherSide.failed = true
+                        }
+                    }
+                }
+            }
+
+            if challenge.isActive() {
+                game.determineOutcome(mine: mySide, theirs: otherSide)
             }
         }
     }
 
+    func stopGame() {
+        message.isHidden = false
+        view.isUserInteractionEnabled = false
+        timer.invalidate()
+    }
+
     func endGame() {
+        stopGame()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
+            if self?.navigationController != nil {
+                _ = self?.navigationController?.popViewController(animated: true)
+            }
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
         mySideToken?.stop()
         otherSideToken?.stop()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            _ = self.navigationController?.popViewController(animated: true)
-        }
     }
 }

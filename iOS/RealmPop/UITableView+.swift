@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 private func fromRow(_ section: Int) -> (_ row: Int) -> IndexPath {
-    return {row in
+    return { row in
         return IndexPath(row: row, section: section)
     }
 }
@@ -18,11 +18,10 @@ private func fromRow(_ section: Int) -> (_ row: Int) -> IndexPath {
 extension UITableView {
 
     func applyChanges(section: Int = 0, deletions: [Int], insertions: [Int], updates: [Int]) {
-        //print("current rows: \(numberOfRows(inSection: 0)) d:\(deletions.count) i:\(insertions.count) u:\(updates.count)")
         beginUpdates()
         deleteRows(at: deletions.map(fromRow(section)), with: .automatic)
         insertRows(at: insertions.map(fromRow(section)), with: .automatic)
-        reloadRows(at: updates.map(fromRow(section)), with: .none)
+        reloadRows(at: updates.map(fromRow(section)), with: .automatic)
         endUpdates()
     }
 

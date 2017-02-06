@@ -25,4 +25,12 @@ class Player: Object {
     override class func primaryKey() -> String? {
         return "id"
     }
+
+    func resetState(available: Bool = false) {
+        try? realm?.write {
+            self.available = available
+            challenger = nil
+            currentGame = nil
+        }
+    }
 }

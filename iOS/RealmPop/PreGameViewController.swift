@@ -28,11 +28,7 @@ class PreGameRoomViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        try! me.realm?.write {
-            me.available = false
-            me.challenger = nil
-        }
+        me.resetState()
     }
 }
 
@@ -44,7 +40,7 @@ extension PreGameRoomViewController: UITextFieldDelegate {
         try! me.realm?.write {
             me.name = name
         }
-
+        
         return true
     }
 }
