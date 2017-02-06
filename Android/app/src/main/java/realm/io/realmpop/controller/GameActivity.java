@@ -1,6 +1,8 @@
 package realm.io.realmpop.controller;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 import org.joda.time.Interval;
 import org.joda.time.Period;
 
+import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -97,29 +100,6 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        startedAt = new Date();
-
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Interval interval = new Interval(startedAt.getTime(), new Date().getTime());
-                Period period = interval.toPeriod();
-                final String timerText = String.format("%02d:%02d", period.getMinutes(), period.getSeconds());
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        timerLabel.setText(timerText);
-                    }
-                });
-            }
-        }, now(), 1000);
 
 
         float density  = 3.5f; //TODO: Clean up magic numbers
@@ -148,6 +128,30 @@ public class GameActivity extends AppCompatActivity {
         }
 
         update();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        startedAt = new Date();
+
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Interval interval = new Interval(startedAt.getTime(), new Date().getTime());
+                Period period = interval.toPeriod();
+                final String timerText = String.format("%02d:%02d", period.getMinutes(), period.getSeconds());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        timerLabel.setText(timerText);
+                    }
+                });
+            }
+        }, now(), 1000);
 
     }
 
@@ -200,9 +204,32 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void onBubbleTap(long number) {
+    public void onBubbleTap(final long number) {
 
         Toast.makeText(this, "" + number, Toast.LENGTH_LONG).show();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Bubble bubble = mySide.getBubbles().last();
+                if(bubble != null && bubble.getNumber() == number) {
+                    mySide.getBubbles().remove(bubble);
+                } else {
+                    message.setText("You tapped " + number + " instead of " + (bubble == null ? 0 : bubble.getNumber()));
+                    mySide.setFailed(true);
+                    message.setVisibility(View.VISIBLE);
+                    Handler handler = new Handler(GameActivity.this.getMainLooper());
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            exitGame();
+                        }
+                    }, 2000);
+                }
+            }
+        });
+
+
 //        try! challenge.realm?.write {
 //            if let bubble = mySide.bubbles.last, bubble.number == number {
 //                mySide.bubbles.removeLast()
@@ -213,7 +240,7 @@ public class GameActivity extends AppCompatActivity {
 //                endGame()
 //            }
 //        }
-//
+
     }
 
     private Date now() {

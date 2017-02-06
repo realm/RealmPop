@@ -11,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +41,8 @@ public class GameRoomActivity extends AppCompatActivity {
     public RecyclerView recyclerView;
 
     private PlayerRecyclerViewAdapter adapter;
+
+    private AtomicBoolean inGame = new AtomicBoolean(false);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,9 +170,17 @@ public class GameRoomActivity extends AppCompatActivity {
     }
 
     private void moveToGame() {
-        Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtra(Player.class.getName(), me.getId());
-        startActivity(intent);
+        if(inGame.compareAndSet(false, true)) {
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra(Player.class.getName(), me.getId());
+            startActivityForResult(intent, 1);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        inGame.set(false);
     }
 
     private void setMyAvailability(final boolean isAvail) {
