@@ -13,7 +13,7 @@ var fs = require('fs');
 var Realm = require('realm');
 
 function isRealmObject(x) {
-    return x !== null && x !== undefined && x.constructor === Realm.Object
+  return x !== null && x !== undefined && x.constructor === Realm.Object
 }
 
 /**
@@ -23,42 +23,42 @@ function isRealmObject(x) {
  */
 
 function Pop(url, path) {
-    this.url = url;
-    this.path = path;
+  this.url = url;
+  this.path = path;
 }
 
 Pop.prototype.connect = function(token) {
-    var admin = Realm.Sync.User.adminUser(token);
+  var admin = Realm.Sync.User.adminUser(token);
 
-    Realm.Sync.addListener(this.url, admin, this.path, 'change', Pop.changeCallback);
-    console.log('Pop app at: ' + this.url + " observing changes at: " + this.path);
+  Realm.Sync.addListener(this.url, admin, this.path, 'change', Pop.changeCallback);
+  console.log('Pop app at: ' + this.url + " observing changes at: " + this.path);
 }
 
 Pop.changeCallback = function(event) {
 
-    let realm = event.realm;
+  let realm = event.realm;
 
-    let changes = event.changes.Score;
-    let indexes = changes.insertions;
+  let changes = event.changes.Score;
+  let indexes = changes.insertions;
 
-    if (indexes.length == 0) return;
+  if (indexes.length == 0) return;
 
-    var scores = realm.objects("Score");
+  var scores = realm.objects("Score");
 
-    for (var i = 0; i < indexes.length; i++) {
-        let index = indexes[i];
-        let score = scores[index];
+  for (var i = 0; i < indexes.length; i++) {
+    let index = indexes[i];
+    let score = scores[index];
 
-        if (isRealmObject(score)) {
-            console.log("[score]: " + score.name + " > " + score.time)
+    if (isRealmObject(score)) {
+      console.log("[score]: " + score.name + " > " + score.time)
 
-            Board.addScore(score, function() {
-                           realm.write(function() {
-                                       realm.delete(score)
-                                       })
-                           })
-        }
+      Board.addScore(score, function() {
+        realm.write(function() {
+          realm.delete(score)
+        })
+      })
     }
+  }
 }
 
 /**
@@ -68,16 +68,16 @@ Pop.changeCallback = function(event) {
  */
 
 var Board = {
-file: 'board.txt'
+  file: 'board.txt'
 }
 
 Board.addScore = function(score, success) {
-    fs.appendFile(this.file, score.name+"\t"+score.time+"\n", function (err) {
-                  if (err) {
-                  return console.error(err);
-                  }
-                  success()
-                  });
+  fs.appendFile(this.file, score.name+"\t"+score.time+"\n", function (err) {
+    if (err) {
+      return console.error(err);
+    }
+    success()
+  })
 }
 
 //
