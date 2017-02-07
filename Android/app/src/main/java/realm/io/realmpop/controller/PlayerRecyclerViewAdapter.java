@@ -1,7 +1,5 @@
 package realm.io.realmpop.controller;
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,10 +8,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import io.realm.OrderedRealmCollection;
-import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
 import realm.io.realmpop.R;
-import realm.io.realmpop.model.realm.Player;
+import realm.io.realmpop.model.Player;
 
 public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, PlayerRecyclerViewAdapter.ViewHolder> {
 

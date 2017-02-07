@@ -2,7 +2,7 @@ package realm.io.realmpop.util;
 
 import java.util.Random;
 
-public class RandomUtils {
+public class RandomNumberUtils {
 
     private static Random rand = new Random(System.currentTimeMillis());
 

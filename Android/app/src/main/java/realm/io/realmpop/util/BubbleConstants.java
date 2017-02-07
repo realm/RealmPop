@@ -11,4 +11,5 @@ public class BubbleConstants {
 
 
     public static final int bubbleCount = 15;
+    public static final int bubbleValueMax = 80;
 }

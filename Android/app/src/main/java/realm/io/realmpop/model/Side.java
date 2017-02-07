@@ -1,9 +1,15 @@
-package realm.io.realmpop.model.realm;
+package realm.io.realmpop.model;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
 public class Side extends RealmObject {
+
+    @PrimaryKey
+    @Required
+    private String playerId;
+
     @Required
     private String name;
     private long left;
@@ -24,6 +30,13 @@ public class Side extends RealmObject {
 
     public boolean isFailed() { return failed; }
 
-    public void setFailed(boolean failed) { this.failed = failed; } 
+    public void setFailed(boolean failed) { this.failed = failed; }
 
+    public String getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
+    }
 }

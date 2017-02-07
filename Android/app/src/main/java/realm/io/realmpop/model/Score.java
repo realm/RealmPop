@@ -1,4 +1,4 @@
-package realm.io.realmpop.model.realm;
+package realm.io.realmpop.model;
 
 import io.realm.RealmObject;
 import io.realm.annotations.Required;

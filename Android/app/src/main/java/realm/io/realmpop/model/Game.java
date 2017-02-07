@@ -1,4 +1,4 @@
-package realm.io.realmpop.model.realm;
+package realm.io.realmpop.model;
 
 import java.util.Arrays;
 

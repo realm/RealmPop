@@ -6,20 +6,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnLongClick;
 import io.realm.ObjectServerError;
 import io.realm.Realm;
 import io.realm.SyncConfiguration;
 import io.realm.SyncCredentials;
 import io.realm.SyncUser;
 import realm.io.realmpop.R;
-import realm.io.realmpop.model.GameModel;
-import realm.io.realmpop.model.realm.Player;
+import realm.io.realmpop.util.GameHelpers;
+import realm.io.realmpop.model.Player;
 
 import static realm.io.realmpop.util.BubbleConstants.AUTH_URL;
 import static realm.io.realmpop.util.BubbleConstants.ID;
@@ -30,38 +28,47 @@ public class PreGameRoomActivity extends AppCompatActivity {
 
     private static final String TAG = PreGameRoomActivity.class.getName();
 
-    private Realm realm;
-    private GameModel gameModel;
-    private Player me;
+    @BindView(R.id.playerNameEditText) public EditText playerNameEditText;
 
-    @BindView(R.id.playerNameEditText)
-    public EditText playerNameEditText;
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // Setup bindings to views.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pregameroom);
         ButterKnife.bind(this);
 
+        // Login to the sync server using pre-configured credentials
         final SyncCredentials syncCredentials = SyncCredentials.usernamePassword(ID, PASSWORD, false);
         SyncUser.loginAsync(syncCredentials, AUTH_URL, new SyncUser.Callback() {
+
+            // If login successful...
             @Override
             public void onSuccess(SyncUser user) {
+
+                // Setup the SyncConfiguration & DefaultInstance configurations for Realm.
                 final SyncConfiguration syncConfiguration = new SyncConfiguration.Builder(user, REALM_URL).build();
                 Realm.setDefaultConfiguration(syncConfiguration);
+
+                // Get an instance of realm to reference on the UI thread, update UI.
                 realm = Realm.getDefaultInstance();
-                gameModel = new GameModel(realm);
-                me = gameModel.currentPlayer();
-                playerNameEditText.setText(me.getName());
-                realm.executeTransaction(new Realm.Transaction() {
+                playerNameEditText.setText(GameHelpers.currentPlayer(realm).getName());
+
+                // Set myself as unavailable and my challenger to nothing because we're on the login screen,
+                // we can't be challenged by anyone or available.
+                realm.executeTransactionAsync(new Realm.Transaction() {
                     @Override
-                    public void execute(Realm realm) {
+                    public void execute(Realm bgRealm) {
+                        Player me = GameHelpers.currentPlayer(bgRealm);
                         me.setAvailable(false);
                         me.setChallenger(null);
                     }
                 });
             }
 
+            // If there was an error logging in, we may have wanted to do something more useful about it.
             @Override
             public void onError(ObjectServerError error) {
                 Log.e(TAG, error.getErrorMessage());
@@ -71,7 +78,7 @@ public class PreGameRoomActivity extends AppCompatActivity {
     }
 
 
-
+    // Make sure we remove all change listeners and close the realm instance on destory.
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -80,25 +87,9 @@ public class PreGameRoomActivity extends AppCompatActivity {
             realm.close();
             realm = null;
         }
-        gameModel = null;
     }
 
-    @OnLongClick(R.id.player_name_prompt)
-    public boolean clearAll() {
-        if(realm != null) {
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm bgrealm) {
-                    bgrealm.deleteAll();
-                }
-            });
-            Toast.makeText(this, "Reset", Toast.LENGTH_SHORT).show();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
+    // When the player presses enter...
     @OnClick(R.id.playerEnteredButton)
     public void onEnterPressed() {
         if(!isPlayerNameValid()) {
@@ -110,16 +101,29 @@ public class PreGameRoomActivity extends AppCompatActivity {
 
     private void moveToGameRoom() {
 
-        if(realm != null) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm r) {
-                    me.setName(playerNameEditText.getText().toString());
-                }
-            });
+        // Realm could be null, this might happen if we haven't heard back from our authenticate
+        // call yet.
+       if(realm != null) {
 
-            Intent gameRoomIntent = new Intent(PreGameRoomActivity.this, GameRoomActivity.class);
-            startActivity(gameRoomIntent);
+           // Get the player name from the text field.
+           final String nameText = playerNameEditText.getText().toString();
+
+           // Update the name of the player on this device in the background.
+           realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgRealm) {
+                    Player me = GameHelpers.currentPlayer(bgRealm);
+                    me.setName(nameText);
+                }
+
+           // afterward, on the foreground, lauch the GameRoomActivity.
+           }, new Realm.Transaction.OnSuccess() {
+                @Override
+                public void onSuccess() {
+                    Intent gameRoomIntent = new Intent(PreGameRoomActivity.this, GameRoomActivity.class);
+                    startActivity(gameRoomIntent);
+                }
+           });
         }
     }
 
