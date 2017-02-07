@@ -1,0 +1,18 @@
+{
+  "name": "RealmPopServer",
+  "version": "1.0.0",
+  "description": "Play RealmPop with friends",
+  "main": "pop.js",
+  "dependencies": {
+	"realm": "file:realm-1.0.2-professional.tgz"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "realm",
+    "pop"
+  ],
+  "author": "MT",
+  "license": "MIT"
+}
