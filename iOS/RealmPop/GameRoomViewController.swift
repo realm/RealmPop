@@ -101,10 +101,12 @@ class GameRoomViewController: UIViewController {
     }
 
     private func createGame(vs: Player) {
-        try! me.realm!.write {
-            let game = Game(challenger: vs, opponent: me)
-            me.currentGame = game
-            vs.currentGame = game
+        if vs.available {
+            try! me.realm!.write {
+                let game = Game(challenger: vs, opponent: me)
+                me.currentGame = game
+                vs.currentGame = game
+            }
         }
     }
 
