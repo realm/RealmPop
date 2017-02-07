@@ -3,14 +3,12 @@ package realm.io.realmpop.controller;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.SyncStateContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import butterknife.BindView;
@@ -20,7 +18,6 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
-import realm.io.realmpop.model.realm.Bubble;
 import realm.io.realmpop.model.realm.Game;
 import realm.io.realmpop.model.realm.Player;
 import realm.io.realmpop.model.realm.Side;
@@ -143,28 +140,21 @@ public class GameRoomActivity extends AppCompatActivity {
             @Override
             public void execute(Realm realm) {
 
-                int [] numbers = generateNumbersArray(BubbleConstants.bubbleCount, 1, 80);
                 Game game = realm.createObject(Game.class);
+
+                int [] numbers = generateNumbersArray(BubbleConstants.bubbleCount, 1, 80);
+                game.setNumberArray(numbers);
 
                 Side player1 = new Side();
                 player1.setName(me.getName());
+                player1.setLeft(numbers.length);
                 player1 = realm.copyToRealm(player1);
-                for(int i = 0; i < numbers.length; i++) {
-                    Bubble bubble = realm.createObject(Bubble.class);
-                    bubble.setNumber(numbers[i]);
-                    player1.getBubbles().add(bubble);
-                }
                 game.setPlayer1(player1);
-
 
                 Side player2 = new Side();
                 player2.setName(challenger.getName());
+                player1.setLeft(numbers.length);
                 player2 = realm.copyToRealm(player2);
-                for(int i = 0; i < numbers.length; i++) {
-                    Bubble bubble = realm.createObject(Bubble.class);
-                    bubble.setNumber(numbers[i]);
-                    player2.getBubbles().add(bubble);
-                }
                 game.setPlayer2(player2);
 
                 me.setCurrentgame(game);

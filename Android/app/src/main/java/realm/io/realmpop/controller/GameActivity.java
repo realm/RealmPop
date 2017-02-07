@@ -25,7 +25,6 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.GameModel;
-import realm.io.realmpop.model.realm.Bubble;
 import realm.io.realmpop.model.realm.Game;
 import realm.io.realmpop.model.realm.Player;
 import realm.io.realmpop.model.realm.Score;
@@ -111,19 +110,19 @@ public class GameActivity extends AppCompatActivity {
         final int MAX_X_MARGIN =  Math.round(outMetrics.widthPixels - (100f * density));
         final int MAX_Y_MARGIN =  Math.round(outMetrics.heightPixels - (180f * density));
 
-        for(final Bubble bubble : mySide.getBubbles()) {
+        for(final int bubbleNumber : challenge.getNumberArray()) {
             View bubbleView = getLayoutInflater().inflate(R.layout.bubble, bubbleBoard, false);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) bubbleView.getLayoutParams();
 
             params.leftMargin = generateNumber(0, MAX_X_MARGIN);
             params.topMargin = generateNumber(0, MAX_Y_MARGIN);
 
-            ((TextView) bubbleView.findViewById(R.id.bubbleValue)).setText(String.valueOf(bubble.getNumber()));
+            ((TextView) bubbleView.findViewById(R.id.bubbleValue)).setText(String.valueOf(bubbleNumber));
             bubbleView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     bubbleBoard.removeView(v);
-                    onBubbleTap(bubble.getNumber());
+                    onBubbleTap(bubbleNumber);
                 }
             });
 
@@ -184,10 +183,7 @@ public class GameActivity extends AppCompatActivity {
                     Game game = me.getCurrentgame();
                     Side s1 = game.getPlayer1();
                     Side s2 = game.getPlayer2();
-
-                    s1.getBubbles().deleteAllFromRealm();
                     s1.deleteFromRealm();
-                    s2.getBubbles().deleteAllFromRealm();
                     s2.deleteFromRealm();
                     game.deleteFromRealm();
 
@@ -219,17 +215,20 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    public void onBubbleTap(final long number) {
+    public void onBubbleTap(final long numberTapped) {
+
+        if (mySide.getLeft() <= 0) {
+            return;
+        }
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                RealmResults<Bubble> sortedBubbles = mySide.getBubbles().sort("number");
-                Bubble bubble = sortedBubbles.last();
-                if(bubble != null && bubble.getNumber() == number) {
-                    mySide.getBubbles().remove(bubble);
+                int bubble = challenge.getNumberArray()[(int)mySide.getLeft() - 1];
+                if(bubble == numberTapped) {
+                    mySide.setLeft(mySide.getLeft() - 1);
                 } else {
-                    message.setText("You tapped " + number + " instead of " + (bubble == null ? 0 : bubble.getNumber()));
+                    message.setText("You tapped " + numberTapped + " instead of " + bubble);
                     mySide.setFailed(true);
                     message.setVisibility(View.VISIBLE);
                 }
@@ -240,10 +239,10 @@ public class GameActivity extends AppCompatActivity {
 
     private void update() {
 
-        player1.setText(challenge.getPlayer1().getName() + " : " + challenge.getPlayer1().getBubbles().size());
-        player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getBubbles().size());
+        player1.setText(challenge.getPlayer1().getName() + " : " + challenge.getPlayer1().getLeft());
+        player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getLeft());
 
-        if(mySide.getBubbles().size() == 0) {
+        if(mySide.getLeft() == 0) {
 
             if(mySide.getTime() == 0) {
                 realm.executeTransaction(new Realm.Transaction() {
