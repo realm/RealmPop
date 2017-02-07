@@ -101,10 +101,12 @@ class GameRoomViewController: UIViewController {
     }
 
     private func createGame(vs: Player) {
-        try! me.realm!.write {
-            let game = Game(challenger: vs, opponent: me)
-            me.currentGame = game
-            vs.currentGame = game
+        if vs.available {
+            try! me.realm!.write {
+                let game = Game(challenger: vs, opponent: me)
+                me.currentGame = game
+                vs.currentGame = game
+            }
         }
     }
 
@@ -139,11 +141,14 @@ extension GameRoomViewController: UITableViewDataSource {
 extension GameRoomViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
+
         let opponent = players[indexPath.row]
         guard opponent.available else { return }
 
         try! game.realm.write {
+            for player in me.realm!.objects(Player.self).filter("challenger = %@", me) {
+                player.challenger = nil
+            }
             opponent.challenger = me
         }
     }

@@ -70,6 +70,11 @@ class GameViewController: UIViewController {
 
             let myTime = Date().timeIntervalSince(strongSelf.staredAt)
             strongSelf.elapsed.text = String(format: "%02.2f", myTime)
+
+            if myTime > 60.0 {
+                strongSelf.message.text = "You're out of time"
+                strongSelf.endGame()
+            }
         }
 
         mySideToken = mySide.addNotificationBlock { [weak self] _ in
