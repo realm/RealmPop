@@ -153,7 +153,7 @@ public class GameRoomActivity extends AppCompatActivity {
 
                 Side player2 = new Side();
                 player2.setName(challenger.getName());
-                player1.setLeft(numbers.length);
+                player2.setLeft(numbers.length);
                 player2 = realm.copyToRealm(player2);
                 game.setPlayer2(player2);
 
