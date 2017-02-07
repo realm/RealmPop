@@ -13,7 +13,7 @@ let host = "192.168.1.33"
 let serverURL = URL(string: "http://\(host):9080")!
 let syncURL = URL(string: "realm://\(host):9080/~/game")!
 
-let user = "default"
+let user = "default@realm"
 let pass = "password"
 
 let invalidCredentialsErrorCode = 611

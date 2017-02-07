@@ -1,0 +1,10 @@
+1. install latest node.js: https://nodejs.org/en/
+
+2. copy in 'realm-1.0.2-professional.tgz' (version might differ for you)
+
+3. run 'npm install'
+
+4. make sure the user can write in the current folder
+
+5. start the app 'node pop.js'
+
