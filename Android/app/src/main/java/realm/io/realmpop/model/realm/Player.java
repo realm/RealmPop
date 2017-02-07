@@ -5,6 +5,7 @@ import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
 public class Player extends RealmObject {
+
     @PrimaryKey
     @Required
     private String id;
