@@ -1,10 +1,8 @@
 package realm.io.realmpop.controller;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -24,15 +22,15 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import realm.io.realmpop.R;
-import realm.io.realmpop.util.GameHelpers;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Score;
 import realm.io.realmpop.model.Side;
+import realm.io.realmpop.util.GameHelpers;
 
 import static realm.io.realmpop.util.RandomNumberUtils.generateNumber;
 
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends BaseActivity {
 
     @BindView(R.id.playerLabel1) public TextView player1;
     @BindView(R.id.playerLabel2) public TextView player2;
@@ -53,14 +51,12 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Setup & Bind Views
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
         message.setText("");
         startedAt = new Date();
 
-        // Get default instance of realm and realm objects to use on the UI thread.
         realm = Realm.getDefaultInstance();
         me = GameHelpers.currentPlayer(realm);
         challenge = me.getCurrentgame();
@@ -68,7 +64,6 @@ public class GameActivity extends AppCompatActivity {
         otherSide = challenge.getPlayer1().getPlayerId().equals(me.getId()) ? challenge.getPlayer2() : challenge.getPlayer1();
         isGameOver =  mySide.isFailed() || otherSide.isFailed();
 
-        // Add a change listeners for the user on this device, to react to data changes.
         me.addChangeListener(new RealmChangeListener<Player>() {
             @Override
             public void onChange(Player me) {
@@ -91,15 +86,10 @@ public class GameActivity extends AppCompatActivity {
         };
         mySide.addChangeListener(onSideChangeListener);
         otherSide.addChangeListener(onSideChangeListener);
-        Log.d("PLAYER_IDs: ", "[myId]" + me.getName());
-        Log.d("PLAYER_IDs: ", "[mySideId]" + mySide.getName());
-        Log.d("PLAYER_IDs: ", "[myOtherId]" + otherSide.getName());
 
-        // Setup the bubble board views.
         setupBubbleBoard();
     }
 
-    // Start the timer and update the view state on resume.
     @Override
     protected void onResume() {
         super.onResume();
@@ -107,14 +97,12 @@ public class GameActivity extends AppCompatActivity {
         update();
     }
 
-    // Stop the timer when we pause.
     @Override
     protected void onPause() {
         super.onPause();
         stopTimer();
     }
 
-    // Remove all change listeners and close out the main realm instance when we're being destroyed.
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -125,7 +113,6 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    // When the user taps exit game.
     @OnClick(R.id.exitGameLabel)
     public void exitGame() {
         if(realm != null) {
@@ -156,7 +143,6 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    // When the user taps a bubble, react to it.
     public void onBubbleTap(final long numberTapped) {
 
         // Just to make sure, if there are none left to tap, exit.
@@ -164,13 +150,10 @@ public class GameActivity extends AppCompatActivity {
             return;
         }
 
-        // Need to pass these objects across threads.
         final int bubble = challenge.getNumberArray()[(int)mySide.getLeft() - 1];
         final long currLeft = mySide.getLeft();
         final String mySidePlayerId = mySide.getPlayerId();
 
-        // If the bubble that should have been tapped is the one the user on this device tapped,
-        // then decrement the number left to tap.
         if(bubble == numberTapped) {
             realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
@@ -179,7 +162,6 @@ public class GameActivity extends AppCompatActivity {
                 }
             });
 
-        // Otherwise, set player on this device as failed and update the message to indicate so on this device.
         } else {
 
             realm.executeTransactionAsync(new Realm.Transaction() {
@@ -227,14 +209,10 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    // Update the state of the UI and Game State if any major events occur each time this method is called.
-    // It's called initially when the view is resumed, and then anytime one of the sides has a change.
-    // Since it is reactive, we don't waste unnecessary cycles by calling it repeatedly on a timer or run loop.
     private void update() {
 
         final String mySidePlayerId = mySide.getPlayerId();
         final String otherSidePlayerId = otherSide.getPlayerId();
-
 
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -270,7 +248,6 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
 
-                // Update UI
                 player1.setText(challenge.getPlayer1().getName() + " : " + challenge.getPlayer1().getLeft());
                 player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getLeft());
 

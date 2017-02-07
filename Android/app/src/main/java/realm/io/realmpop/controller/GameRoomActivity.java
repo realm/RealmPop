@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
@@ -17,16 +16,16 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import realm.io.realmpop.R;
-import realm.io.realmpop.util.GameHelpers;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Side;
 import realm.io.realmpop.util.BubbleConstants;
+import realm.io.realmpop.util.GameHelpers;
 
 import static realm.io.realmpop.R.style.AppTheme_RealmPopDialog;
 import static realm.io.realmpop.util.RandomNumberUtils.generateNumbersArray;
 
-public class GameRoomActivity extends AppCompatActivity {
+public class GameRoomActivity extends BaseActivity {
 
     @BindView(R.id.player_list) public RecyclerView recyclerView;
 
@@ -37,17 +36,13 @@ public class GameRoomActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Setup & Bind Views.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gameroom);
         ButterKnife.bind(this);
 
-        // Get handle on a realm instance and my Player object on the main thread.
         realm = Realm.getDefaultInstance();
         me = GameHelpers.currentPlayer(realm);
 
-        // Attach a listener for me to react to things like, handling an invite from someone
-        // or moving to a game, if one has been setup.
         me.addChangeListener(new RealmChangeListener<Player>() {
             @Override
             public void onChange(Player myself) {
@@ -62,9 +57,6 @@ public class GameRoomActivity extends AppCompatActivity {
             }
         });
 
-        // Setup the recycler view.  Note here that we're performing this query Async and just passing
-        // the results to the PlayerRecyclerViewAdapter.  The adapter will just react and update the
-        // RecyclerView as results change, either from local changes, or changes over the network.
         RealmResults<Player> otherPlayers = realm.where(Player.class)
                 .equalTo("available", true)
                 .notEqualTo("id", me.getId())
@@ -73,21 +65,18 @@ public class GameRoomActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
 
-    // When we resume, we will set our availability to true.
     @Override
     protected void onResume() {
         super.onResume();
         setMyAvailability(true, null);
     }
 
-    // When we pause, we will set our availability to false.
     @Override
     protected void onPause() {
         super.onPause();
         setMyAvailability(false, null);
     }
 
-    // We will set our availability in the background.
     private void setMyAvailability(final boolean isAvail, Realm.Transaction.OnSuccess onSuccess) {
 
         if(onSuccess == null) {
@@ -103,7 +92,6 @@ public class GameRoomActivity extends AppCompatActivity {
         }, onSuccess);
     }
 
-    // Remember to always close your realm instances when you're done and remove all change listeners.
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -114,29 +102,25 @@ public class GameRoomActivity extends AppCompatActivity {
         }
     }
 
-    // When someone invites us, we need to display a dialog to the user on this device, to see if they want to start the game.
     private void handleInvite(final Player challenger) {
 
-        // Build a dialog click listener to handle the users choice.
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
-                    // If the user on this device wants to accept and start a game.
+
                     case DialogInterface.BUTTON_POSITIVE:
-                        // Let's create the game with this challenger
                         createGame(challenger);
                         break;
 
-                    // If the user on this device declines let's remove the challenger.
                     case DialogInterface.BUTTON_NEGATIVE:
                         removeChallenger();
                         break;
+
                 }
             }
         };
 
-        // Build the dialog and show it.
         ContextThemeWrapper themedContext = new ContextThemeWrapper( this, AppTheme_RealmPopDialog );
         AlertDialog.Builder builder = new AlertDialog.Builder(themedContext);
         builder.setMessage("You were invited to a game by " + challenger.getName() + "")
@@ -145,24 +129,23 @@ public class GameRoomActivity extends AppCompatActivity {
                 .show();
     }
 
-    // When an item in the adapter is clicked, it will call this action and pass the player that was tapped
-    // so we can react to the tap by challenging that player.
     public void challengePlayer(final Player player) {
 
-        // We will set ourselves as the challenger for the other player.
-        // Once that change makes it to the other player, they'll react to the challenge.
-        final String otherPlayerId = player.getId();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm bgRealm) {
-                Player me = GameHelpers.currentPlayer(bgRealm);
-                Player otherPlayer = GameHelpers.playerWithId(otherPlayerId, bgRealm);
-                otherPlayer.setChallenger(me);
-            }
-        });
+        if(player.isAvailable()) {
+
+            final String otherPlayerId = player.getId();
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgRealm) {
+                    Player me = GameHelpers.currentPlayer(bgRealm);
+                    Player otherPlayer = GameHelpers.playerWithId(otherPlayerId, bgRealm);
+                    otherPlayer.setChallenger(me);
+                }
+            });
+        }
+
     }
 
-    // Remove the challenger from the player on this device.
     private void removeChallenger() {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -172,7 +155,6 @@ public class GameRoomActivity extends AppCompatActivity {
         });
     }
 
-    // Create a game between teh player on this device and the challenger.
     private void createGame(final Player challenger) {
 
         final String myId = me.getId();
@@ -219,7 +201,6 @@ public class GameRoomActivity extends AppCompatActivity {
 
     }
 
-    // Mark that we're in a game and move to that activity.
     private void moveToGame() {
         if(inGame.compareAndSet(false, true)) {
             setMyAvailability(false, new Realm.Transaction.OnSuccess() {
@@ -233,7 +214,6 @@ public class GameRoomActivity extends AppCompatActivity {
         }
     }
 
-    // When the GameActivity finishes, we can set ourselves as available again.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

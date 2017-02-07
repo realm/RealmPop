@@ -37,9 +37,7 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            if(player.isAvailable()) {
-                gameRoomActivity.challengePlayer(player);
-            }
+            gameRoomActivity.challengePlayer(player);
             }
         });
     }
@@ -53,11 +51,6 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
             super(view);
             this.view = view;
             titleView = (TextView) view.findViewById(R.id.title);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + playerId + "' " + ":" + " '" + titleView.getText() + "'";
         }
     }
     

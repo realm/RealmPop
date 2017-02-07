@@ -3,7 +3,6 @@ package realm.io.realmpop.util;
 import io.realm.Realm;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Side;
-import realm.io.realmpop.util.SharedPrefsUtils;
 
 public class GameHelpers {
 

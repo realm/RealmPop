@@ -16,6 +16,7 @@
         android:layout_gravity="top"
         android:padding="6dp"
         android:textSize="18sp"
+        android:gravity="center_vertical"
         android:textAppearance="?attr/textAppearanceListItem"
         tools:text="Anonymous"
         />
