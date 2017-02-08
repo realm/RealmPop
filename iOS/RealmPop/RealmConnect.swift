@@ -9,7 +9,7 @@
 import Foundation
 import RealmSwift
 
-let host = "192.168.1.33"
+let host = "192.168.0.42"
 let serverURL = URL(string: "http://\(host):9080")!
 let syncURL = URL(string: "realm://\(host):9080/~/game")!
 
