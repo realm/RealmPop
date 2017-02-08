@@ -49,7 +49,7 @@ public class GameRoomActivity extends BaseActivity {
             @Override
             public void onChange(Player myself) {
                 if(!inGame.get()) {
-                    if(myself.getChallenger() != null) {
+                    if(myself.getChallenger() != null && myself.getCurrentgame() == null) {
                         handleInvite(myself.getChallenger());
                     }
                     if(myself.getCurrentgame() != null) {
