@@ -35,7 +35,7 @@ class GameViewController: UIViewController {
     private var otherSideToken: NotificationToken?
 
     private var staredAt: Date!
-    private var timer: Timer!
+    private var timer: Timer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -133,7 +133,7 @@ class GameViewController: UIViewController {
     }
 
     func stopGame(_ text: String) {
-        timer.invalidate()
+        timer?.invalidate()
         view.isUserInteractionEnabled = false
         message.isHidden = false
         message.text = text
