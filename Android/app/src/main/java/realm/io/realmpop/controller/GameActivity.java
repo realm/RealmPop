@@ -1,9 +1,9 @@
 package realm.io.realmpop.controller;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -182,12 +182,18 @@ public class GameActivity extends BaseActivity {
 
     private void setupBubbleBoard() {
 
-        float density  = 3.5f; //TODO: Clean up magic numbers
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics ();
-        display.getMetrics(outMetrics);
-        final int MAX_X_MARGIN =  Math.round(outMetrics.widthPixels - (100f * density));
-        final int MAX_Y_MARGIN =  Math.round(outMetrics.heightPixels - (180f * density));
+        Resources res = getResources();
+        DisplayMetrics display = res.getDisplayMetrics();
+        final int spaceTakenByButton = res.getDimensionPixelSize(R.dimen.bubble_button_diameter);
+        final int titleBarHeight = res.getDimensionPixelSize(res.getIdentifier("status_bar_height", "dimen", "android"));
+
+        final int MAX_X_MARGIN = display.widthPixels - spaceTakenByButton; // bubble button diameter;
+
+        final int MAX_Y_MARGIN =  display.heightPixels - (res.getDimensionPixelSize(R.dimen.activity_vertical_margin) //top margin
+                                                        + res.getDimensionPixelSize(R.dimen.activity_vertical_margin) // bottom margin
+                                                        + res.getDimensionPixelSize(R.dimen.realm_pop_status_bar_height) // pop status bar height
+                                                        + titleBarHeight // android status bar height
+                                                        + spaceTakenByButton); // bubble button diameter;
 
         for(final int bubbleNumber : challenge.getNumberArray()) {
             View bubbleView = getLayoutInflater().inflate(R.layout.bubble, bubbleBoard, false);
