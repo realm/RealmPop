@@ -3,7 +3,14 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
-    defaultConfig {
+
+        lintOptions {
+            lintOptions {
+                warning 'InvalidPackage'
+            }
+        }
+
+        defaultConfig {
         applicationId "realm.io.realmpop"
         minSdkVersion 17
         targetSdkVersion 25
@@ -11,6 +18,16 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("realmpop.jks")
+            storePassword "realmpop"
+            keyAlias "realmpop"
+            keyPassword "realmpop"
+        }
+    }
+
     buildTypes {
 
         //def host = InetAddress.getLocalHost().getCanonicalHostName() // "192.168.1.79"
@@ -25,6 +42,7 @@ android {
         }
 
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
