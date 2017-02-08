@@ -7,7 +7,7 @@
 
 const REALM_ADMIN_TOKEN = "ewoJImlkZW50aXR5IjogIl9fYXV0aCIsCgkiYWNjZXNzIjogWyJ1cGxvYWQiLCAiZG93bmxvYWQiLCAibWFuYWdlIl0KfQo=:JrlE/EenpDV8n8a6UZd3ybmIEsVobO+eblIuVT+g+GEzgX1JSXmMe5qDot6TapEshQkq5k2NUGsxXKug8eIW277ijjN9Vh7teJbau9HykkUQHGG238kdBn+jlUhJbgRy5wQ7Om0ft/A9qSxtueYoEGXZtJZHFtvs/6dIoK7KuVSy1BMsh19b6164z2ZX8dZv/kqQRbC4luU/9HbK1IGyUevD9pgS8Am010PC9dRimfO1mdxekgTTCaaYAVicWmIEw44wNrNOMKVzJg0xnv9VtCTdDBLPdcDc8JEOQPuaaThO2eGCBCKJQMD//WtFf2z9IfTFeRRc7Jrfl8o4PKOH7Q==";
 
-const IP = '192.168.1.33';
+const IP = '192.168.0.42';
 
 var fs = require('fs');
 var Realm = require('realm');
@@ -37,8 +37,10 @@ Pop.prototype.connect = function(token) {
 Pop.changeCallback = function(event) {
 
   let realm = event.realm;
-
   let changes = event.changes.Score;
+  if (changes == undefined) { 
+    return
+  }
   let indexes = changes.insertions;
 
   if (indexes.length == 0) return;
