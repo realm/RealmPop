@@ -167,9 +167,9 @@
 		9CF6B6711E40FE35006FB848 /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				9CB82BB11E38CB4200785399 /* RealmConnect.swift */,
 				9CB75DB81E389C9C003482C2 /* AppDelegate.swift */,
 				9CB82BA91E38A49100785399 /* GameModel.swift */,
-				9CB82BB11E38CB4200785399 /* RealmConnect.swift */,
 				9CB75DBC1E389C9C003482C2 /* Main.storyboard */,
 			);
 			name = Application;
