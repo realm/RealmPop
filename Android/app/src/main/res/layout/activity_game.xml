@@ -70,10 +70,10 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/exitGameLabel"
+        android:id="@+id/exitGameButton"
         style="@style/Text.Button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="25dp"
         android:layout_alignParentBottom="true"
         android:text="@string/end_game_button_label"
         android:textColor="@color/textBackground"

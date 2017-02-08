@@ -113,7 +113,7 @@ public class GameActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.exitGameLabel)
+    @OnClick(R.id.exitGameButton)
     public void exitGame() {
         if(realm != null) {
 
