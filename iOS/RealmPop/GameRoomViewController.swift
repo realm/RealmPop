@@ -92,10 +92,6 @@ class GameRoomViewController: UIViewController {
         }
     }
 
-    deinit {
-        print("deinit GameRoom")
-    }
-
     private func showGameViewController(with challenge: Game) {
         let gameVC = storyboard!.instantiateViewController(withIdentifier: "GameViewController") as! GameViewController
         gameVC.game = game
