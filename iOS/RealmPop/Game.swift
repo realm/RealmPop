@@ -27,12 +27,14 @@ class Game: Object {
         let player1 = Side()
         player1.left = ints.count
         player1.name = challenger.name
+        player1.playerId = challenger.id
         self.player1 = player1
 
         //create player2 side
         let player2 = Side()
         player2.left = ints.count
         player2.name = opponent.name
+        player2.playerId = opponent.id
         self.player2 = player2
     }
 

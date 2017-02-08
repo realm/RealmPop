@@ -40,6 +40,48 @@ class GameModel {
             .sorted(byKeyPath: "name")
     }
 
+    func challenge(me: Player, vs: Player) {
+        guard vs.available else { return }
+
+        try! me.realm!.write {
+            for player in me.realm!.objects(Player.self).filter("challenger = %@", me) {
+                player.challenger = nil
+            }
+            vs.challenger = me
+        }
+    }
+
+    func createGame(me: Player, vs: Player) {
+        if vs.available {
+            try! me.realm!.write {
+                let game = Game(challenger: vs, opponent: me)
+                me.currentGame = game
+                vs.currentGame = game
+            }
+        }
+    }
+
+    func updateTime(mySide: Side, myTime: Double, otherSide: Side) {
+        try! mySide.realm!.write {
+            mySide.time = myTime
+            if otherSide.time < myTime {
+                logTime(for: mySide)
+            }
+        }
+    }
+
+    func updateBubbles(side: Side, count: Int) {
+        try! side.realm!.write {
+            side.left = count
+        }
+    }
+
+    func fail(side: Side) {
+        try! side.realm?.write {
+            side.failed = true
+        }
+    }
+
     func determineOutcome(mine mySide: Side, theirs otherSide: Side) {
         if otherSide.time > 0 && mySide.time > 0 {
             try! mySide.realm?.write {
@@ -52,7 +94,7 @@ class GameModel {
         }
     }
 
-    func logTime(for side: Side) {
+    private func logTime(for side: Side) {
         realm.add(Score(name: side.name, time: side.time))
     }
 }

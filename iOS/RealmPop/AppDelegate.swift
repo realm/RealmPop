@@ -14,7 +14,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-
+        application.isIdleTimerDisabled = true
+        
         connect { [unowned self] in
             if let splash = self.window?.rootViewController,
                 let nav = splash.storyboard?.instantiateViewController(withIdentifier: "Navigation") {
