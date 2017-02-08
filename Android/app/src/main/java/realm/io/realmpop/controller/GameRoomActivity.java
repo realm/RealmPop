@@ -29,6 +29,8 @@ public class GameRoomActivity extends BaseActivity {
 
     @BindView(R.id.player_list) public RecyclerView recyclerView;
 
+    private AlertDialog challengeDialog;
+
     private Realm realm;
     private Player me;
     private AtomicBoolean inGame = new AtomicBoolean(false);
@@ -104,29 +106,35 @@ public class GameRoomActivity extends BaseActivity {
 
     private void handleInvite(final Player challenger) {
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+        if(challengeDialog == null) {
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
 
-                    case DialogInterface.BUTTON_POSITIVE:
-                        createGame(challenger);
-                        break;
+                        case DialogInterface.BUTTON_POSITIVE:
+                            createGame(challenger);
+                            break;
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        removeChallenger();
-                        break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            removeChallenger();
+                            break;
 
+                    }
                 }
-            }
-        };
+            };
 
-        ContextThemeWrapper themedContext = new ContextThemeWrapper( this, AppTheme_RealmPopDialog );
-        AlertDialog.Builder builder = new AlertDialog.Builder(themedContext);
-        builder.setMessage("You were invited to a game by " + challenger.getName() + "")
-                .setPositiveButton("Accept", dialogClickListener)
-                .setNegativeButton("No, thanks", dialogClickListener)
-                .show();
+            ContextThemeWrapper themedContext = new ContextThemeWrapper( this, AppTheme_RealmPopDialog );
+            AlertDialog.Builder builder = new AlertDialog.Builder(themedContext);
+            challengeDialog = builder.setMessage("You were invited to a game by " + challenger.getName() + "")
+                    .setPositiveButton("Accept", dialogClickListener)
+                    .setNegativeButton("No, thanks", dialogClickListener).create();
+        }
+
+        if(!challengeDialog.isShowing()) {
+            challengeDialog.show();
+        }
+
     }
 
     public void challengePlayer(final Player player) {
