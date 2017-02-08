@@ -17,10 +17,16 @@ class GameViewController: UIViewController {
     @IBOutlet var message: UILabel!
 
     var game: GameModel!
-    var challenge: Game!
     var numbers: [Int]!
 
-    var haveChallenged = false
+    var challenge: Game! {
+        didSet {
+            let haveChallenged = challenge.player1!.playerId == game.currentPlayer().id
+            mySide =  haveChallenged ? challenge.player1 : challenge.player2
+            otherSide = haveChallenged ? challenge.player2 : challenge.player1
+            numbers = challenge.numbers.components(separatedBy: ",").map { return Int($0)! }
+        }
+    }
 
     private var mySide: Side!
     private var mySideToken: NotificationToken?
@@ -34,17 +40,8 @@ class GameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        numbers = challenge.numbers.components(separatedBy: ",")
-            .map {
-                return Int($0)!
-            }
-
-        mySide = haveChallenged ? challenge.player1 : challenge.player2
-        otherSide = haveChallenged ? challenge.player2 : challenge.player1
-
         //build UI
         let playRect = view.bounds.insetBy(dx: 40, dy: 70).offsetBy(dx: 0, dy: 30)
-
         for number in numbers {
             let bubbleView = BubbleView.bubble(number: number, inRect: playRect)
             bubbleView.tap = {[weak self] number in
@@ -72,8 +69,7 @@ class GameViewController: UIViewController {
             strongSelf.elapsed.text = String(format: "%02.2f", myTime)
 
             if myTime > 60.0 {
-                strongSelf.message.text = "You're out of time"
-                strongSelf.endGame()
+                strongSelf.endGame("You're out of time")
             }
         }
 
@@ -85,17 +81,20 @@ class GameViewController: UIViewController {
         }
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        mySideToken?.stop()
+        otherSideToken?.stop()
+    }
+
     func didPop(number: Int) {
-        try! challenge.realm?.write {
-            if let last = numbers.last, last == number {
-                numbers.removeLast()
-                mySide.left = numbers.count
-            } else {
-                message.isHidden = false
-                message.text = "You tapped \(number) instead of \(numbers.last ?? 0)"
-                mySide.failed = true
-                stopGame()
-            }
+        if let last = numbers.last, last == number {
+            numbers.removeLast()
+            game.updateBubbles(side: mySide, count: numbers.count)
+        } else {
+            stopGame("Lost. You tapped \(number) instead of \(numbers.last ?? 0)")
+            game.fail(side: mySide)
         }
     }
 
@@ -104,14 +103,10 @@ class GameViewController: UIViewController {
         player2.text = "\(challenge.player2!.left) : "+challenge.player2!.name
 
         if otherSide.failed {
-            message.text = "You win! Congrats"
-            endGame()
+            endGame("You win! Sweet")
             return
         } else if mySide.failed {
-            if message.isHidden {
-                message.text = "You lost!"
-            }
-            endGame()
+            endGame(message.isHidden ? "You lost" : message.text ?? "You lost")
             return
         }
 
@@ -120,28 +115,14 @@ class GameViewController: UIViewController {
             if mySide.time == 0 {
                 //store the time for current player
                 let myTime = Date().timeIntervalSince(staredAt)
-                try! mySide.realm?.write {
-                    mySide.time = myTime
-                    elapsed.text = String(format: "%02.2f", myTime)
-                    
-                    if otherSide.time < myTime {
-                        game.logTime(for: mySide)
-                    }
-                }
+                elapsed.text = String(format: "%02.2f", myTime)
 
-                message.text = String(format: "Your time: %.2fs", myTime)
-                stopGame()
+                game.updateTime(mySide: mySide, myTime: myTime, otherSide: otherSide)
+                stopGame(String(format: "Your time: %.2fs", myTime))
 
                 //timeout if other player doesn't finish
                 DispatchQueue.main.asyncAfter(deadline: .now() + 20) { [weak self] in
-                    guard let strongSelf = self, strongSelf.navigationController != nil else {
-                        return
-                    }
-                    if strongSelf.challenge.isActive() {
-                        try! strongSelf.otherSide.realm?.write {
-                            strongSelf.otherSide.failed = true
-                        }
-                    }
+                    self?.endGameTimeout()
                 }
             }
 
@@ -151,14 +132,15 @@ class GameViewController: UIViewController {
         }
     }
 
-    func stopGame() {
-        message.isHidden = false
-        view.isUserInteractionEnabled = false
+    func stopGame(_ text: String) {
         timer.invalidate()
+        view.isUserInteractionEnabled = false
+        message.isHidden = false
+        message.text = text
     }
 
-    func endGame() {
-        stopGame()
+    func endGame(_ text: String) {
+        stopGame(text)
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
             if self?.navigationController != nil {
                 _ = self?.navigationController?.popViewController(animated: true)
@@ -166,10 +148,12 @@ class GameViewController: UIViewController {
         }
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        mySideToken?.stop()
-        otherSideToken?.stop()
+    func endGameTimeout() {
+        guard navigationController != nil else {
+            return
+        }
+        if challenge.isActive() {
+            game.fail(side: otherSide)
+        }
     }
 }

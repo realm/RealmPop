@@ -25,7 +25,7 @@ class GameRoomViewController: UIViewController {
         super.viewDidLoad()
 
         guard let game = GameModel() else {
-            fatalError("Couldn't open realm")
+            fatalError("Couldn't create game model")
         }
         self.game = game
 
@@ -38,12 +38,11 @@ class GameRoomViewController: UIViewController {
     func handleInvite(from: Player) {
         alert = UIAlertController(title: "You were invited", message: "to a game by \(from.name)", preferredStyle: .alert)
         alert?.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
-            self?.createGame(vs: from)
+            guard let game = self?.game, let me = self?.me else { return }
+            game.createGame(me: me, vs: from)
         }))
         alert?.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
-            try! self?.me.realm?.write {
-                self?.me.challenger = nil
-            }
+            self?.me.resetState(available: true)
         }))
         present(alert!, animated: true, completion: nil)
     }
@@ -63,10 +62,7 @@ class GameRoomViewController: UIViewController {
                     self?.showGameViewController(with: challenge)
                 }
 
-            case .error(let error):
-                NSLog("error: \(error)")
-                _ = self?.navigationController?.popViewController(animated: true)
-            case .deleted:
+            case .error, .deleted:
                 _ = self?.navigationController?.popViewController(animated: true)
             }
         }
@@ -75,9 +71,9 @@ class GameRoomViewController: UIViewController {
             guard let strongSelf = self else { return }
 
             switch changes {
-            case .update://(_, let del, let ins, let mod):
-                //strongSelf.tableView.applyChanges(deletions: del, insertions: ins, updates: mod)
-                strongSelf.tableView.reloadData()
+            case .update(_, let del, let ins, let mod):
+                strongSelf.tableView.applyChanges(deletions: del, insertions: ins, updates: mod)
+                //strongSelf.tableView.reloadData()
             default:
                 strongSelf.tableView.reloadData()
             }
@@ -100,21 +96,10 @@ class GameRoomViewController: UIViewController {
         print("deinit GameRoom")
     }
 
-    private func createGame(vs: Player) {
-        if vs.available {
-            try! me.realm!.write {
-                let game = Game(challenger: vs, opponent: me)
-                me.currentGame = game
-                vs.currentGame = game
-            }
-        }
-    }
-
     private func showGameViewController(with challenge: Game) {
         let gameVC = storyboard!.instantiateViewController(withIdentifier: "GameViewController") as! GameViewController
         gameVC.game = game
         gameVC.challenge = challenge
-        gameVC.haveChallenged = (me.challenger == nil)
         navigationController!.pushViewController(gameVC, animated: true)
     }
 }
@@ -143,13 +128,13 @@ extension GameRoomViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
 
         let opponent = players[indexPath.row]
-        guard opponent.available else { return }
+        game.challenge(me: me, vs: opponent)
 
-        try! game.realm.write {
-            for player in me.realm!.objects(Player.self).filter("challenger = %@", me) {
-                player.challenger = nil
+        if let cell = tableView.cellForRow(at: indexPath) {
+            cell.contentView.backgroundColor = UIColor.white
+            UIView.animate(withDuration: 0.33) {
+                cell.contentView.backgroundColor = UIColor.clear
             }
-            opponent.challenger = me
         }
     }
 }

@@ -16,18 +16,11 @@ let syncURL = URL(string: "realm://\(host):9080/~/game")!
 let user = "default@realm"
 let pass = "password"
 
-let invalidCredentialsErrorCode = 611
-
-func connect(shouldRegister: Bool = false, completion: @escaping () -> Void) {
+func connect(completion: @escaping () -> Void) {
     let cred = SyncCredentials.usernamePassword(
-        username: user, password: pass, register: shouldRegister)
+        username: user, password: pass, register: false)
 
     SyncUser.logIn(with: cred, server: serverURL) {user, error in
-        if let error = error as? NSError, error.code == invalidCredentialsErrorCode {
-            connect(shouldRegister: true, completion: completion)
-            return
-        }
-
         guard let user = user else {
             return DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                 connect(completion: completion)
