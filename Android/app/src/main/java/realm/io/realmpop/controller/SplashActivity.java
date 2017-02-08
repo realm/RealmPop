@@ -16,6 +16,7 @@ import io.realm.SyncUser;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.util.GameHelpers;
+import realm.io.realmpop.util.SharedPrefsUtils;
 
 import static realm.io.realmpop.util.BubbleConstants.AUTH_URL;
 import static realm.io.realmpop.util.BubbleConstants.ID;
@@ -49,6 +50,12 @@ public class SplashActivity extends BaseActivity {
                     @Override
                     public void execute(Realm bgRealm) {
                         Player me = GameHelpers.currentPlayer(bgRealm);
+                        if(me == null) {
+                            me = new Player();
+                            me.setId(SharedPrefsUtils.getInstance().idForCurrentPlayer());
+                            me.setName("Anonymous");
+                            me = bgRealm.copyToRealm(me);
+                        }
                         me.setAvailable(false);
                         me.setChallenger(null);
                     }

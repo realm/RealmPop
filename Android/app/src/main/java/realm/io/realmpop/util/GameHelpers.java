@@ -15,26 +15,8 @@ public class GameHelpers {
     }
 
     public static Player currentPlayer(Realm realm) {
-
         String currentId = SharedPrefsUtils.getInstance().idForCurrentPlayer();
-
-        Player player = realm.where(Player.class).equalTo("id", currentId).findFirst();
-
-        if(player == null) {
-            try {
-                realm.beginTransaction();
-                player = new Player();
-                player.setId(currentId);
-                player.setName("Anonymous");
-                player = realm.copyToRealm(player);
-                realm.commitTransaction();
-            } catch (Exception e) {
-                realm.cancelTransaction();
-                throw e;
-            }
-        }
-
-        return player;
+        return realm.where(Player.class).equalTo("id", currentId).findFirst();
     }
 
 }
