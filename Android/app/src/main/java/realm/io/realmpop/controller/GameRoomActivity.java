@@ -49,7 +49,7 @@ public class GameRoomActivity extends BaseActivity {
             @Override
             public void onChange(Player myself) {
                 if(!inGame.get()) {
-                    if(myself.getChallenger() != null) {
+                    if(myself.getChallenger() != null && myself.getCurrentgame() == null) {
                         handleInvite(myself.getChallenger());
                     }
                     if(myself.getCurrentgame() != null) {
@@ -172,11 +172,8 @@ public class GameRoomActivity extends BaseActivity {
             @Override
             public void execute(Realm bgRealm) {
 
-                // Set myself and my challenger to unavailable.
                 Player me = GameHelpers.playerWithId(myId, bgRealm);
                 Player challenger = GameHelpers.playerWithId(challengerId, bgRealm);
-                me.setAvailable(false);
-                challenger.setAvailable(false);
 
                 // Create a new game object
                 Game game = bgRealm.createObject(Game.class);
@@ -204,6 +201,9 @@ public class GameRoomActivity extends BaseActivity {
                 // Set the game object on both players.  They will react to this and automatically transition to the game.
                 me.setCurrentgame(game);
                 challenger.setCurrentgame(game);
+
+                me.setAvailable(false);
+                challenger.setAvailable(false);
             }
         });
 
