@@ -10,6 +10,7 @@ import Foundation
 import RealmSwift
 
 class Side: Object {
+    dynamic var playerId = ""
     dynamic var name = ""
     dynamic var left = 0
     dynamic var time = 0.0
