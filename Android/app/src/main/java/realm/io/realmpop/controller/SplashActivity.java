@@ -43,7 +43,7 @@ public class SplashActivity extends BaseActivity {
 
                 final SyncConfiguration syncConfiguration = new SyncConfiguration.Builder(user, REALM_URL).build();
                 Realm.setDefaultConfiguration(syncConfiguration);
-                Realm realm = Realm.getDefaultInstance();
+                realm = Realm.getDefaultInstance();
 
                 realm.executeTransactionAsync(new Realm.Transaction() {
                     @Override
