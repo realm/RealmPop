@@ -1,9 +1,8 @@
 {
   "images" : [
     {
-      "size" : "20x20",
       "idiom" : "iphone",
-      "filename" : "Icon-Spotlight-40@2x.png",
+      "size" : "20x20",
       "scale" : "2x"
     },
     {
