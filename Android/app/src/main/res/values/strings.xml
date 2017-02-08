@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RealmPop</string>
+    <string name="app_name">Realm Pop</string>
 
     <string name="pregameroom_enter_button_label">Enter</string>
     <string name="pregameroom_player_name_prompt_label">Player Name</string>

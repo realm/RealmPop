@@ -26,6 +26,18 @@
         <item name="android:textColor">@color/colorAccent</item>
     </style>
 
+    <style name="Text.WhiteTextView">
+        <item name="android:textColor">@android:color/background_light</item>
+    </style>
+
+    <style name="SalmonTextViewBigly">
+        <item name="android:typeface">monospace</item>
+        <item name="android:textSize">36sp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="fontPath">fonts/PressStart2P.ttf</item>
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
     <style name="Text.EditText">
         <item name="android:background">@drawable/round_corner_bg</item>
     </style>

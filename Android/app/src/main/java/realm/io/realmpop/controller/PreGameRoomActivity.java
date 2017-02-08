@@ -37,35 +37,8 @@ public class PreGameRoomActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pregameroom);
         ButterKnife.bind(this);
-
-        final SyncCredentials syncCredentials = SyncCredentials.usernamePassword(ID, PASSWORD, false);
-        SyncUser.loginAsync(syncCredentials, AUTH_URL, new SyncUser.Callback() {
-
-            @Override
-            public void onSuccess(SyncUser user) {
-
-                final SyncConfiguration syncConfiguration = new SyncConfiguration.Builder(user, REALM_URL).build();
-                Realm.setDefaultConfiguration(syncConfiguration);
-
-                realm = Realm.getDefaultInstance();
-                playerNameEditText.setText(GameHelpers.currentPlayer(realm).getName());
-
-                realm.executeTransactionAsync(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm bgRealm) {
-                        Player me = GameHelpers.currentPlayer(bgRealm);
-                        me.setAvailable(false);
-                        me.setChallenger(null);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(ObjectServerError error) {
-                Log.e(TAG, error.getErrorMessage());
-                error.getException().printStackTrace();
-            }
-        });
+        realm = Realm.getDefaultInstance();
+        playerNameEditText.setText(GameHelpers.currentPlayer(realm).getName());
     }
 
     @Override
