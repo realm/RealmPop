@@ -32,6 +32,7 @@ android {
 
         //def host = InetAddress.getLocalHost().getCanonicalHostName() // "192.168.1.79"
         def host = getIP()
+        def cloudHost = "http://45.55.167.56/";  // Digital Ocean IP address.
 
         debug {
             // This will automatically detect the IP address of the machine building RealmTasks.
@@ -50,6 +51,14 @@ android {
             // It is assumed that this machine is also running the Object Server.
             // If not, replace 'host' with the IP of the machine hosting the server.
             buildConfigField "String", "OBJECT_SERVER_IP", "\"${host}\""
+        }
+
+        cloudRelease {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "OBJECT_SERVER_IP", "\"${cloudHost}\""
         }
     }
 }
