@@ -49,7 +49,8 @@ Here are the instructions to run the project locally.
  * open the `RealmConnect.swift` file and at the top put in the IP of your server (if you run the server on your computer, open System Preference/Network - your IP is towards the top of the window)
  
 #### Android:
- * ? 
+
+ * [See Android Sub-project](Android#installation-instructions)
 
 #### Event handler:
  * install the latest Node.js from https://nodejs.org/en/
