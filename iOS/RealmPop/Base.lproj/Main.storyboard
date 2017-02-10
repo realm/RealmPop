@@ -57,7 +57,7 @@
                                         <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="17"/>
                                         <state key="normal" title="Enter"/>
                                         <connections>
-                                            <segue destination="BYZ-38-t0r" kind="show" id="6aB-f3-daf"/>
+                                            <segue destination="BYZ-38-t0r" kind="show" identifier="ShowGameRoom" id="6aB-f3-daf"/>
                                         </connections>
                                     </button>
                                 </subviews>

@@ -30,6 +30,16 @@ class PreGameRoomViewController: UIViewController {
         super.viewWillAppear(animated)
         me.resetState()
     }
+
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        switch identifier {
+        case "ShowGameRoom":
+            return playerName.text?.isEmpty == false
+        default:
+            return true
+        }
+    }
+
 }
 
 extension PreGameRoomViewController: UITextFieldDelegate {
