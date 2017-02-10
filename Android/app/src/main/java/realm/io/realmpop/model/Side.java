@@ -6,7 +6,6 @@ import io.realm.annotations.Required;
 
 public class Side extends RealmObject {
 
-    @PrimaryKey
     @Required
     private String playerId;
 

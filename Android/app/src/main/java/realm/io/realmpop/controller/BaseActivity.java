@@ -19,7 +19,7 @@ abstract public class BaseActivity extends AppCompatActivity {
     }
 
     public static void setActiveUser(SyncUser user) {
-        final SyncConfiguration syncConfiguration = new SyncConfiguration.Builder(user, REALM_URL).build();
+        final SyncConfiguration syncConfiguration = new SyncConfiguration.Builder(user, REALM_URL).schemaVersion(1).build();
         Realm.setDefaultConfiguration(syncConfiguration);
     }
 

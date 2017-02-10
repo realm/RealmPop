@@ -124,12 +124,13 @@ public class GameActivity extends BaseActivity {
 
                     Player me = GameHelpers.currentPlayer(bgRealm);
                     Player challenger = me.getChallenger();
-                    Game game = me.getCurrentgame();
-                    Side s1 = game.getPlayer1();
-                    Side s2 = game.getPlayer2();
-                    s1.deleteFromRealm();
-                    s2.deleteFromRealm();
-                    game.deleteFromRealm();
+                    // We are not deleting games anymore.
+//                    Game game = me.getCurrentgame();
+//                    Side s1 = game.getPlayer1();
+//                    Side s2 = game.getPlayer2();
+//                    s1.deleteFromRealm();
+//                    s2.deleteFromRealm();
+//                    game.deleteFromRealm();
 
                     if(challenger != null) {
                         challenger.setCurrentgame(null);
