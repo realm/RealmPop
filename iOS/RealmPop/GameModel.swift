@@ -37,7 +37,7 @@ class GameModel {
     func otherPlayers(than me: Player) -> Results<Player> {
         return realm.objects(Player.self)
             .filter("id != %@", me.id)
-            .sorted(byKeyPath: "name")
+            .sorted(byKeyPath: "available", ascending: false)
     }
 
     func challenge(me: Player, vs: Player) {
