@@ -117,28 +117,21 @@ public class GameActivity extends BaseActivity {
     public void exitGame() {
         if(realm != null) {
 
-            // Delete the game and associated objects asynchronously.
+            final String mySidePlayerId = mySide.getPlayerId();
+            final String otherSidePlayerId = otherSide.getPlayerId();
+
             realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
 
-                    Player me = GameHelpers.currentPlayer(bgRealm);
-                    Player challenger = me.getChallenger();
-                    // We are not deleting games anymore.
-//                    Game game = me.getCurrentgame();
-//                    Side s1 = game.getPlayer1();
-//                    Side s2 = game.getPlayer2();
-//                    s1.deleteFromRealm();
-//                    s2.deleteFromRealm();
-//                    game.deleteFromRealm();
+                    Player me = GameHelpers.playerWithId(mySidePlayerId, bgRealm);
+                    Player other = GameHelpers.playerWithId(otherSidePlayerId, bgRealm);
 
-                    if(challenger != null) {
-                        challenger.setCurrentgame(null);
-                        challenger.setChallenger(null);
-                    }
-
-                    me.setCurrentgame(null);
+                    other.setChallenger(null);
                     me.setChallenger(null);
+                    other.setCurrentgame(null);
+                    me.setCurrentgame(null);
+
                 }
             });
         }
