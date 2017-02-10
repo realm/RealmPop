@@ -44,4 +44,14 @@ public class Game extends RealmObject {
         }
     }
 
+    public Side sideWithPlayerId(final String playerId) {
+        if(player1 != null && player1.getPlayerId().equals(playerId)) {
+            return player1;
+        } else if (player2 != null && player2.getPlayerId().equals(playerId)) {
+            return player2;
+        } else {
+            return null;
+        }
+    }
+
 }

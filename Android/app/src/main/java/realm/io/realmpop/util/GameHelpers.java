@@ -11,9 +11,9 @@ public class GameHelpers {
         return realm.where(Player.class).equalTo("id", id).findFirst();
     }
 
-    public static Side sideWithPlayerId(String id, Realm realm) {
-        return realm.where(Side.class).equalTo("playerId", id).findFirst();
-    }
+//    public static Side sideWithPlayerId(String id, Realm realm) {
+//        return realm.where(Side.class).equalTo("playerId", id).findFirst();
+//    }
 
     public static Player currentPlayer(Realm realm) {
         String currentId = SharedPrefsUtils.getInstance().idForCurrentPlayer();

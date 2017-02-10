@@ -159,7 +159,9 @@ public class GameActivity extends BaseActivity {
             realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
-                    GameHelpers.sideWithPlayerId(mySidePlayerId, bgRealm).setLeft(currLeft - 1);
+                    Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentgame();
+                    Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
+                    mySide.setLeft(currLeft - 1);
                 }
             });
 
@@ -168,7 +170,9 @@ public class GameActivity extends BaseActivity {
             realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
-                    GameHelpers.sideWithPlayerId(mySidePlayerId, bgRealm).setFailed(true);
+                    Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentgame();
+                    Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
+                    mySide.setFailed(true);
                 }
 
             }, new Realm.Transaction.OnSuccess() {
@@ -218,6 +222,10 @@ public class GameActivity extends BaseActivity {
 
     private void update() {
 
+        if(realm == null || me.getCurrentgame() == null) {
+            return;
+        }
+
         final String mySidePlayerId = mySide.getPlayerId();
         final String otherSidePlayerId = otherSide.getPlayerId();
 
@@ -225,8 +233,9 @@ public class GameActivity extends BaseActivity {
             @Override
             public void execute(Realm bgRealm) {
 
-                Side mySide = GameHelpers.sideWithPlayerId(mySidePlayerId, bgRealm);
-                Side otherSide = GameHelpers.sideWithPlayerId(otherSidePlayerId, bgRealm);
+                Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentgame();
+                Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
+                Side otherSide = currentGame.sideWithPlayerId(otherSidePlayerId);
 
                 if (mySide.getLeft() == 0) {
 
