@@ -10,7 +10,7 @@ import RealmSwift
 
 class Player: Object {
     dynamic var id = UUID().uuidString
-    dynamic var name = "Anonymous"
+    dynamic var name = ""
 
     dynamic var available = false
     dynamic var challenger: Player?
