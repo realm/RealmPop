@@ -9,7 +9,7 @@
 import Foundation
 import RealmSwift
 
-let host = "192.168.0.42"
+let host = "45.55.167.56"
 let serverURL = URL(string: "http://\(host):9080")!
 let syncURL = URL(string: "realm://\(host):9080/~/game")!
 
@@ -28,6 +28,7 @@ func connect(completion: @escaping () -> Void) {
         }
 
         var config = Realm.Configuration.defaultConfiguration
+        config.schemaVersion = 1
         config.syncConfiguration = SyncConfiguration(user: user, realmURL: syncURL)
         Realm.Configuration.defaultConfiguration = config
 

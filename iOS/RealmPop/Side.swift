@@ -15,8 +15,4 @@ class Side: Object {
     dynamic var left = 0
     dynamic var time = 0.0
     dynamic var failed = false
-
-    override class func primaryKey() -> String? {
-        return "playerId"
-    }
 }
