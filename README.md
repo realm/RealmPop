@@ -34,6 +34,38 @@ A "legacy system" server demo. This app looks for a `board.txt` file in the fold
 
 This simple demo shows how a server legacy system might not depend in any way on Realm itself and use other formats/files to communicate with the  Realm Object Server.
 
+## Installation
+
+Here are the instructions to run the project locally.
+
+#### Server: 
+  * download PE Trial from here: https://realm.io/pricing/
+  * unpack the archive on your computer, and from the resulting folder start the server by typing: `./start-object-server.command`
+  * in the web browser that pops up create an admin account
+  * once logged in the web console, click "+New User", enter email "`default@realm`", password "`password`"
+
+#### iOS:
+  * install all dependencies of the iOS project. In the shell, navigate to `RealmPop/iOS` and type in `pod install` to install the dependencies
+ * open the `RealmConnect.swift` file and at the top put in the IP of your server (if you run the server on your computer, open System Preference/Network - your IP is towards the top of the window)
+ 
+#### Android:
+ * ? 
+
+#### Event handler:
+ * install the latest Node.js from https://nodejs.org/en/
+ * copy 'realm-1.0.2-professional.tgz' from your PE/EE folder to the JS folder of this repo (version might differ for you)
+ * run 'npm install'
+ * start the app by typing in the shell 'node pop.js'
+
+Any time a player stores their high score, the event handler will grab the Score object and append it a `board.txt` file in the `JS` folder.
+
+#### Legacy system:
+ * build the project located in `RealmPop/macOS` (it has no dependencies)
+ * once built, in Xode inside the Project Navigator find the file `PopBoard.app`, right-click it and choose "Show in Finder"
+ * copy `PopBoard.app` from Finder into the `JS` folder and start the app
+
+The app will monitor `board.txt` and display a dynamically updating score board.
+
 ## TODO
 
 ## License
