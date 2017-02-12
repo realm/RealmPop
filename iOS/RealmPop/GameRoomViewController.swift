@@ -123,15 +123,15 @@ extension GameRoomViewController: UITableViewDataSource {
 
 extension GameRoomViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-
         let opponent = players[indexPath.row]
-        game.challenge(me: me, vs: opponent)
 
         if let cell = tableView.cellForRow(at: indexPath) {
-            cell.contentView.backgroundColor = UIColor.white
-            UIView.animate(withDuration: 0.33) {
+            cell.contentView.backgroundColor = UIColor.elephant
+            UIView.animate(withDuration: 0.33, animations: {
                 cell.contentView.backgroundColor = UIColor.clear
+            }) {[weak self]_ in
+                guard let strongSelf = self else { return }
+                strongSelf.game.challenge(me: strongSelf.me, vs: opponent)
             }
         }
     }
