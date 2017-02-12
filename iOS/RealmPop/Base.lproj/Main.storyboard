@@ -91,8 +91,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="yx6-kc-ZON">
-                                <rect key="frame" x="0.0" y="20" width="667" height="355"/>
+                                <rect key="frame" x="0.0" y="30" width="667" height="345"/>
                                 <color key="backgroundColor" red="0.13333334029999999" green="0.13333334029999999" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="separatorColor" red="0.27450981740000002" green="0.25490197539999998" blue="0.54901963470000004" alpha="1" colorSpace="calibratedRGB"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="Cell" textLabel="zTg-Rz-aFA" style="IBUITableViewCellStyleDefault" id="tR1-FI-v80">
                                         <rect key="frame" x="0.0" y="56" width="667" height="44"/>
@@ -105,12 +106,12 @@
                                                     <rect key="frame" x="15" y="0.0" width="617" height="43"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="13"/>
-                                                    <nil key="textColor"/>
+                                                    <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <color key="highlightedColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
-                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="backgroundColor" red="0.086274512110000007" green="0.1019607857" blue="0.18823529780000001" alpha="1" colorSpace="calibratedRGB"/>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
@@ -118,13 +119,39 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="Kh5-Re-uZb"/>
                                 </connections>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0dH-mH-2Oy">
+                                <rect key="frame" x="582" y="0.0" width="85" height="41"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="41" id="4CA-yT-8W9"/>
+                                    <constraint firstAttribute="width" constant="85" id="i94-Wm-Icu"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="13"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="back:" destination="BYZ-38-t0r" eventType="touchUpInside" id="p2l-NW-h7Y"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Players" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="emi-qW-b8Y">
+                                <rect key="frame" x="259.5" y="10" width="148" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="VxS-Vc-0cu"/>
+                                    <constraint firstAttribute="width" constant="148" id="ohl-lu-Edq"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="15"/>
+                                <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.93725490570000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="0.13333334029999999" green="0.13333334029999999" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="yx6-kc-ZON" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="7es-ZT-bOl"/>
+                            <constraint firstItem="emi-qW-b8Y" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" constant="10" id="E4v-xo-58m"/>
                             <constraint firstAttribute="trailing" secondItem="yx6-kc-ZON" secondAttribute="trailing" id="FpY-tQ-MRg"/>
+                            <constraint firstItem="0dH-mH-2Oy" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="JCI-qn-IMg"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="yx6-kc-ZON" secondAttribute="bottom" id="LKx-Q6-xni"/>
-                            <constraint firstItem="yx6-kc-ZON" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="sRC-uf-TsV"/>
+                            <constraint firstAttribute="trailing" secondItem="0dH-mH-2Oy" secondAttribute="trailing" id="ihO-K1-whH"/>
+                            <constraint firstItem="emi-qW-b8Y" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="rKE-Ni-8IN"/>
+                            <constraint firstItem="yx6-kc-ZON" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="10" id="sRC-uf-TsV"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="HTf-7L-vMg">
