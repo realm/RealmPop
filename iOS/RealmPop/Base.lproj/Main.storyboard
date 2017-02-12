@@ -185,25 +185,25 @@
                                     <constraint firstAttribute="height" constant="35" id="rPG-In-3zU"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="15"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.93725490570000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iYD-9j-1q3">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Player 1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iYD-9j-1q3">
                                 <rect key="frame" x="20" y="20" width="300" height="35"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="7UX-7V-NmK"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="15"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.93725490570000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XC3-95-pRh">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Player 2" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XC3-95-pRh">
                                 <rect key="frame" x="347" y="20" width="300" height="35"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="tTR-He-4RC"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="15"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.93725490570000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You Win" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hFs-S7-jxQ">
@@ -270,7 +270,7 @@
                                     <constraint firstAttribute="height" constant="21" id="DcF-OQ-vyn"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="11"/>
-                                <color key="textColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <color key="textColor" red="0.90196079019999997" green="0.90196079019999997" blue="0.93725490570000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
