@@ -21,7 +21,7 @@ extension UITableView {
         beginUpdates()
         deleteRows(at: deletions.map(fromRow(section)), with: .automatic)
         insertRows(at: insertions.map(fromRow(section)), with: .automatic)
-        reloadRows(at: updates.map(fromRow(section)), with: .automatic)
+        reloadRows(at: updates.map(fromRow(section)), with: .none)
         endUpdates()
     }
 
