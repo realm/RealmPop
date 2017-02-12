@@ -11,7 +11,7 @@ import UIKit
 
 class BubbleView: UIView {
 
-    private var color = UIColor(red: 254.0/255.0, green: 159.0/255.0, blue: 147.0/255.0, alpha: 0.8)
+    private var color = UIColor.peach.withAlphaComponent(0.8)
     private static let size = CGSize(width: 60, height: 60)
 
     private var number = 0

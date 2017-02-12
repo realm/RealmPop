@@ -98,6 +98,10 @@ class GameRoomViewController: UIViewController {
         gameVC.challenge = challenge
         navigationController!.pushViewController(gameVC, animated: true)
     }
+
+    @IBAction func back(_ sender: Any) {
+        navigationController!.popViewController(animated: true)
+    }
 }
 
 extension GameRoomViewController: UITableViewDataSource {
@@ -110,26 +114,24 @@ extension GameRoomViewController: UITableViewDataSource {
 
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")!
         cell.textLabel?.text = opponent.name
-        cell.textLabel?.textColor = opponent.available ? UIColor.white : UIColor.gray
+        cell.textLabel?.textColor = opponent.available ? UIColor.melon : UIColor.gray
+        cell.accessoryType = opponent.available ? .disclosureIndicator : .none
         return cell
     }
 
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Available players"
-    }
 }
 
 extension GameRoomViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-
         let opponent = players[indexPath.row]
-        game.challenge(me: me, vs: opponent)
 
         if let cell = tableView.cellForRow(at: indexPath) {
-            cell.contentView.backgroundColor = UIColor.white
-            UIView.animate(withDuration: 0.33) {
+            cell.contentView.backgroundColor = UIColor.elephant
+            UIView.animate(withDuration: 0.33, animations: {
                 cell.contentView.backgroundColor = UIColor.clear
+            }) {[weak self]_ in
+                guard let strongSelf = self else { return }
+                strongSelf.game.challenge(me: strongSelf.me, vs: opponent)
             }
         }
     }
