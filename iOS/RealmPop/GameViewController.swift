@@ -102,7 +102,7 @@ class GameViewController: UIViewController {
         player1.text = challenge.player1!.name + " : \(challenge.player1!.left)"
         player2.text = "\(challenge.player2!.left) : "+challenge.player2!.name
 
-        if otherSide.failed {
+        if otherSide.failed && !mySide.failed {
             endGame("You win! Sweet")
             return
         } else if mySide.failed {
