@@ -129,7 +129,7 @@ public class GameRoomActivity extends BaseActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(themedContext);
             challengeDialog = builder.setMessage("You were invited to a game by " + challenger.getName() + "")
                     .setPositiveButton("Accept", dialogClickListener)
-                    .setNegativeButton("No, thanks", dialogClickListener).create();
+                    .setNegativeButton("No, thanks!", dialogClickListener).create();
         }
 
         if(!challengeDialog.isShowing()) {
