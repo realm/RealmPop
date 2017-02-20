@@ -3,6 +3,7 @@
     <color name="colorPrimary">@color/colorBlack</color>
     <color name="colorPrimaryDark">@color/colorBlack</color>
     <color name="colorAccent">#F3C59D</color>
+    <color name="playerAvailableColor">#FCC397</color>
 
     <color name="colorBlack">#000000</color>
     <color name="textBackground">#FFFFFF</color>
