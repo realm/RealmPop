@@ -2,7 +2,9 @@ package realm.io.realmpop.controller;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
 
@@ -23,7 +25,7 @@ import static realm.io.realmpop.util.BubbleConstants.ID;
 import static realm.io.realmpop.util.BubbleConstants.PASSWORD;
 import static realm.io.realmpop.util.BubbleConstants.REALM_URL;
 
-public class PreGameRoomActivity extends BaseActivity {
+public class PreGameRoomActivity extends BaseActivity implements TextWatcher {
 
     private static final String TAG = PreGameRoomActivity.class.getName();
 
@@ -39,6 +41,7 @@ public class PreGameRoomActivity extends BaseActivity {
         ButterKnife.bind(this);
         realm = Realm.getDefaultInstance();
         playerNameEditText.setText(GameHelpers.currentPlayer(realm).getName());
+        playerNameEditText.addTextChangedListener(this);
     }
 
     @Override
@@ -82,6 +85,31 @@ public class PreGameRoomActivity extends BaseActivity {
                 }
            });
         }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if(realm != null) {
+            final String nameText = playerNameEditText.getText().toString();
+
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgRealm) {
+                    Player me = GameHelpers.currentPlayer(bgRealm);
+                    me.setName(nameText);
+                }
+
+                // afterward, on the foreground, lauch the GameRoomActivity.
+            });
+        }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
     }
 
     private void shakeText() {
