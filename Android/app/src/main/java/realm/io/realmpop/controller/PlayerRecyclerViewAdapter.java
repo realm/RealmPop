@@ -1,5 +1,6 @@
 package realm.io.realmpop.controller;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -33,6 +34,11 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
         final Player player = getData().get(position);
         holder.playerId = player.getId();
         holder.titleView.setText(player.getName());
+        if (player.isAvailable()) {
+            holder.titleView.setTextColor(Color.parseColor("#FCC397"));
+        } else {
+            holder.titleView.setTextColor(R.color.colorPrimaryDark);
+        }
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override

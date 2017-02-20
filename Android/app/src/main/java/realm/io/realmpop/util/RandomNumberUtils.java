@@ -14,7 +14,11 @@ public class RandomNumberUtils {
 
         int[] numbers = new int[count];
         for(int i = 0; i < count; i++) {
-            numbers[i] = generateNumber(prevNum + 1, maxNum);
+            if (i == 0) {
+                numbers[i] = 0;
+            } else {
+                numbers[i] = generateNumber(prevNum + 1, maxNum);
+            }
             prevNum = numbers[i];
             maxNum = prevNum + eachNumberRange;
         }

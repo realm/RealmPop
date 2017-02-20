@@ -15,6 +15,7 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
@@ -60,9 +61,9 @@ public class GameRoomActivity extends BaseActivity {
         });
 
         RealmResults<Player> otherPlayers = realm.where(Player.class)
-                .equalTo("available", true)
+                //.equalTo("available", true)
                 .notEqualTo("id", me.getId())
-                .findAllSortedAsync("name");
+                .findAllSortedAsync("available", Sort.DESCENDING);
         recyclerView.setAdapter(new PlayerRecyclerViewAdapter(this, otherPlayers));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
@@ -128,7 +129,7 @@ public class GameRoomActivity extends BaseActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(themedContext);
             challengeDialog = builder.setMessage("You were invited to a game by " + challenger.getName() + "")
                     .setPositiveButton("Accept", dialogClickListener)
-                    .setNegativeButton("No, thanks", dialogClickListener).create();
+                    .setNegativeButton("No, thanks!", dialogClickListener).create();
         }
 
         if(!challengeDialog.isShowing()) {
