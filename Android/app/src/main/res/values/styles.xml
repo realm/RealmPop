@@ -16,7 +16,6 @@
     </style>
 
     <style name="Text" parent="@android:style/TextAppearance">
-        <item name="android:typeface">monospace</item>
         <item name="android:textSize">18sp</item>
         <item name="android:layout_margin">@dimen/realm_pop_text_margin</item>
         <item name="fontPath">fonts/PressStart2P.ttf</item>
@@ -24,6 +23,10 @@
 
     <style name="Text.SalmonTextView">
         <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="Text.BubbleTextView">
+        <item name="android:textColor">@color/bubbleColor</item>
     </style>
 
     <style name="Text.WhiteTextView">

@@ -234,7 +234,7 @@
 				TargetAttributes = {
 					9CB75DB41E389C9B003482C2 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = 9MF8G8D9Y5;
+						DevelopmentTeam = 397FP8392F;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Keychain = {
@@ -468,7 +468,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = RealmPop/RealmPop.entitlements;
-				DEVELOPMENT_TEAM = 9MF8G8D9Y5;
+				DEVELOPMENT_TEAM = 397FP8392F;
 				INFOPLIST_FILE = RealmPop/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.RealmPop;
@@ -484,7 +484,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = RealmPop/RealmPop.entitlements;
-				DEVELOPMENT_TEAM = 9MF8G8D9Y5;
+				DEVELOPMENT_TEAM = 397FP8392F;
 				INFOPLIST_FILE = RealmPop/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.RealmPop;

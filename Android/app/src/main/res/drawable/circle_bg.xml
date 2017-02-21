@@ -5,10 +5,10 @@
         android:width="100dp"
         android:height="100dp" />
     <stroke
-        android:width="1dp"
-        android:color="@color/colorAccent"
+        android:width="5dp"
+        android:color="@color/bubbleColor"
         />
 
-    <solid android:color="@color/colorBlack" />
+    <solid android:color="@color/bubbleBackground" />
 
 </shape>
