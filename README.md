@@ -72,3 +72,5 @@ The app will monitor `board.txt` and display a dynamically updating score board.
 ## License
 
 Realm Pop is available under the MIT license. See the LICENSE file for more info.
+
+_Press Start 2p_ is a free font under the SIL Open Font License(OFL). For more information: [http://www.fontspace.com/codeman38/press-start-2p](http://www.fontspace.com/codeman38/press-start-2p).
