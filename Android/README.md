@@ -22,7 +22,7 @@ If you build the project through Android studio, the app you build and launch wi
 
 #### Running against a Digital Ocean ROS
 
-If you want to build the version that runs against the cloud, you can just run `gradle clean build` from the Android directory of the project.
+If you want to build the version that runs against the cloud, you can just run `./gradlew clean build` from the Android directory of the project.
 
 This will create 3 APKs at ./app/build/outputs/apk/
 * `app-cloudRelease.apk` <-- This one points to our cloud container.  The IP is hard coded into the app/build.gradle file in a variable called `cloudHost`
