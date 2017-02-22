@@ -27,6 +27,7 @@
 
     <style name="Text.BubbleTextView">
         <item name="android:textColor">@color/bubbleColor</item>
+        <item name="android:background">@color/bubbleBackground</item>
     </style>
 
     <style name="Text.WhiteTextView">

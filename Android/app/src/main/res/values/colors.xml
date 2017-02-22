@@ -5,6 +5,9 @@
     <color name="colorAccent">#F3C59D</color>
 
     <color name="playerAvailableColor">#FCC397</color>
+    <color name="playerUnavailableColor">#808080</color>
+
+    <color name="playersRowBackground">#1E243D</color>
 
     <color name="bubbleColor">#C78981</color>
     <color name="bubbleBackground">#000000</color>

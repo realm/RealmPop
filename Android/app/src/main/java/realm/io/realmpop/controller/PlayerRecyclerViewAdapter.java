@@ -38,7 +38,7 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
         if (player.isAvailable()) {
             holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.playerAvailableColor));
         } else {
-            holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.colorPrimaryDark));
+            holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.playerUnavailableColor));
         }
 
         holder.view.setOnClickListener(new View.OnClickListener() {

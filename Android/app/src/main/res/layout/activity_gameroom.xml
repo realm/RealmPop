@@ -13,12 +13,10 @@
         android:id="@+id/availablePlayers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/grayText"
-        android:paddingLeft="8dp"
-        android:paddingStart="8dp"
-        android:paddingRight="8dp"
-        android:paddingEnd="8dp"
-        android:text="AVAILABLE PLAYERS"
+        android:textColor="@color/textBackground"
+        android:padding="16dp"
+        android:textAlignment="center"
+        android:text="Players"
         />
 
     <android.support.v7.widget.RecyclerView

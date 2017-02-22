@@ -69,16 +69,6 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/exitGameButton"
-        style="@style/Text.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:layout_alignParentBottom="true"
-        android:text="@string/end_game_button_label"
-        android:textColor="@color/textBackground"
-        android:textSize="18sp" />
-
     <TextView
         android:id="@+id/message"
         style="@style/Text"

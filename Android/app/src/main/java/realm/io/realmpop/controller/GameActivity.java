@@ -2,6 +2,8 @@ package realm.io.realmpop.controller;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -10,6 +12,8 @@ import android.widget.TextView;
 
 import org.joda.time.Interval;
 import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 
 import java.util.Date;
 import java.util.Locale;
@@ -46,8 +50,6 @@ public class GameActivity extends BaseActivity {
     private Date startedAt;
     private Player me;
 
-    private boolean isGameOver;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -62,26 +64,24 @@ public class GameActivity extends BaseActivity {
         challenge = me.getCurrentgame();
         mySide = challenge.getPlayer1().getPlayerId().equals(me.getId()) ? challenge.getPlayer1() : challenge.getPlayer2();
         otherSide = challenge.getPlayer1().getPlayerId().equals(me.getId()) ? challenge.getPlayer2() : challenge.getPlayer1();
-        isGameOver =  mySide.isFailed() || otherSide.isFailed();
 
         me.addChangeListener(new RealmChangeListener<Player>() {
             @Override
             public void onChange(Player me) {
-                if(me.getCurrentgame() == null) {
-                    finish();
-                }
+            if(me.getCurrentgame() == null) {
+                finish();
+            }
             }
         });
 
         RealmChangeListener<Side> onSideChangeListener = new RealmChangeListener<Side>() {
             @Override
             public void onChange(Side element) {
-                if(isGameOver) {
-                    mySide.removeChangeListeners();
-                    otherSide.removeChangeListeners();
-                } else {
-                    update();
-                }
+            if(isGameOver()) {
+                mySide.removeChangeListeners();
+                otherSide.removeChangeListeners();
+            }
+            update();
             }
         };
         mySide.addChangeListener(onSideChangeListener);
@@ -113,28 +113,40 @@ public class GameActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.exitGameButton)
-    public void exitGame() {
-        if(realm != null) {
+    @Override
+    public void onBackPressed() {
+        exitGameAfterDelay(0);
+    }
 
-            final String mySidePlayerId = mySide.getPlayerId();
-            final String otherSidePlayerId = otherSide.getPlayerId();
+    public void exitGameAfterDelay(int delay) {
 
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm bgRealm) {
+        Handler handler = new Handler(getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
-                    Player me = GameHelpers.playerWithId(mySidePlayerId, bgRealm);
-                    Player other = GameHelpers.playerWithId(otherSidePlayerId, bgRealm);
+                if(realm != null) {
 
-                    other.setChallenger(null);
-                    me.setChallenger(null);
-                    other.setCurrentgame(null);
-                    me.setCurrentgame(null);
+                    final String mySidePlayerId = mySide.getPlayerId();
+                    final String otherSidePlayerId = otherSide.getPlayerId();
 
+                    realm.executeTransactionAsync(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm bgRealm) {
+
+                            Player me = GameHelpers.playerWithId(mySidePlayerId, bgRealm);
+                            Player other = GameHelpers.playerWithId(otherSidePlayerId, bgRealm);
+
+                            other.setChallenger(null);
+                            me.setChallenger(null);
+                            other.setCurrentgame(null);
+                            me.setCurrentgame(null);
+
+                        }
+                    });
                 }
-            });
-        }
+            }
+        }, delay);
     }
 
     public void onBubbleTap(final long numberTapped) {
@@ -239,7 +251,6 @@ public class GameActivity extends BaseActivity {
 
                     // Both side times have been recorded, the game is over.
                     if (otherSide.getTime() > 0 && mySide.getTime() > 0) {
-                        isGameOver = true;
                         if (otherSide.getTime() < mySide.getTime()) {
                             mySide.setFailed(true);
                         } else {
@@ -260,27 +271,81 @@ public class GameActivity extends BaseActivity {
                 player1.setText(challenge.getPlayer1().getName() + " : " + challenge.getPlayer1().getLeft());
                 player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getLeft());
 
-                if(mySide.getTime() > 0) {
-                    message.setText(String.format("Your time: %s", timeElapsedString()));
-                    message.setVisibility(View.VISIBLE);
-                }
-
-                if(otherSide.isFailed()) {
-                    isGameOver = true;
+                if(isGameOver()) {
                     stopTimer();
-                    message.setText("You win! Congrats");
-                    message.setVisibility(View.VISIBLE);
-                } else if(mySide.isFailed()) {
-                    isGameOver = true;
-                    stopTimer();
-                    if(TextUtils.isEmpty(message.getText())) {
-                        message.setText("You lost!");
+                    if(otherSide.isFailed()) {
+                        showMessage("You win! Sweet");
+                    } else if(mySide.isFailed()) {
+                        if(TextUtils.isEmpty(message.getText())) {
+                            message.setText("You lost!");
+                        }
+                        message.setVisibility(View.VISIBLE);
                     }
-                    message.setVisibility(View.VISIBLE);
-                }
+                    exitGameAfterDelay(5000);
 
+                } else if(timeHasExpired()) {
+                    // If time is expired and I have not got a time yet, I'm out of time.
+                    if(mySide.getTime() == 0) {
+                        stopTimer();
+                        showMessage("You're out of time!");
+                        exitGameAfterDelay(5000);
+
+                    // Time expired and I've got time then I must have one.
+                    } else {
+                        stopTimer();
+                        showMessage("You win! Sweet");
+                        exitGameAfterDelay(5000);
+                    }
+
+                } else if(!timeHasExpired() && mySide.getTime() > 0) {
+                    stopTimer();
+                    showMessage(String.format("Your time: %s", timerLabel.getText()));
+                    Handler handler = new Handler(getMainLooper());
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            failPlayer(otherSide.getPlayerId(), new Realm.Transaction.OnSuccess() {
+                                @Override
+                                public void onSuccess() {
+                                    update();
+                                }
+                            });
+                        }
+                    }, 20000);
+               }
             }
         });
+    }
+
+    private void showMessage(String text) {
+        message.setText(text);
+        message.setVisibility(View.VISIBLE);
+    }
+
+    private void failPlayer(final String playerId, Realm.Transaction.OnSuccess onSuccess) {
+
+        if(onSuccess == null) {
+            onSuccess = new Realm.Transaction.OnSuccess() { public void onSuccess() {} };
+        }
+
+        if(realm != null) {
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgRealm) {
+                    Game currentGame = GameHelpers.playerWithId(playerId, bgRealm).getCurrentgame();
+                    if(currentGame != null) {
+                        Side side = currentGame.sideWithPlayerId(playerId);
+                        if(side != null) {
+                            side.setFailed(true);
+                        }
+                    }
+                }
+            }, onSuccess);
+        }
+    }
+
+    private boolean isGameOver() {
+        return mySide.isFailed() || otherSide.isFailed();
     }
 
     private Period timeElapsed() {
@@ -289,7 +354,11 @@ public class GameActivity extends BaseActivity {
 
     private String timeElapsedString() {
         Period period = timeElapsed();
-        return String.format(Locale.US, "%02d:%02d", period.getMinutes(), (period.getSeconds() % 60));
+        return String.format( Locale.US, "%.1f", period.getSeconds() + ((period.getMillis() / 1000d) % 60) );
+    }
+
+    private boolean timeHasExpired() {
+        return timeElapsed().getMinutes() >= 1;
     }
 
     private void stopTimer() {
@@ -304,17 +373,24 @@ public class GameActivity extends BaseActivity {
             stopTimer();
         }
         timer = new Timer();
+        startedAt = new Date();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        timerLabel.setText(timeElapsedString());
+                        String timerText = timeElapsedString();
+                        if(timeHasExpired()) {
+                            timerText = "60.0";
+                            stopTimer();
+                            update();
+                        }
+                        timerLabel.setText(timerText);
                     }
                 });
             }
-        }, new Date(), 1000);
+        }, new Date(), 100);
     }
 
 }
