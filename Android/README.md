@@ -1,12 +1,10 @@
 # Realm Pop Demo
 
-<span style="color:red">This demo is fully functional, but rather thrown together quickly for demo.  The code will be cleaned up soon, including using async tx.</span>
-
 Realm Pop is a simple game app designed to show off the collaborative features of the [Realm Mobile Platform](https://realm.io/news/introducing-realm-mobile-platform/).
 
 Any number of users may join and play in any given moment.
 
-This version is the Android version.
+This is the Android version.
 
 ## Installation Instructions
 
