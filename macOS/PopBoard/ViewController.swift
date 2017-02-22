@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import CoreGraphics
 
 struct Score {
     let name: String
@@ -18,9 +19,10 @@ class ViewController: NSViewController {
     
     var scores: [Score]?
     let file = ScoresFile("board.txt")
-    
+
     override func viewDidAppear() {
         super.viewDidAppear()
+        view.window!.level = Int(CGWindowLevelForKey(.maximumWindow))
         refresh()
     }
 
