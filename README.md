@@ -22,7 +22,7 @@ Install dependencies via CocoaPods, replace the demo IP address with your own Re
 
 ### Android
 
-Android app, for installation instructions check Android/README.md
+Android version of RealmPop.  Installation instructions are below.
 
 ### JS
 

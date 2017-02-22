@@ -1,12 +1,10 @@
 # Realm Pop Demo
 
-<span style="color:red">This demo is fully functional, but rather thrown together quickly for demo.  The code will be cleaned up soon, including using async tx.</span>
-
 Realm Pop is a simple game app designed to show off the collaborative features of the [Realm Mobile Platform](https://realm.io/news/introducing-realm-mobile-platform/).
 
 Any number of users may join and play in any given moment.
 
-This version is the Android version.
+This is the Android version.
 
 ## Installation Instructions
 
@@ -22,7 +20,7 @@ If you build the project through Android studio, the app you build and launch wi
 
 #### Running against a Digital Ocean ROS
 
-If you want to build the version that runs against the cloud, you can just run `gradle clean build` from the Android directory of the project.
+If you want to build the version that runs against the cloud, you can just run `./gradlew clean build` from the Android directory of the project.
 
 This will create 3 APKs at ./app/build/outputs/apk/
 * `app-cloudRelease.apk` <-- This one points to our cloud container.  The IP is hard coded into the app/build.gradle file in a variable called `cloudHost`
