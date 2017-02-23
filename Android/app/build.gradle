@@ -40,7 +40,7 @@ android {
             // It is assumed that this machine is also running the Object Server.
             // If not, replace 'host' with the IP of the machine hosting the server.
             buildConfigField "String", "OBJECT_SERVER_IP", "\"${host}\""
-
+            resValue "string", "objectServerIp", "${host}"
         }
 
         release {
@@ -52,6 +52,7 @@ android {
             // It is assumed that this machine is also running the Object Server.
             // If not, replace 'host' with the IP of the machine hosting the server.
             buildConfigField "String", "OBJECT_SERVER_IP", "\"${host}\""
+            resValue "string", "objectServerIp", "\${host}\""
         }
 
         cloudRelease {
@@ -60,6 +61,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             buildConfigField "String", "OBJECT_SERVER_IP", "\"${cloudHost}\""
+            resValue "string", "objectServerIp", "\"${cloudHost}\""
         }
 
         marinEuIpRelease {
@@ -68,6 +70,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             buildConfigField "String", "OBJECT_SERVER_IP", "\"${marinEuIp}\""
+            resValue "string", "objectServerIp", "\"${marinEuIp}\""
         }
 
     }

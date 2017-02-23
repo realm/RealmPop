@@ -30,4 +30,11 @@
         android:text="Loading..."
         />
 
+    <TextView
+        style="@style/Text.WhiteTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/objectServerIp" />
+
 </RelativeLayout>
