@@ -3,17 +3,15 @@ package realm.io.realmpop.controller;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.joda.time.Interval;
 import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
 
 import java.util.Date;
 import java.util.Locale;
@@ -22,7 +20,6 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import realm.io.realmpop.R;
@@ -50,6 +47,10 @@ public class GameActivity extends BaseActivity {
     private Date startedAt;
     private Player me;
 
+    private Score pendingScore;
+
+    private static String TAG = GameActivity.class.getName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -68,9 +69,11 @@ public class GameActivity extends BaseActivity {
         me.addChangeListener(new RealmChangeListener<Player>() {
             @Override
             public void onChange(Player me) {
-            if(me.getCurrentgame() == null) {
-                finish();
-            }
+                if(me.getCurrentgame() == null) {
+                    if(realm != null) {
+                        logScoreAndFinish();
+                    }
+                }
             }
         });
 
@@ -89,6 +92,7 @@ public class GameActivity extends BaseActivity {
 
         setupBubbleBoard();
     }
+
 
     @Override
     protected void onResume() {
@@ -149,6 +153,29 @@ public class GameActivity extends BaseActivity {
         }, delay);
     }
 
+    private void logScoreAndFinish() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                if (pendingScore != null) {
+                    bgRealm.copyToRealm(pendingScore);
+                    pendingScore = null;
+                }
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                finish();
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.e(TAG, error.getMessage());
+                finish();
+            }
+        });
+    }
+
     public void onBubbleTap(final long numberTapped) {
 
         // Just to make sure, if there are none left to tap, exit.
@@ -187,6 +214,12 @@ public class GameActivity extends BaseActivity {
                     message.setVisibility(View.VISIBLE);
                 }
             });
+        }
+    }
+
+    private void setScore(Score score) {
+        if(this.pendingScore == null) {
+            this.pendingScore = score;
         }
     }
 
@@ -246,7 +279,16 @@ public class GameActivity extends BaseActivity {
 
                     // MySide finished but time hasn't been recorded yet, so let's do that.
                     if (mySide.getTime() == 0) {
-                        mySide.setTime(timeElapsed().getSeconds());
+                        mySide.setTime(Double.valueOf(timeElapsedString()));
+                    }
+
+                    // Log score right away if mySide is the winner, but let both sides continue
+                    // until something ends the game.
+                    if(otherSide.getTime() == 0 || otherSide.getTime() > mySide.getTime()) {
+                        Score score = new Score();
+                        score.setName(mySide.getName());
+                        score.setTime(mySide.getTime());
+                        setScore(score);
                     }
 
                     // Both side times have been recorded, the game is over.
@@ -255,10 +297,6 @@ public class GameActivity extends BaseActivity {
                             mySide.setFailed(true);
                         } else {
                             otherSide.setFailed(true);
-                            Score score = new Score();
-                            score.setName(mySide.getName());
-                            score.setTime(mySide.getTime());
-                            bgRealm.copyToRealm(score);
                         }
                     }
                 }
@@ -285,7 +323,7 @@ public class GameActivity extends BaseActivity {
 
                 } else if(timeHasExpired()) {
                     // If time is expired and I have not got a time yet, I'm out of time.
-                    if(mySide.getTime() == 0) {
+                    if (mySide.getTime() == 0) {
                         stopTimer();
                         showMessage("You're out of time!");
                         exitGameAfterDelay(5000);
@@ -297,9 +335,10 @@ public class GameActivity extends BaseActivity {
                         exitGameAfterDelay(5000);
                     }
 
-                } else if(!timeHasExpired() && mySide.getTime() > 0) {
+                } else if(pendingScore != null) {
                     stopTimer();
-                    showMessage(String.format("Your time: %s", timerLabel.getText()));
+                    timerLabel.setText(String.valueOf(pendingScore.getTime()));
+                    showMessage(String.format("Your time: %s", String.valueOf(pendingScore.getTime())));
                     Handler handler = new Handler(getMainLooper());
                     handler.postDelayed(new Runnable() {
                         @Override
