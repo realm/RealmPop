@@ -64,7 +64,9 @@ class GameModel {
     func updateTime(mySide: Side, myTime: Double, otherSide: Side) {
         try! mySide.realm!.write {
             mySide.time = myTime
-            if otherSide.time < myTime {
+            
+            let iAmTheWinner = (otherSide.time == 0) || (otherSide.time > myTime)
+            if iAmTheWinner {
                 logTime(for: mySide)
             }
         }
