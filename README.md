@@ -1,5 +1,6 @@
 # Realm Pop
 
+<img src=http://i.imgur.com/pTxoTPX.png width=300> <img src=http://i.imgur.com/Zrvfypq.png width=300>
 
 ## Usage
 
