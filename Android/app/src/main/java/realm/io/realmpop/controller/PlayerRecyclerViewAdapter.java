@@ -19,7 +19,7 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
     private GameRoomActivity gameRoomActivity;
 
     public PlayerRecyclerViewAdapter(@NonNull GameRoomActivity gameRoomActivity, @NonNull OrderedRealmCollection<Player> players) {
-        super(gameRoomActivity, players, true);
+        super(players, true);
         this.gameRoomActivity = gameRoomActivity;
     }
 
