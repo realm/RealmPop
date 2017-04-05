@@ -37,6 +37,13 @@ class GameViewController: UIViewController {
     private var staredAt: Date!
     private var timer: Timer?
 
+    static func create(with gameModel: GameModel, challenge: Game) -> GameViewController {
+        return UIStoryboard.instantiateViewController(ofType: self).then { vc in
+            vc.game = gameModel
+            vc.challenge = challenge
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 

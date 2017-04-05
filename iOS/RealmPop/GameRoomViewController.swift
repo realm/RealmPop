@@ -94,10 +94,8 @@ class GameRoomViewController: UIViewController {
     }
 
     private func showGameViewController(with challenge: Game) {
-        let gameVC = storyboard!.instantiateViewController(withIdentifier: "GameViewController") as! GameViewController
-        gameVC.game = game
-        gameVC.challenge = challenge
-        navigationController!.pushViewController(gameVC, animated: true)
+        navigationController!.pushViewController(
+            GameViewController.create(with: game, challenge: challenge), animated: true)
     }
 
     @IBAction func back(_ sender: Any) {
