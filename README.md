@@ -55,7 +55,7 @@ Here are the instructions to run the project locally.
 
 #### Event handler:
  * install the latest Node.js from https://nodejs.org/en/
- * copy 'realm-1.0.2-professional.tgz' from your PE/EE folder to the JS folder of this repo (version might differ for you)
+ * copy 'realm-1.3.0-professional.tgz' from your PE/EE folder to the JS folder of this repo (version might differ for you)
  * run 'npm install'
  * start the app by typing in the shell 'node pop.js'
 
