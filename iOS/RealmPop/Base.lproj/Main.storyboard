@@ -29,10 +29,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="u8W-HG-DvT">
-                                <rect key="frame" x="233.5" y="87" width="200.5" height="107"/>
+                                <rect key="frame" x="233.5" y="88.5" width="200.5" height="104"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Player Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ngq-qt-RD2">
-                                        <rect key="frame" x="52" y="0.0" width="97" height="21"/>
+                                        <rect key="frame" x="7" y="0.0" width="187" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="21" id="uIb-F3-WeG"/>
                                         </constraints>
@@ -53,12 +53,9 @@
                                         </connections>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w2K-uN-ZnN">
-                                        <rect key="frame" x="80.5" y="75" width="40" height="32"/>
+                                        <rect key="frame" x="58" y="75" width="85" height="29"/>
                                         <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="17"/>
                                         <state key="normal" title="Enter"/>
-                                        <connections>
-                                            <segue destination="BYZ-38-t0r" kind="show" identifier="ShowGameRoom" id="6aB-f3-daf"/>
-                                        </connections>
                                     </button>
                                 </subviews>
                             </stackView>
@@ -72,6 +69,7 @@
                     <navigationItem key="navigationItem" id="7Mw-ru-yyN"/>
                     <connections>
                         <outlet property="playerName" destination="bdf-ac-lYI" id="hhz-HR-aPF"/>
+                        <segue destination="BYZ-38-t0r" kind="show" identifier="GameRoomSegue" id="DEC-gH-bUc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7EL-DG-vRS" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -247,7 +245,7 @@
         <scene sceneID="0Q5-bE-Vqr">
             <objects>
                 <navigationController id="TLY-AT-C0V" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="F98-pF-N43">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="F98-pF-N43">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -302,7 +300,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="WI4-vj-clF"/>
                     <connections>
-                        <segue destination="VYl-gB-Sgm" kind="show" id="GfC-3u-iFm"/>
+                        <segue destination="VYl-gB-Sgm" kind="show" identifier="UsernameSegue" id="GfC-3u-iFm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vld-h5-s8w" userLabel="First Responder" sceneMemberID="firstResponder"/>

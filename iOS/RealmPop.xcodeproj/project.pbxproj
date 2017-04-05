@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9C13FAEA1E94F17F00D72650 /* Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C13FAE81E94F17F00D72650 /* Ext.swift */; };
 		9C13FAEB1E94F17F00D72650 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C13FAE91E94F17F00D72650 /* Notification.swift */; };
+		9C13FAED1E9501EE00D72650 /* Storyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C13FAEC1E9501EE00D72650 /* Storyboard.swift */; };
 		9C34FFC21E9415FF00BA5C18 /* ConnectedUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C34FFC11E9415FF00BA5C18 /* ConnectedUser.swift */; };
 		9C40C2551E40988100045987 /* PreGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C40C2541E40988100045987 /* PreGameViewController.swift */; };
 		9C40C2571E40998000045987 /* UIViewController+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C40C2561E40998000045987 /* UIViewController+.swift */; };
@@ -39,6 +40,7 @@
 		3A5AFD18F6E84D8EF8E43A88 /* Pods_RealmPop.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RealmPop.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C13FAE81E94F17F00D72650 /* Ext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ext.swift; sourceTree = "<group>"; };
 		9C13FAE91E94F17F00D72650 /* Notification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
+		9C13FAEC1E9501EE00D72650 /* Storyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storyboard.swift; sourceTree = "<group>"; };
 		9C34FFC11E9415FF00BA5C18 /* ConnectedUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectedUser.swift; sourceTree = "<group>"; };
 		9C40C2541E40988100045987 /* PreGameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreGameViewController.swift; sourceTree = "<group>"; };
 		9C40C2561E40998000045987 /* UIViewController+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+.swift"; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 			children = (
 				9C13FAE81E94F17F00D72650 /* Ext.swift */,
 				9C13FAE91E94F17F00D72650 /* Notification.swift */,
+				9C13FAEC1E9501EE00D72650 /* Storyboard.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -371,6 +374,7 @@
 				9CB82BB21E38CB4200785399 /* ServerIPAddress.swift in Sources */,
 				9C40C25B1E40A6C800045987 /* GameViewController.swift in Sources */,
 				9CB82BA81E38A40300785399 /* UserDefaults+.swift in Sources */,
+				9C13FAED1E9501EE00D72650 /* Storyboard.swift in Sources */,
 				9C40C2551E40988100045987 /* PreGameViewController.swift in Sources */,
 				9C40C2591E40A52200045987 /* Game.swift in Sources */,
 				9C5CE5411E50C2780046BC57 /* UIColor+realm.swift in Sources */,

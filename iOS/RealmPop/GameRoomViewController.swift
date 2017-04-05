@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import Then
 
 class GameRoomViewController: UIViewController {
 
@@ -21,16 +22,16 @@ class GameRoomViewController: UIViewController {
     fileprivate var players: Results<Player>!
     fileprivate var playersToken: NotificationToken?
 
+    static func create(with me: Player, game: GameModel) -> GameRoomViewController {
+        return UIStoryboard.instantiateViewController(ofType: self).then { vc in
+            vc.me = me
+            vc.game = game
+            vc.players = vc.game.otherPlayers(than: me)
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        guard let game = GameModel() else {
-            fatalError("Couldn't create game model")
-        }
-        self.game = game
-
-        me = game.currentPlayer()
-        players = game.otherPlayers(than: me)
     }
 
     var alert: UIAlertController?

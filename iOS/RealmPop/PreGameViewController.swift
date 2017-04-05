@@ -15,18 +15,14 @@ class PreGameRoomViewController: UIViewController {
     fileprivate var me: Player!
 
     static func create() -> PreGameRoomViewController {
-        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: String(describing: self)) as! PreGameRoomViewController
+        return UIStoryboard.instantiateViewController(ofType: self).then { vc in
+            let game = GameModel()!
+            vc.me = game.currentPlayer()
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        guard let game = GameModel() else {
-            //total disaster
-            return alert(message: "Could not initialize the game. Try turning it off an on again")
-        }
-        
-        me = game.currentPlayer()
         playerName.text = me.name
     }
 
@@ -34,16 +30,6 @@ class PreGameRoomViewController: UIViewController {
         super.viewWillAppear(animated)
         me.resetState()
     }
-
-    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
-        switch identifier {
-        case "ShowGameRoom":
-            return playerName.text?.isEmpty == false
-        default:
-            return true
-        }
-    }
-
 }
 
 extension PreGameRoomViewController: UITextFieldDelegate {
