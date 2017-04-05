@@ -13,7 +13,7 @@ class GameModel {
 
     let realm: Realm
 
-    init?(config: Realm.Configuration = Realm.Configuration.defaultConfiguration) {
+    init?(config: Realm.Configuration = RealmConfig(.app).configuration) {
         guard let realm = try? Realm(configuration: config) else {
             return nil
         }
@@ -47,7 +47,7 @@ class GameModel {
             for player in me.realm!.objects(Player.self).filter("challenger = %@", me) {
                 player.challenger = nil
             }
-            vs.challenger = me
+            //vs.challenger = me
         }
     }
 
@@ -55,8 +55,8 @@ class GameModel {
         if vs.available {
             try! me.realm!.write {
                 let game = Game(challenger: vs, opponent: me)
-                me.currentGame = game
-                vs.currentGame = game
+                //me.currentGame = game
+                //vs.currentGame = game
             }
         }
     }

@@ -9,13 +9,14 @@
 import RealmSwift
 
 class Player: Object {
+
     dynamic var id = UUID().uuidString
     dynamic var name = ""
 
     dynamic var available = false
-    dynamic var challenger: Player?
+    dynamic var challenger: String?
 
-    dynamic var currentGame: Game?
+    dynamic var currentGame: String?
 
     convenience init(id: String) {
         self.init()

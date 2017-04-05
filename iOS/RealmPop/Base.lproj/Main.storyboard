@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="KaG-KZ-Jwm">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="TLY-AT-C0V">
     <device id="retina4_7" orientation="landscape">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -29,10 +29,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="u8W-HG-DvT">
-                                <rect key="frame" x="233.5" y="88.5" width="200.5" height="104"/>
+                                <rect key="frame" x="233.5" y="87" width="200.5" height="107"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Player Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ngq-qt-RD2">
-                                        <rect key="frame" x="7" y="0.0" width="187" height="21"/>
+                                        <rect key="frame" x="52" y="0.0" width="97" height="21"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="21" id="uIb-F3-WeG"/>
                                         </constraints>
@@ -53,7 +53,7 @@
                                         </connections>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w2K-uN-ZnN">
-                                        <rect key="frame" x="58" y="75" width="85" height="29"/>
+                                        <rect key="frame" x="80.5" y="75" width="40" height="32"/>
                                         <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="17"/>
                                         <state key="normal" title="Enter"/>
                                         <connections>
@@ -91,19 +91,19 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="yx6-kc-ZON">
-                                <rect key="frame" x="0.0" y="30" width="667" height="345"/>
+                                <rect key="frame" x="0.0" y="74" width="667" height="301"/>
                                 <color key="backgroundColor" red="0.13333334029999999" green="0.13333334029999999" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="separatorColor" red="0.27450981740000002" green="0.25490197539999998" blue="0.54901963470000004" alpha="1" colorSpace="calibratedRGB"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="Cell" textLabel="zTg-Rz-aFA" style="IBUITableViewCellStyleDefault" id="tR1-FI-v80">
-                                        <rect key="frame" x="0.0" y="56" width="667" height="44"/>
+                                        <rect key="frame" x="0.0" y="55.5" width="667" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="tR1-FI-v80" id="u3b-gj-OUf">
-                                            <rect key="frame" x="0.0" y="0.0" width="634" height="43"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="634" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="zTg-Rz-aFA">
-                                                    <rect key="frame" x="15" y="0.0" width="617" height="43"/>
+                                                    <rect key="frame" x="15" y="0.0" width="617" height="43.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="13"/>
                                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -243,10 +243,26 @@
             </objects>
             <point key="canvasLocation" x="121.88905547226388" y="2608.8000000000002"/>
         </scene>
-        <!--View Controller-->
+        <!--Navigation Controller-->
+        <scene sceneID="0Q5-bE-Vqr">
+            <objects>
+                <navigationController id="TLY-AT-C0V" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="F98-pF-N43">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="KaG-KZ-Jwm" kind="relationship" relationship="rootViewController" id="Yua-cr-BgK"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="nrP-BE-d4V" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="122" y="-714"/>
+        </scene>
+        <!--Game Login View Controller-->
         <scene sceneID="hPG-bW-Cyq">
             <objects>
-                <viewController id="KaG-KZ-Jwm" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="GameLoginViewController" id="KaG-KZ-Jwm" customClass="GameLoginViewController" customModule="RealmPop" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="9zL-Lb-ryr"/>
                         <viewControllerLayoutGuide type="bottom" id="4pl-5g-ptE"/>
@@ -284,28 +300,14 @@
                             <constraint firstItem="YrE-ew-KeJ" firstAttribute="leading" secondItem="QZ8-SU-MjB" secondAttribute="leadingMargin" id="nmY-7H-4t2"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="WI4-vj-clF"/>
+                    <connections>
+                        <segue destination="VYl-gB-Sgm" kind="show" id="GfC-3u-iFm"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vld-h5-s8w" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="123.68815592203899" y="-674.39999999999998"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="3iy-iC-3eH">
-            <objects>
-                <navigationController storyboardIdentifier="Navigation" automaticallyAdjustsScrollViewInsets="NO" navigationBarHidden="YES" id="BBS-Jo-OUb" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="tu8-u0-h2O">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="VYl-gB-Sgm" kind="relationship" relationship="rootViewController" id="K3F-Pc-zZ6"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="kLi-aG-4Mv" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="123.68815592203899" y="101.59999999999999"/>
+            <point key="canvasLocation" x="122" y="94"/>
         </scene>
     </scenes>
 </document>

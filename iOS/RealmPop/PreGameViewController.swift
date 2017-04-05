@@ -14,6 +14,10 @@ class PreGameRoomViewController: UIViewController {
     @IBOutlet var playerName: UITextField!
     fileprivate var me: Player!
 
+    static func create() -> PreGameRoomViewController {
+        return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: String(describing: self)) as! PreGameRoomViewController
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 

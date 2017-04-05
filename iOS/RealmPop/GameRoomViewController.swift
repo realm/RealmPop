@@ -55,11 +55,11 @@ class GameRoomViewController: UIViewController {
             case .change(let properties):
                 if properties.first(where: { $0.name == "challenger"}) != nil,
                     let challenger = self?.me.challenger {
-                    self?.handleInvite(from: challenger)
+                    //self?.handleInvite(from: challenger)
                 }
                 if properties.first(where: { $0.name == "currentGame"}) != nil,
                     let challenge = self?.me.currentGame {
-                    self?.showGameViewController(with: challenge)
+                    //self?.showGameViewController(with: challenge)
                 }
 
             case .error, .deleted:
