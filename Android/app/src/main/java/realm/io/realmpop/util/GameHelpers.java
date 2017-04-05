@@ -1,9 +1,7 @@
 package realm.io.realmpop.util;
 
 import io.realm.Realm;
-import io.realm.SyncUser;
 import realm.io.realmpop.model.Player;
-import realm.io.realmpop.model.Side;
 
 public class GameHelpers {
 
