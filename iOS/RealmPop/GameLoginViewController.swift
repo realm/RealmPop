@@ -14,31 +14,14 @@ let kSharedRealmFileCreatedNotification = "kSharedRealmFileCreatedNotification"
 
 class GameLoginViewController: UIViewController {
 
-    //private var loginViewController: LoginViewController!
     private var me: ConnectedUser?
+
+    // MARK: - View controller life cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         navigationController!.navigationBar.isHidden = true
-    }
-
-    private func createOrFetchConnectedUser(with user: SyncUser) -> ConnectedUser {
-        host = user.authenticationServer!.host!
-
-        let usersConfig = RealmConfig(.users)
-        guard let identity = SyncUser.current?.identity else {
-            fatalError("Should have user at this point")
-        }
-
-        return usersConfig.realm.object(ofType: ConnectedUser.self, forPrimaryKey: identity) ?? {
-            //create user
-            let me = ConnectedUser(identity)
-            try! usersConfig.realm.write {
-                usersConfig.realm.add(me, update: true)
-            }
-            return me
-        }()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -73,9 +56,29 @@ class GameLoginViewController: UIViewController {
         navigationController?.pushViewController(PreGameRoomViewController.create(), animated: true)
     }
 
-    var permissionsToken: NotificationToken!
+    // MARK: - Data stuffs
 
-    func setupDefaultGlobalPermissions(user: SyncUser) {
+    private func createOrFetchConnectedUser(with user: SyncUser) -> ConnectedUser {
+        host = user.authenticationServer!.host!
+
+        let usersConfig = RealmConfig(.users)
+        guard let identity = SyncUser.current?.identity else {
+            fatalError("Should have user at this point")
+        }
+
+        return usersConfig.realm.object(ofType: ConnectedUser.self, forPrimaryKey: identity) ?? {
+            //create user
+            let me = ConnectedUser(identity)
+            try! usersConfig.realm.write {
+                usersConfig.realm.add(me, update: true)
+            }
+            return me
+            }()
+    }
+
+    private var permissionsToken: NotificationToken!
+
+    private func setupDefaultGlobalPermissions(user: SyncUser) {
 
         let managementRealm = try! user.managementRealm()
         let fileUrl = RealmConfig(.users).url
