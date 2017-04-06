@@ -5,25 +5,15 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.widget.EditText;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.realm.ObjectServerError;
 import io.realm.Realm;
-import io.realm.SyncConfiguration;
-import io.realm.SyncCredentials;
-import io.realm.SyncUser;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.util.GameHelpers;
-
-import static realm.io.realmpop.util.BubbleConstants.AUTH_URL;
-import static realm.io.realmpop.util.BubbleConstants.ID;
-import static realm.io.realmpop.util.BubbleConstants.PASSWORD;
-import static realm.io.realmpop.util.BubbleConstants.REALM_URL;
 
 public class PreGameRoomActivity extends BaseActivity implements TextWatcher {
 
