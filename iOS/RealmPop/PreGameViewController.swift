@@ -16,11 +16,11 @@ class PreGameRoomViewController: UIViewController {
     fileprivate var game: GameModel!
     private var defaultUsername: String?
 
-    static func create(username: String?) -> PreGameRoomViewController {
+    static func create(connectedUser: ConnectedUser) -> PreGameRoomViewController {
         return UIStoryboard.instantiateViewController(ofType: self).then { vc in
             vc.game = GameModel()!
             vc.me = vc.game.currentPlayer()
-            vc.defaultUsername = username
+            vc.defaultUsername = connectedUser.username
         }
     }
 

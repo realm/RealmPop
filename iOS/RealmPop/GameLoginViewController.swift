@@ -34,31 +34,37 @@ class GameLoginViewController: UIViewController {
             setupDefaultGlobalPermissions(user: user)
             me = createOrFetchConnectedUser(with: user)
 
-            showGameRoomViewController()
+            showPreGameRoomViewController()
 
         } else {
             // show login screen
-
-            let loginViewController = LoginViewController(style: .darkOpaque)
-
-            if loginViewController.serverURL == nil {
-                loginViewController.serverURL = defaultSyncHost
+            showLoginViewController(defaultHost: defaultSyncHost) {[unowned self] username, user in
+                self.username = username
             }
-
-            loginViewController.loginSuccessfulHandler = { user in
-                DispatchQueue.main.async {[unowned self] in
-                    self.username = loginViewController.username
-                    loginViewController.dismiss(animated: true, completion: nil)
-                }
-            }
-
-            present(loginViewController, animated: false, completion: nil)
         }
     }
 
-    private func showGameRoomViewController() {
+    private func showLoginViewController(defaultHost: String?, completion: @escaping (String?, SyncUser) -> Void) {
+        let loginViewController = LoginViewController(style: .darkOpaque)
+        if loginViewController.serverURL == nil {
+            loginViewController.serverURL = defaultHost
+        }
+        loginViewController.loginSuccessfulHandler = {user in
+            DispatchQueue.main.async {
+                loginViewController.dismiss(animated: true, completion: nil)
+                completion(loginViewController.username, user)
+            }
+        }
+        present(loginViewController, animated: false, completion: nil)
+    }
+
+    private func showPreGameRoomViewController() {
+        guard let me = me else {
+            fatalError("Should not call this method before having fetched user")
+        }
+
         navigationController!.navigationBar.isHidden = false
-        navigationController!.pushViewController(PreGameRoomViewController.create(username: username), animated: true)
+        navigationController!.pushViewController(PreGameRoomViewController.create(connectedUser: me), animated: true)
     }
 
     // MARK: - Data stuffs

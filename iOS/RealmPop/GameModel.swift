@@ -21,16 +21,24 @@ class GameModel {
     }
 
     func currentPlayer() -> Player {
-        let currentId = UserDefaults.idForCurrentPlayer()
+        guard let id = SyncUser.current?.identity else {
+            fatalError("Should not call this function if there's no logged in user")
+        }
 
-        if let player = realm.object(ofType: Player.self, forPrimaryKey: currentId) {
+        if let player = realm.object(ofType: Player.self, forPrimaryKey: id) {
             return player
         }
 
-        let player = Player(id: currentId)
+        return createCurrentPlayer(id: id)
+    }
+
+    private func createCurrentPlayer(id: String) -> Player {
+        // create private Player object
+        let player = Player(id: id)
         try! realm.write {
             realm.add(player)
         }
+
         return player
     }
 
