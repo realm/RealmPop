@@ -19,14 +19,14 @@ class GameRoomViewController: UIViewController {
     fileprivate var me: Player!
     fileprivate var meToken: NotificationToken?
 
-    fileprivate var players: Results<Player>!
-    fileprivate var playersToken: NotificationToken?
+    fileprivate var users: Results<ConnectedUser>!
+    fileprivate var usersToken: NotificationToken?
 
     static func create(with me: Player, game: GameModel) -> GameRoomViewController {
         return UIStoryboard.instantiateViewController(ofType: self).then { vc in
             vc.me = me
             vc.game = game
-            vc.players = vc.game.otherPlayers(than: me)
+            vc.users = vc.game.otherPlayers(than: me)
         }
     }
 
@@ -40,7 +40,7 @@ class GameRoomViewController: UIViewController {
         alert = UIAlertController(title: "You were invited", message: "to a game by \(from.name)", preferredStyle: .alert)
         alert?.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
             guard let game = self?.game, let me = self?.me else { return }
-            game.createGame(me: me, vs: from)
+            //game.createGame(me: me, vs: from)
         }))
         alert?.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
             self?.me.resetState(available: true)
@@ -68,7 +68,7 @@ class GameRoomViewController: UIViewController {
             }
         }
 
-        playersToken = players.addNotificationBlock { [weak self] changes in
+        usersToken = users.addNotificationBlock { [weak self] changes in
             guard let strongSelf = self else { return }
 
             switch changes {
@@ -86,7 +86,7 @@ class GameRoomViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         meToken?.stop()
-        playersToken?.stop()
+        usersToken?.stop()
 
         try! me.realm?.write {
             me.available = false
@@ -105,14 +105,14 @@ class GameRoomViewController: UIViewController {
 
 extension GameRoomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return players.count
+        return users.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let opponent = players[indexPath.row]
+        let opponent = users[indexPath.row]
 
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")!
-        cell.textLabel?.text = opponent.name
+        cell.textLabel?.text = opponent.username
         cell.textLabel?.textColor = opponent.available ? UIColor.melon : UIColor.gray
         cell.accessoryType = opponent.available ? .disclosureIndicator : .none
         return cell
@@ -122,7 +122,7 @@ extension GameRoomViewController: UITableViewDataSource {
 
 extension GameRoomViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let opponent = players[indexPath.row]
+        let opponent = users[indexPath.row]
 
         if let cell = tableView.cellForRow(at: indexPath) {
             cell.contentView.backgroundColor = UIColor.elephant

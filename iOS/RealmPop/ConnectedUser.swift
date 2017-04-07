@@ -15,7 +15,7 @@ class ConnectedUser: Object {
     dynamic var creationDate = Date()
     dynamic var username = ""
     dynamic var lastUpdate = Date()
-    dynamic var isAvailable = false
+    dynamic var available = false
 
     convenience init(_ id: String) {
         self.init()

@@ -49,13 +49,15 @@ class GameModel {
         }
     }
 
-    func otherPlayers(than me: Player) -> Results<Player> {
-        return realm.objects(Player.self)
+    func otherPlayers(than me: Player) -> Results<ConnectedUser> {
+        let usersRealm = RealmConfig(.users).realm
+
+        return usersRealm.objects(ConnectedUser.self)
             .filter("id != %@", me.id)
             .sorted(byKeyPath: "available", ascending: false)
     }
 
-    func challenge(me: Player, vs: Player) {
+    func challenge(me: Player, vs: ConnectedUser) {
         guard vs.available else { return }
 
         try! me.realm!.write {
@@ -66,10 +68,10 @@ class GameModel {
         }
     }
 
-    func createGame(me: Player, vs: Player) {
+    func createGame(me: Player, vs: ConnectedUser) {
         if vs.available {
             try! me.realm!.write {
-                let game = Game(challenger: vs, opponent: me)
+                //let game = Game(challenger: vs, opponent: me)
                 //me.currentGame = game
                 //vs.currentGame = game
             }
