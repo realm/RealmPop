@@ -15,6 +15,7 @@ let kSharedRealmFileCreatedNotification = "kSharedRealmFileCreatedNotification"
 class GameLoginViewController: UIViewController {
 
     private var me: ConnectedUser?
+    private var username: String?
 
     // MARK: - View controller life cycle
 
@@ -28,13 +29,16 @@ class GameLoginViewController: UIViewController {
         super.viewWillAppear(animated)
 
         if let user = SyncUser.current {
+            // user logged in, proceed to username screen
 
             setupDefaultGlobalPermissions(user: user)
             me = createOrFetchConnectedUser(with: user)
 
-            navigationController!.pushViewController(PreGameRoomViewController.create(), animated: true)
+            showGameRoomViewController()
 
         } else {
+            // show login screen
+
             let loginViewController = LoginViewController(style: .darkOpaque)
 
             if loginViewController.serverURL == nil {
@@ -42,7 +46,8 @@ class GameLoginViewController: UIViewController {
             }
 
             loginViewController.loginSuccessfulHandler = { user in
-                DispatchQueue.main.async {
+                DispatchQueue.main.async {[unowned self] in
+                    self.username = loginViewController.username
                     loginViewController.dismiss(animated: true, completion: nil)
                 }
             }
@@ -51,9 +56,9 @@ class GameLoginViewController: UIViewController {
         }
     }
 
-    func showGameRoomViewController() {
+    private func showGameRoomViewController() {
         navigationController!.navigationBar.isHidden = false
-        navigationController?.pushViewController(PreGameRoomViewController.create(), animated: true)
+        navigationController!.pushViewController(PreGameRoomViewController.create(username: username), animated: true)
     }
 
     // MARK: - Data stuffs
@@ -73,12 +78,13 @@ class GameLoginViewController: UIViewController {
                 usersConfig.realm.add(me, update: true)
             }
             return me
-            }()
+        }()
     }
 
     private var permissionsToken: NotificationToken!
 
     private func setupDefaultGlobalPermissions(user: SyncUser) {
+        return;
 
         let managementRealm = try! user.managementRealm()
         let fileUrl = RealmConfig(.users).url

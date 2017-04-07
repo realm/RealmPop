@@ -34,6 +34,13 @@ class GameModel {
         return player
     }
 
+    func update(name: String) {
+        let player = currentPlayer()
+        try! player.realm?.write {
+            player.name = name
+        }
+    }
+
     func otherPlayers(than me: Player) -> Results<Player> {
         return realm.objects(Player.self)
             .filter("id != %@", me.id)

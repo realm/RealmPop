@@ -16,7 +16,7 @@
         </array>
     </customFonts>
     <scenes>
-        <!--Pre Game Room View Controller-->
+        <!--Choose your name-->
         <scene sceneID="A1o-hD-NyW">
             <objects>
                 <viewController storyboardIdentifier="PreGameRoomViewController" id="VYl-gB-Sgm" customClass="PreGameRoomViewController" customModule="RealmPop" customModuleProvider="target" sceneMemberID="viewController">
@@ -56,6 +56,9 @@
                                         <rect key="frame" x="58" y="75" width="85" height="29"/>
                                         <fontDescription key="fontDescription" name="PressStart2P" family="Press Start 2P" pointSize="17"/>
                                         <state key="normal" title="Enter"/>
+                                        <connections>
+                                            <action selector="showGameRoom:" destination="VYl-gB-Sgm" eventType="touchUpInside" id="6nd-af-HCn"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                             </stackView>
@@ -66,7 +69,13 @@
                             <constraint firstItem="u8W-HG-DvT" firstAttribute="centerY" secondItem="FMo-gu-1pW" secondAttribute="centerY" multiplier="0.75" id="Hf5-I7-h3l"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="7Mw-ru-yyN"/>
+                    <navigationItem key="navigationItem" title="Choose your name" id="hzQ-lE-hJF">
+                        <barButtonItem key="leftBarButtonItem" title="Log out" id="vtH-UE-ejJ">
+                            <connections>
+                                <action selector="logOut:" destination="VYl-gB-Sgm" id="pM3-uB-LaX"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="playerName" destination="bdf-ac-lYI" id="hhz-HR-aPF"/>
                         <segue destination="BYZ-38-t0r" kind="show" identifier="GameRoomSegue" id="DEC-gH-bUc"/>
