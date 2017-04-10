@@ -14,8 +14,8 @@ class Player: Object {
     dynamic var name = ""
 
     dynamic var available = false
-    dynamic var challenger: String?
 
+    dynamic var challengerId: String?
     dynamic var currentGame: String?
 
     convenience init(id: String) {
@@ -30,7 +30,7 @@ class Player: Object {
     func resetState(available: Bool = false) {
         try? realm?.write {
             self.available = available
-            challenger = nil
+            challengerId = nil
             currentGame = nil
         }
     }

@@ -26,7 +26,7 @@ class GameRoomViewController: UIViewController {
         return UIStoryboard.instantiateViewController(ofType: self).then { vc in
             vc.me = me
             vc.game = game
-            vc.users = vc.game.otherPlayers(than: me)
+            vc.users = game.otherPlayers(than: me)
         }
     }
 
@@ -55,7 +55,7 @@ class GameRoomViewController: UIViewController {
             switch change {
             case .change(let properties):
                 if properties.first(where: { $0.name == "challenger"}) != nil,
-                    let challenger = self?.me.challenger {
+                    let challenger = self?.me.challengerId {
                     //self?.handleInvite(from: challenger)
                 }
                 if properties.first(where: { $0.name == "currentGame"}) != nil,
@@ -69,6 +69,7 @@ class GameRoomViewController: UIViewController {
         }
 
         usersToken = users.addNotificationBlock { [weak self] changes in
+            NSLog("users update!");
             guard let strongSelf = self else { return }
 
             switch changes {
@@ -105,6 +106,7 @@ class GameRoomViewController: UIViewController {
 
 extension GameRoomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        NSLog("USERS: \(users.count)");
         return users.count
     }
 
@@ -130,7 +132,10 @@ extension GameRoomViewController: UITableViewDelegate {
                 cell.contentView.backgroundColor = UIColor.clear
             }) {[weak self]_ in
                 guard let strongSelf = self else { return }
-                strongSelf.game.challenge(me: strongSelf.me, vs: opponent)
+                strongSelf.game.challenge(me: strongSelf.me, vs: opponent, completion: {token in
+                    print(token)
+                    return
+                })
             }
         }
     }

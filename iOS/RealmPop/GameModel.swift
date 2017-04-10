@@ -53,19 +53,67 @@ class GameModel {
         let usersRealm = RealmConfig(.users).realm
 
         return usersRealm.objects(ConnectedUser.self)
-            .filter("id != %@", me.id)
+            //.filter("id != %@", me.id)
             .sorted(byKeyPath: "available", ascending: false)
     }
 
-    func challenge(me: Player, vs: ConnectedUser) {
+    private var challengeToken: NotificationToken?
+
+    func challenge(me: Player, vs: ConnectedUser, completion: @escaping (String?) -> Void) {
         guard vs.available else { return }
 
-        try! me.realm!.write {
-            for player in me.realm!.objects(Player.self).filter("challenger = %@", me) {
-                player.challenger = nil
-            }
-            //vs.challenger = me
+        // build the game file URL
+        let gameConfig = RealmConfig(.game)
+        let gameUrl = gameConfig.url
+
+        // TODO: unshare the game file with anyone else
+
+
+        // offer the user access to the game file
+        let challengeOffer = SyncPermissionOffer(
+            realmURL: gameUrl.absoluteString,
+            expiresAt: nil,
+            mayRead: true,
+            mayWrite: true,
+            mayManage: false)
+
+        // create the offer and send it off to the ros
+        let managementRealm = try! SyncUser.current!.managementRealm()
+        try! managementRealm.write {
+            managementRealm.add(challengeOffer)
         }
+
+        // observe for accepting the offer
+        challengeToken = challengeOffer.addNotificationBlock { changes in
+            switch changes {
+            case .change where challengeOffer.status == .success:
+                completion(challengeOffer.token)
+            default:
+                completion(nil)
+            }
+        }
+    }
+
+    private func sendChallenge() {
+
+//        let listID = taskList.realm?.configuration.syncConfiguration?.realmURL.lastPathComponent
+//
+//        let syncConfig = Realm.Configuration.defaultConfiguration.syncConfiguration!
+//
+//        let rootRealmURL = syncConfig.realmURL.deletingLastPathComponent().deletingLastPathComponent()
+//
+//        let listRealmURL = rootRealmURL.appendingPathComponent("\(syncConfig.user.identity!)/\(listID!)")
+//
+//        let shareOffer = SyncPermissionOffer(realmURL: listRealmURL.absoluteString, expiresAt: nil, mayRead: true, mayWrite: true, mayManage: true)
+//
+//        let managementRealm = try! syncConfig.user.managementRealm()
+//        try! managementRealm.write { managementRealm.add(shareOffer) }
+//        shareOfferNotificationToken = managementRealm.objects(SyncPermissionOffer.self).filter("id = %@", shareOffer.id).addNotificationBlock { changes in
+//            guard case let .update(change, _, _, _) = changes, let offer = change.first, offer.status == .success, let token = offer.token else { return }
+//            let url = "realmtasks://" + token.replacingOccurrences(of: ":", with: "/")
+//            let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+//            self.present(activityViewController, animated: true, completion: nil)
+//        }
     }
 
     func createGame(me: Player, vs: ConnectedUser) {

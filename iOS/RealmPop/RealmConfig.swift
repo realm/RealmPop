@@ -12,7 +12,7 @@ import RealmSwift
 enum RealmFile {
     case users
     case app
-    case game(String)
+    case game
 }
 
 struct RealmConfig {
@@ -37,7 +37,7 @@ struct RealmConfig {
         switch file {
         case .app: return "/~/app"
         case .users: return "/users"
-        case .game(let name): return "/~/\(name)"
+        case .game: return "/~/game"
         }
     }
 
@@ -45,7 +45,7 @@ struct RealmConfig {
         switch file {
         case .app: return [Player.self]
         case .users: return [ConnectedUser.self]
-        case .game(let name): return [Game.self, Side.self]
+        case .game: return [Game.self, Side.self]
         }
     }
 

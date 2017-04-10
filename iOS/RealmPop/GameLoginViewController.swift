@@ -14,7 +14,6 @@ let kSharedRealmFileCreatedNotification = "kSharedRealmFileCreatedNotification"
 
 class GameLoginViewController: UIViewController {
 
-    private var me: ConnectedUser?
     private var username: String?
 
     // MARK: - View controller life cycle
@@ -29,13 +28,10 @@ class GameLoginViewController: UIViewController {
         super.viewWillAppear(animated)
 
         if let user = SyncUser.current {
-            // user logged in, proceed to username screen
-
-            setupDefaultGlobalPermissions(user: user)
-            me = createOrFetchConnectedUser(with: user)
-
-            showPreGameRoomViewController()
-
+            // observer for received ConnectedUser and proceed to next screen
+            fetchConnectedUser(with: user, completion: {[weak self] connectedUser in
+                self?.showPreGameRoomViewController(me: connectedUser)
+            })
         } else {
             // show login screen
             showLoginViewController(defaultHost: defaultSyncHost) {[unowned self] username, user in
@@ -58,67 +54,47 @@ class GameLoginViewController: UIViewController {
         present(loginViewController, animated: false, completion: nil)
     }
 
-    private func showPreGameRoomViewController() {
-        guard let me = me else {
-            fatalError("Should not call this method before having fetched user")
-        }
-
+    private func showPreGameRoomViewController(me: ConnectedUser) {
         navigationController!.navigationBar.isHidden = false
         navigationController!.pushViewController(PreGameRoomViewController.create(connectedUser: me), animated: true)
     }
 
     // MARK: - Data stuffs
+    private var userToken: NotificationToken?
 
-    private func createOrFetchConnectedUser(with user: SyncUser) -> ConnectedUser {
-        host = user.authenticationServer!.host!
-
-        let usersConfig = RealmConfig(.users)
+    private func fetchConnectedUser(with user: SyncUser, completion: @escaping (ConnectedUser)->Void ) {
         guard let identity = SyncUser.current?.identity else {
             fatalError("Should have user at this point")
         }
 
-        return usersConfig.realm.object(ofType: ConnectedUser.self, forPrimaryKey: identity) ?? {
-            //create user
-            let me = ConnectedUser(identity)
-            try! usersConfig.realm.write {
-                usersConfig.realm.add(me, update: true)
-            }
-            return me
-        }()
-    }
+        let game = GameModel()!
+        let player = game.currentPlayer()
 
-    private var permissionsToken: NotificationToken!
+        let usersRealm = RealmConfig(.users).realm
 
-    private func setupDefaultGlobalPermissions(user: SyncUser) {
-        return;
+        if let user = usersRealm.object(ofType: ConnectedUser.self, forPrimaryKey: player.id) {
+            completion(user)
+            return
+        }
 
-        let managementRealm = try! user.managementRealm()
-        let fileUrl = RealmConfig(.users).url
-        let permissionChange = SyncPermissionChange(realmURL: fileUrl.absoluteString,
-            userID: "*",
-            mayRead: true,
-            mayWrite: false,
-            mayManage: false)
+        userToken = usersRealm.objects(ConnectedUser.self)
+            .filter(NSPredicate(format: "id == %@", player.id))
+            .addNotificationBlock { [weak self] changes in
 
-        permissionsToken = managementRealm.objects(SyncPermissionChange.self)
-            .filter("id = %@", permissionChange.id).addNotificationBlock {[weak self] notification in
-            if case .update(let changes, _, _, _) = notification, let change = changes.first {
-                // Object Server processed the permission change operation
-                switch change.status {
-                case .notProcessed:
-                    print("not processed.")
-                case .success:
-                    self?.notification(name: kSharedRealmFileCreatedNotification)
-                case .error:
-                    print("Error.")
+                switch changes {
+                case .initial(let users):
+                    if !users.isEmpty {
+                        completion(users.first!)
+                        self?.userToken = nil
+                    }
+                case .update(let users, _, _, _):
+                    if !users.isEmpty {
+                        completion(users.first!)
+                        self?.userToken = nil
+                    }
+                default:
+                    fatalError("Errored out")
                 }
-                print("change notification: \(change.debugDescription)")
             }
-        }
-
-        try! managementRealm.write {
-            managementRealm.add(permissionChange)
-        }
     }
-
 }

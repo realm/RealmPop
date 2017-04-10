@@ -19,6 +19,8 @@
 		9C46880E1E940611007D1E43 /* RealmConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C46880D1E940611007D1E43 /* RealmConfig.swift */; };
 		9C4688111E940C5A007D1E43 /* GameLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4688101E940C5A007D1E43 /* GameLoginViewController.swift */; };
 		9C5CE5411E50C2780046BC57 /* UIColor+realm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5CE5401E50C2780046BC57 /* UIColor+realm.swift */; };
+		9C7C536D1E9A3B8400818295 /* SyncUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C536C1E9A3B8400818295 /* SyncUser.swift */; };
+		9C7C536F1E9A3BAE00818295 /* NSError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C536E1E9A3BAE00818295 /* NSError.swift */; };
 		9CA8C4991E494112005111F3 /* Side.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA8C4981E494112005111F3 /* Side.swift */; };
 		9CB75DB91E389C9C003482C2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB75DB81E389C9C003482C2 /* AppDelegate.swift */; };
 		9CB75DBB1E389C9C003482C2 /* GameRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB75DBA1E389C9C003482C2 /* GameRoomViewController.swift */; };
@@ -50,6 +52,8 @@
 		9C46880D1E940611007D1E43 /* RealmConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmConfig.swift; sourceTree = "<group>"; };
 		9C4688101E940C5A007D1E43 /* GameLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameLoginViewController.swift; sourceTree = "<group>"; };
 		9C5CE5401E50C2780046BC57 /* UIColor+realm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+realm.swift"; sourceTree = "<group>"; };
+		9C7C536C1E9A3B8400818295 /* SyncUser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncUser.swift; sourceTree = "<group>"; };
+		9C7C536E1E9A3BAE00818295 /* NSError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSError.swift; sourceTree = "<group>"; };
 		9CA8C4981E494112005111F3 /* Side.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Side.swift; sourceTree = "<group>"; };
 		9CB75DB51E389C9C003482C2 /* RealmPop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmPop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CB75DB81E389C9C003482C2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -97,6 +101,8 @@
 				9C13FAE81E94F17F00D72650 /* Ext.swift */,
 				9C13FAE91E94F17F00D72650 /* Notification.swift */,
 				9C13FAEC1E9501EE00D72650 /* Storyboard.swift */,
+				9C7C536C1E9A3B8400818295 /* SyncUser.swift */,
+				9C7C536E1E9A3BAE00818295 /* NSError.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -367,6 +373,7 @@
 				9CF6B6741E40FEAA006FB848 /* Score.swift in Sources */,
 				9CB82BAA1E38A49100785399 /* GameModel.swift in Sources */,
 				9C40C2601E40A8A700045987 /* BubbleView.swift in Sources */,
+				9C7C536F1E9A3BAE00818295 /* NSError.swift in Sources */,
 				9C46880E1E940611007D1E43 /* RealmConfig.swift in Sources */,
 				9C34FFC21E9415FF00BA5C18 /* ConnectedUser.swift in Sources */,
 				9C40C2571E40998000045987 /* UIViewController+.swift in Sources */,
@@ -383,6 +390,7 @@
 				9C4688111E940C5A007D1E43 /* GameLoginViewController.swift in Sources */,
 				9C13FAEB1E94F17F00D72650 /* Notification.swift in Sources */,
 				9CB82BAC1E38A8C600785399 /* UITableView+.swift in Sources */,
+				9C7C536D1E9A3B8400818295 /* SyncUser.swift in Sources */,
 				9CB82BA61E38A3DA00785399 /* Player.swift in Sources */,
 				9CB75DB91E389C9C003482C2 /* AppDelegate.swift in Sources */,
 			);
