@@ -14,7 +14,7 @@ function Pop(config, path) {
   Pop.config = config;
   Pop.serverUrl = 'realm://' + Pop.config.host + ':' + Pop.config.port;
   Pop.adminUser = null;
-  this.path = '/.*/app';
+  this.path = '.*\/app';
 }
 
 Pop.usersUrl = function() {
@@ -23,21 +23,21 @@ Pop.usersUrl = function() {
 
 Pop.prototype.connect = function(adminToken, accessToken) {
   // get access to ros
+  //print('using access token: ' + accessToken);
   Realm.Sync.setAccessToken(accessToken);
+  //print('using admin token: ' + adminToken);
   Pop.adminUser = Realm.Sync.User.adminUser(adminToken);
   
   //install listener
   Realm.Sync.addListener(Pop.serverUrl, Pop.adminUser, this.path, 'change', Pop.changeCallback);
-  console.log('Install event listener for \''+Pop.serverUrl+this.path+'\'');
+  print('Install event listener on ' + Pop.serverUrl + ' at ' + this.path);
 }
 
 Pop.changeCallback = function(event) {
-  //console.log('event callback');
 
   var matches = event.path.match(/^\/([0-9a-f]+)\/app$/);
   var sourceUserId = matches[1];
 
-  let realm = event.realm;
   let changes = event.changes.Player;
   if (changes == undefined) {
     return
@@ -52,67 +52,67 @@ Pop.changeCallback = function(event) {
     schema: [ConnectedUser.schema]
   });
 
+  // open source realm
+  let sourceRealm = event.realm;
+  let players = sourceRealm.objects('Player');
+
   // insertions
   let insertions = changes.insertions;
   if (insertions.length > 0) {
-    Pop.insertions(realm, sourceUserId, usersRealm, insertions);
+    Pop.insertions(players, sourceUserId, usersRealm, insertions);
   }
 
   // modifications
   let modifications = changes.modifications;
   if (modifications.length > 0) {
-    Pop.modifications(realm, sourceUserId, usersRealm, modifications);
+    Pop.modifications(players, sourceUserId, usersRealm, modifications);
   }
 
-  //console.log('event handled');
 }
 
-Pop.insertions = function(sourceRealm, sourceUserId, usersRealm, indexes) {
+Pop.insertions = function(players, sourceUserId, usersRealm, indexes) {
 
   // insert new user objects
   let now = new Date()
-  let players = sourceRealm.objects('Player');
 
   for (var i = 0; i < indexes.length; i++) {
     let index = indexes[i];
     let player = players[index];
 
     if (isRealmObject(player) && player.id == sourceUserId) {
-      console.log("[add player]: " + player.name);
+      //print("add player: " + player.name);
 
       usersRealm.write(() => {
       	let newUser = usersRealm.create('ConnectedUser', {
-		  id: player.id,
-		  creationDate: now,
-		  username: player.name,
-		  lastUpdate: now,
-		  available: false
+		      id: player.id,
+		      creationDate: now,
+    		  username: player.name,
+		      lastUpdate: now,
+		      available: false
       	});
       });
     } 
   }
-
 }
 
-Pop.modifications = function(sourceRealm, sourceUserId, usersRealm, indexes) {
-  // console.log('modifications');
+Pop.modifications = function(players, sourceUserId, usersRealm, indexes) {
+
   // update a user objects
   let now = new Date()
-  let players = sourceRealm.objects('Player');
 
   for (var i = 0; i < indexes.length; i++) {
     let index = indexes[i];
     let player = players[index];
 
     if (isRealmObject(player)) {
-      console.log("[update player]: " + player.name);
+      //print("update player: " + player.name);
 
       usersRealm.write(() => {
       	usersRealm.create('ConnectedUser', {
-		  id: player.id,
+    		  id: player.id,
           creationDate: now, //TODO: fix
-		  username: player.name,
-		  lastUpdate: now,
+		      username: player.name,
+		      lastUpdate: now,
           available: player.available
       	}, true);
       });

@@ -15,6 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         application.isIdleTimerDisabled = true
+        SyncManager.shared.logLevel = .error
         observeNotification(name: kSharedRealmFileCreatedNotification, selector: #selector(didCreateSharedRealm))
         return true
     }

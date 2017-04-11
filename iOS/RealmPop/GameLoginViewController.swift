@@ -14,29 +14,39 @@ let kSharedRealmFileCreatedNotification = "kSharedRealmFileCreatedNotification"
 
 class GameLoginViewController: UIViewController {
 
-    private var username: String?
-
     // MARK: - View controller life cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         navigationController!.navigationBar.isHidden = true
     }
+
+    private var inSegue = false
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if let user = SyncUser.current {
+        print("viewWillAppear \(String(describing: SyncUser.current))");
+
+        // has already signed in previously
+        if let user = SyncUser.current, !inSegue {
+            print("has sync user")
             // observer for received ConnectedUser and proceed to next screen
             fetchConnectedUser(with: user, completion: {[weak self] connectedUser in
+                print("has connected user")
                 self?.showPreGameRoomViewController(me: connectedUser)
             })
-        } else {
-            // show login screen
-            showLoginViewController(defaultHost: defaultSyncHost) {[unowned self] username, user in
-                self.username = username
-            }
+            return
+        }
+
+        // login or register
+        showLoginViewController(defaultHost: defaultSyncHost) {[unowned self] username, user in
+            self.inSegue = true
+            self.fetchConnectedUser(with: user, completion: {[unowned self] connectedUser in
+                print("showing next screen!")
+                self.showPreGameRoomViewController(me: connectedUser)
+                self.inSegue = false
+            })
         }
     }
 
@@ -47,8 +57,8 @@ class GameLoginViewController: UIViewController {
         }
         loginViewController.loginSuccessfulHandler = {user in
             DispatchQueue.main.async {
-                loginViewController.dismiss(animated: true, completion: nil)
                 completion(loginViewController.username, user)
+                loginViewController.dismiss(animated: true, completion: nil)
             }
         }
         present(loginViewController, animated: false, completion: nil)
@@ -63,38 +73,25 @@ class GameLoginViewController: UIViewController {
     private var userToken: NotificationToken?
 
     private func fetchConnectedUser(with user: SyncUser, completion: @escaping (ConnectedUser)->Void ) {
-        guard let identity = SyncUser.current?.identity else {
-            fatalError("Should have user at this point")
-        }
-
         let game = GameModel()!
         let player = game.currentPlayer()
 
         let usersRealm = RealmConfig(.users).realm
 
-        if let user = usersRealm.object(ofType: ConnectedUser.self, forPrimaryKey: player.id) {
-            completion(user)
+        if let me = usersRealm.object(ofType: ConnectedUser.self, forPrimaryKey: player.id) {
+            print("ConnectedUser exists")
+            completion(me)
             return
         }
 
-        userToken = usersRealm.objects(ConnectedUser.self)
-            .filter(NSPredicate(format: "id == %@", player.id))
-            .addNotificationBlock { [weak self] changes in
-
-                switch changes {
-                case .initial(let users):
-                    if !users.isEmpty {
-                        completion(users.first!)
-                        self?.userToken = nil
-                    }
-                case .update(let users, _, _, _):
-                    if !users.isEmpty {
-                        completion(users.first!)
-                        self?.userToken = nil
-                    }
-                default:
-                    fatalError("Errored out")
-                }
+        let users = usersRealm.objects(ConnectedUser.self).filter(NSPredicate(format: "id == %@", player.id))
+        userToken = users.addNotificationBlock { [weak self] changes in
+            if let me = users.first {
+                // ConnectedUser created, move on
+                print("ConnectedUser created")
+                self?.userToken = nil
+                completion(me)
             }
+        }
     }
 }

@@ -16,46 +16,49 @@ var ConnectedUser = Schema.ConnectedUser;
 
 class SetupRealmPop { }
 
-SetupRealmPop.setConfig = function(config) {
+SetupRealmPop._setConfig = function(config) {
+  // set the server url and shared users realm url
   SetupRealmPop.url = config.host + ':' + config.port;
   SetupRealmPop.usersUrl = 'realm://' + SetupRealmPop.url + '/users';
 }
 
-SetupRealmPop.generateUniqueId = function(object)  {
+SetupRealmPop._generateUniqueId = function(object)  {
+  //create a "random" string
   return object + ':' + (new Date) + ':' + Math.random;
 }
 
 SetupRealmPop.run = function(config, token) {
-  SetupRealmPop.setConfig(config);
+  SetupRealmPop._setConfig(config);
 
   Realm.Sync.User.login('http://'+SetupRealmPop.url, 'popadmin@realm', 'p@s$w0rd', (error, user) => {
     if (user !== undefined) {
-      this.__setup(user, config, token);
+      print('Logged in as popadmin@realm. Syncing user list; takes a moment...');
+      let realm = new Realm({
+        sync: { user: user, url: SetupRealmPop.usersUrl },
+        schema: [ConnectedUser.schema]
+      });
+      setTimeout(function () { //TODO: clean up
+        SetupRealmPop._setup(realm, user, config, token);
+      }, 5000);
     } else {
-      console.log(error);
-      console.log('You need to create a "popadmin@realm" admin user first.');
+      print(error);
+      print('You need to create a "popadmin@realm" admin user first.');
       process.exit(1);
     };
   });
 }
 
-SetupRealmPop.__setup = function(admin, config, token) {
-
-  let realm = new Realm({
-    sync: {
-      user: admin,
-      url: SetupRealmPop.usersUrl,
-    },
-    schema: [ConnectedUser.schema]
-  });
+SetupRealmPop._setup = function(realm, admin, config, token) {
 
   let users = realm.objects('ConnectedUser');
-  console.log('users: '+users.length);
+  print('User count: ' + users.length);
 
   if (users.length > 0) {
     // setup's been already performed
-    console.log('Setup has already been performed previously.');
+    print('Setup has already been performed, nothing to do from setup right now.');
+
   } else {
+
     let now = new Date()
 
     // create a new admin user
@@ -67,31 +70,35 @@ SetupRealmPop.__setup = function(admin, config, token) {
         lastUpdate: now
       });
     });
-    console.log('Admin user Created.');
+    print('Admin user Created.');
     
     // not needed when an admin creates a shared file
     var managementRealm = null
     try {
-      console.log('Open management realm');
+      print('Open management realm');
       managementRealm = admin.openManagementRealm();
     } catch (e) {
-      console.log(e);
+      print(e);
       process.exit(1);
     }
 
     if (managementRealm != null) {
-        console.log('Add sharing permission to users');
+        print('Add sharing permission to users');
         managementRealm.write(() => {
           managementRealm.create('PermissionChange', {
-            id: SetupRealmPop.generateUniqueId('PermissionChange'),
-            createdAt: Date.now(),
+            id: SetupRealmPop._generateUniqueId('PermissionChange'),
+            createdAt: now,
+            updatedAt: now, 
             userId: '*',
             realmUrl: SetupRealmPop.usersUrl,
             mayRead: true
           }, true);
         });
 
-        console.log('Created shared users file.');
+        print('Created shared users file.');
+    } else {
+      print('Couldn\'t open management realm.')
+      process.exit(1);
     }
   }
 }

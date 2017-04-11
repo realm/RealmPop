@@ -13,6 +13,7 @@ var Game = require('./pop-event-handler.js');
 //
 // parse command line arguments
 //
+global.print = function (line) { console.log('[pop] ' + line); }
 
 const args = process.argv.slice(2);
 
@@ -29,6 +30,7 @@ token.load('access', args[3]);
 // run server setup
 //
 
+Realm.Sync.setLogLevel('error');
 Setup.GameSetup.run(config, token.get('admin'));
 
 //
@@ -38,4 +40,4 @@ Setup.GameSetup.run(config, token.get('admin'));
 let pop = new Game.Pop(config);
 pop.connect(token.get('admin'), token.get('access'));
 
-console.log('Completed');
+print('Started');
