@@ -7,21 +7,24 @@ PODS:
     - TORoundedTableView
   - RealmSwift (2.5.0):
     - Realm (= 2.5.0)
+  - SwiftSpinner (1.2.1)
   - Then (2.1.0)
   - TORoundedTableView (0.0.3)
 
 DEPENDENCIES:
   - RealmLoginKit (= 0.0.11)
   - RealmSwift (~> 2.5)
+  - SwiftSpinner
   - Then
 
 SPEC CHECKSUMS:
   Realm: 62abce501668580092d2be9b6ba7324a3d5f906a
   RealmLoginKit: 3a1b3614e43e1b8553d032fcdfbe2f1280d0860c
   RealmSwift: 9f1a8f624f2f153410115c2cb7d486be9976565d
+  SwiftSpinner: 62a28bbb4035f252a1e91b0e17fc40bdbbfa0aab
   Then: 8496793c8fcac95482b943909b440724c7d8d82c
   TORoundedTableView: 4155565233135d81d6626a0c4ecfba27991cf2b1
 
-PODFILE CHECKSUM: 06e9dd0fe7cf0a5d471c219d4fa9c1d600d89807
+PODFILE CHECKSUM: 1416a4c0e5eec62d3276457fe4c052c555d1cecf
 
 COCOAPODS: 1.2.0

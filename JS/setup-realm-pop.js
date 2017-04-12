@@ -20,6 +20,7 @@ SetupRealmPop._setConfig = function(config) {
   // set the server url and shared users realm url
   SetupRealmPop.url = config.host + ':' + config.port;
   SetupRealmPop.usersUrl = 'realm://' + SetupRealmPop.url + '/users';
+  SetupRealmPop.__completion = null;
 }
 
 SetupRealmPop._generateUniqueId = function(object)  {
@@ -27,8 +28,9 @@ SetupRealmPop._generateUniqueId = function(object)  {
   return object + ':' + (new Date) + ':' + Math.random;
 }
 
-SetupRealmPop.run = function(config, token) {
+SetupRealmPop.run = function(config, token, completion) {
   SetupRealmPop._setConfig(config);
+  SetupRealmPop.__completion = completion;
 
   Realm.Sync.User.login('http://'+SetupRealmPop.url, 'popadmin@realm', 'p@s$w0rd', (error, user) => {
     if (user !== undefined) {
@@ -56,7 +58,8 @@ SetupRealmPop._setup = function(realm, admin, config, token) {
   if (users.length > 0) {
     // setup's been already performed
     print('Setup has already been performed, nothing to do from setup right now.');
-
+    SetupRealmPop.__completion();
+    SetupRealmPop.__completion = null;
   } else {
 
     let now = new Date()
@@ -96,6 +99,9 @@ SetupRealmPop._setup = function(realm, admin, config, token) {
         });
 
         print('Created shared users file.');
+        SetupRealmPop.__completion();
+        SetupRealmPop.__completion = null;
+        
     } else {
       print('Couldn\'t open management realm.')
       process.exit(1);

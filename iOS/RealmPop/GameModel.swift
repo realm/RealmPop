@@ -11,17 +11,12 @@ import RealmSwift
 
 class GameModel {
 
-    let realm: Realm
-
-    init?(config: Realm.Configuration = RealmConfig(.app).configuration) {
-        guard let realm = try? Realm(configuration: config) else {
-            return nil
-        }
-        self.realm = realm
+    var realm: Realm {
+        return RealmFile.app.realm
     }
 
-    func currentPlayer() -> Player {
-        guard let id = SyncUser.current?.identity else {
+    func currentPlayer(for user: SyncUser? = SyncUser.current) -> Player {
+        guard let id = user?.identity else {
             fatalError("Should not call this function if there's no logged in user")
         }
 
@@ -50,7 +45,7 @@ class GameModel {
     }
 
     func otherPlayers(than me: Player) -> Results<ConnectedUser> {
-        let usersRealm = RealmConfig(.users).realm
+        let usersRealm = RealmFile.users.realm
 
         return usersRealm.objects(ConnectedUser.self)
             //.filter("id != %@", me.id)
@@ -63,15 +58,15 @@ class GameModel {
         guard vs.available else { return }
 
         // build the game file URL
-        let gameConfig = RealmConfig(.game)
+        let gameConfig = RealmFile.game
         let gameUrl = gameConfig.url
 
         // TODO: unshare the game file with anyone else
-
+        
 
         // offer the user access to the game file
         let challengeOffer = SyncPermissionOffer(
-            realmURL: gameUrl.absoluteString,
+            realmURL: gameUrl.replaceUserFolder(with: me.id).absoluteString,
             expiresAt: nil,
             mayRead: true,
             mayWrite: true,

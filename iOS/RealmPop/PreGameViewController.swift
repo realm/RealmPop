@@ -18,10 +18,14 @@ class PreGameRoomViewController: UIViewController {
 
     static func create(connectedUser: ConnectedUser) -> PreGameRoomViewController {
         return UIStoryboard.instantiateViewController(ofType: self).then { vc in
-            vc.game = GameModel()!
+            vc.game = GameModel()
             vc.me = vc.game.currentPlayer()
             vc.defaultUsername = connectedUser.username
         }
+    }
+
+    deinit {
+        print("deiniting pre-game vc")
     }
 
     override func viewDidLoad() {
@@ -40,14 +44,12 @@ class PreGameRoomViewController: UIViewController {
             return
         }
 
-        navigationController?.pushViewController(
-            GameRoomViewController.create(with: me, game: game), animated: true
-        )
+        navigationController!.pushViewController( GameRoomViewController.create(with: me, game: game), animated: true)
     }
 
     @IBAction func logOut(_ sender: Any) {
-        SyncUser.current?.logOut()
-        navigationController?.popToRootViewController(animated: true)
+        SyncUser.current!.logOut()
+        navigationController!.popToRootViewController(animated: true)
     }
 }
 

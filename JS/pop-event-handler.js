@@ -23,9 +23,7 @@ Pop.usersUrl = function() {
 
 Pop.prototype.connect = function(adminToken, accessToken) {
   // get access to ros
-  //print('using access token: ' + accessToken);
   Realm.Sync.setAccessToken(accessToken);
-  //print('using admin token: ' + adminToken);
   Pop.adminUser = Realm.Sync.User.adminUser(adminToken);
   
   //install listener
@@ -80,7 +78,7 @@ Pop.insertions = function(players, sourceUserId, usersRealm, indexes) {
     let player = players[index];
 
     if (isRealmObject(player) && player.id == sourceUserId) {
-      //print("add player: " + player.name);
+      print("add player: " + player.name);
 
       usersRealm.write(() => {
       	let newUser = usersRealm.create('ConnectedUser', {
@@ -105,7 +103,7 @@ Pop.modifications = function(players, sourceUserId, usersRealm, indexes) {
     let player = players[index];
 
     if (isRealmObject(player)) {
-      //print("update player: " + player.name);
+      print("update player: " + player.name);
 
       usersRealm.write(() => {
       	usersRealm.create('ConnectedUser', {

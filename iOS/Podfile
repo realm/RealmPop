@@ -4,5 +4,6 @@ target 'RealmPop' do
   pod 'RealmSwift', '~> 2.5'
   pod 'RealmLoginKit', '0.0.11'
   pod 'Then'
+  pod 'SwiftSpinner'
 end
 

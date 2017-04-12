@@ -41,4 +41,16 @@ class Game: Object {
     func isActive() -> Bool {
         return !player1!.failed && !player2!.failed
     }
+
+    static func createEmpty() {
+        // add faux object to create the file on the server
+        let gameRealm = RealmFile.game.realm
+        guard gameRealm.isEmpty else {
+            return
+        }
+
+        try! gameRealm.write {
+            gameRealm.add(Game())
+        }
+    }
 }

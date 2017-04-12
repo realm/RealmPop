@@ -31,13 +31,15 @@ token.load('access', args[3]);
 //
 
 Realm.Sync.setLogLevel('error');
-Setup.GameSetup.run(config, token.get('admin'));
+Setup.GameSetup.run(config, token.get('admin'), function() {
 
-//
-// listen for events
-//
+  //
+  // listen for events
+  //
 
-let pop = new Game.Pop(config);
-pop.connect(token.get('admin'), token.get('access'));
+  let pop = new Game.Pop(config);
+  pop.connect(token.get('admin'), token.get('access'));
 
-print('Started');
+  print('Started');
+  
+});

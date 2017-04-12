@@ -36,58 +36,58 @@ class GameRoomViewController: UIViewController {
 
     var alert: UIAlertController?
 
-    func handleInvite(from: Player) {
-        alert = UIAlertController(title: "You were invited", message: "to a game by \(from.name)", preferredStyle: .alert)
-        alert?.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
-            guard let game = self?.game, let me = self?.me else { return }
-            //game.createGame(me: me, vs: from)
-        }))
-        alert?.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
-            self?.me.resetState(available: true)
-        }))
-        present(alert!, animated: true, completion: nil)
-    }
+//    func handleInvite(from: Player) {
+//        alert = UIAlertController(title: "You were invited", message: "to a game by \(from.name)", preferredStyle: .alert)
+//        alert?.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
+//            guard let game = self?.game, let me = self?.me else { return }
+//            //game.createGame(me: me, vs: from)
+//        }))
+//        alert?.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
+//            self?.me.resetState(available: true)
+//        }))
+//        present(alert!, animated: true, completion: nil)
+//    }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        meToken = me.addNotificationBlock {[weak self] change in
-            switch change {
-            case .change(let properties):
-                if properties.first(where: { $0.name == "challenger"}) != nil,
-                    let challenger = self?.me.challengerId {
-                    //self?.handleInvite(from: challenger)
-                }
-                if properties.first(where: { $0.name == "currentGame"}) != nil,
-                    let challenge = self?.me.currentGame {
-                    //self?.showGameViewController(with: challenge)
-                }
-
-            case .error, .deleted:
-                _ = self?.navigationController?.popViewController(animated: true)
-            }
-        }
-
-        usersToken = users.addNotificationBlock { [weak self] changes in
-            NSLog("users update!");
-            guard let strongSelf = self else { return }
-
-            switch changes {
-            case .update(_, let del, let ins, let mod):
-                strongSelf.tableView.applyChanges(deletions: del, insertions: ins, updates: mod)
-                //strongSelf.tableView.reloadData()
-            default:
-                strongSelf.tableView.reloadData()
-            }
-        }
-
-        me.resetState(available: true)
+//        meToken = me.addNotificationBlock {[weak self] change in
+//            switch change {
+//            case .change(let properties):
+//                if properties.first(where: { $0.name == "challenger"}) != nil,
+//                    let challenger = self?.me.challengerId {
+//                    //self?.handleInvite(from: challenger)
+//                }
+//                if properties.first(where: { $0.name == "currentGame"}) != nil,
+//                    let challenge = self?.me.currentGame {
+//                    //self?.showGameViewController(with: challenge)
+//                }
+//
+//            case .error, .deleted:
+//                _ = self?.navigationController?.popViewController(animated: true)
+//            }
+//        }
+//
+//        usersToken = users.addNotificationBlock { [weak self] changes in
+//            NSLog("users update! count: \(self!.users.count)");
+//            guard let strongSelf = self else { return }
+//
+//            switch changes {
+//            case .update(_, let del, let ins, let mod):
+//                strongSelf.tableView.applyChanges(deletions: del, insertions: ins, updates: mod)
+//                //strongSelf.tableView.reloadData()
+//            default:
+//                strongSelf.tableView.reloadData()
+//            }
+//        }
+//
+//        me.resetState(available: true)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        meToken?.stop()
-        usersToken?.stop()
+//        meToken?.stop()
+//        usersToken?.stop()
 
         try! me.realm?.write {
             me.available = false
@@ -106,7 +106,7 @@ class GameRoomViewController: UIViewController {
 
 extension GameRoomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        NSLog("USERS: \(users.count)");
+        //NSLog("USERS: \(users.count)");
         return users.count
     }
 
