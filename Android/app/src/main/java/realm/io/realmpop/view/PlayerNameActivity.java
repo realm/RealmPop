@@ -1,4 +1,4 @@
-package realm.io.realmpop.controller;
+package realm.io.realmpop.view;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,11 +15,12 @@ import realm.io.realmpop.R;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.util.GameHelpers;
 
-public class PreGameRoomActivity extends BaseActivity implements TextWatcher {
+public class PlayerNameActivity extends BaseActivity implements TextWatcher {
 
-    private static final String TAG = PreGameRoomActivity.class.getName();
+    private static final String TAG = PlayerNameActivity.class.getName();
 
-    @BindView(R.id.playerNameEditText) public EditText playerNameEditText;
+    @BindView(R.id.playerNameEditText)
+    public EditText playerNameEditText;
 
     private Realm realm;
 
@@ -27,7 +28,7 @@ public class PreGameRoomActivity extends BaseActivity implements TextWatcher {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pregameroom);
+        setContentView(R.layout.activity_playername);
         ButterKnife.bind(this);
         realm = Realm.getDefaultInstance();
         playerNameEditText.setText(GameHelpers.currentPlayer(realm).getName());
@@ -70,7 +71,7 @@ public class PreGameRoomActivity extends BaseActivity implements TextWatcher {
            }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
-                    Intent gameRoomIntent = new Intent(PreGameRoomActivity.this, GameRoomActivity.class);
+                    Intent gameRoomIntent = new Intent(PlayerNameActivity.this, GameRoomActivity.class);
                     startActivity(gameRoomIntent);
                 }
            });

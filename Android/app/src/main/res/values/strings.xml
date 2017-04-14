@@ -4,5 +4,6 @@
     <string name="pregameroom_enter_button_label">Enter</string>
     <string name="pregameroom_player_name_prompt_label">Player Name</string>
     <string name="end_game_button_label">End Game</string>
+    <string name="connect_button_label">Connect</string>
 
 </resources>

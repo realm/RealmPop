@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 25
@@ -29,17 +30,15 @@ android {
 
     buildTypes {
 
-        //def host = InetAddress.getLocalHost().getCanonicalHostName() // "192.168.1.79"
         def host = getIP()
-        def cloudHost = "45.55.167.56";  // Digital Ocean IP address.
-        def marinEuIp = "192.168.0.42";  // Marins UI IP address.
+//        host = "45.55.167.56";  // Digital Ocean IP address.
 
         debug {
             // This will automatically detect the IP address of the machine building RealmTasks.
             // It is assumed that this machine is also running the Object Server.
             // If not, replace 'host' with the IP of the machine hosting the server.
-            buildConfigField "String", "OBJECT_SERVER_IP", "\"${host}\""
-            resValue "string", "objectServerIp", "${host}"
+            buildConfigField "String", "DEFAULT_OBJECT_SERVER_IP", "\"${host}\""
+            resValue "string", "defaultObjectServerIp", "${host}"
         }
 
         release {
@@ -50,32 +49,11 @@ android {
             // This will automatically detect the IP address of the machine building RealmTasks.
             // It is assumed that this machine is also running the Object Server.
             // If not, replace 'host' with the IP of the machine hosting the server.
-            buildConfigField "String", "OBJECT_SERVER_IP", "\"${host}\""
-            resValue "string", "objectServerIp", "\${host}\""
+            buildConfigField "String", "DEFAULT_OBJECT_SERVER_IP", "\"${host}\""
+            resValue "string", "defaultObjectServerIp", "${host}"
         }
-
-        cloudRelease {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            buildConfigField "String", "OBJECT_SERVER_IP", "\"${cloudHost}\""
-            resValue "string", "objectServerIp", "\"${cloudHost}\""
-        }
-
-        marinEuIpRelease {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            buildConfigField "String", "OBJECT_SERVER_IP", "\"${marinEuIp}\""
-            resValue "string", "objectServerIp", "\"${marinEuIp}\""
-        }
-
     }
 }
-
-apply plugin: 'realm-android'
 
 realm {
     syncEnabled = true;
@@ -95,7 +73,7 @@ dependencies {
 }
 
 
-def getIP() {
+static getIP() {
     InetAddress result = null;
     Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
     while (interfaces.hasMoreElements()) {

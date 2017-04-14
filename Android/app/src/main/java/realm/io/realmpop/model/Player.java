@@ -1,5 +1,6 @@
 package realm.io.realmpop.model;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -31,8 +32,11 @@ public class Player extends RealmObject {
 
     public void setChallenger(Player challenger) { this.challenger = challenger; } 
 
-    public Game getCurrentgame() { return currentGame; }
+    public Game getCurrentGame() { return currentGame; }
 
-    public void setCurrentgame(Game currentGame) { this.currentGame = currentGame; } 
+    public void setCurrentGame(Game currentGame) { this.currentGame = currentGame; }
 
+    public static Player byId(Realm realm, String id) {
+        return realm.where(Player.class).equalTo("id", id).findFirst();
+    }
 }

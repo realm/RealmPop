@@ -1,4 +1,4 @@
-package realm.io.realmpop.controller;
+package realm.io.realmpop.view;
 
 
 import android.content.Context;
@@ -10,7 +10,7 @@ import io.realm.SyncConfiguration;
 import io.realm.SyncUser;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import static realm.io.realmpop.util.BubbleConstants.REALM_URL;
+import static realm.io.realmpop.util.BubbleUtils.REALM_URL;
 
 abstract public class BaseActivity extends AppCompatActivity {
 

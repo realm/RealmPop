@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:layout_gravity="center"
-    tools:context="realm.io.realmpop.controller.SplashActivity">
+    tools:context=".view.SplashActivity">
 
     <TextView
         android:id="@+id/biglyTextView"
@@ -20,21 +20,29 @@
         android:text="@string/app_name"
         />
 
-    <TextView
-        android:id="@+id/splashText"
+
+    <EditText
+        android:id="@+id/hostIpTextView"
+        style="@style/Text.EditText"
         android:layout_below="@id/biglyTextView"
         android:layout_centerHorizontal="true"
-        style="@style/Text.WhiteTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:text="Loading..."
-        />
+        android:imeOptions="flagNoExtractUi"
+        android:hint="@string/pregameroom_player_name_prompt_label"
+        android:text="@string/defaultObjectServerIp"
+        android:textAlignment="center"
+        android:inputType="text" />
 
-    <TextView
-        style="@style/Text.WhiteTextView"
+
+    <Button
+        android:id="@+id/connectToRosButton"
+        style="@style/Text.Button"
+        android:layout_below="@id/hostIpTextView"
+        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="@string/objectServerIp" />
+        android:text="@string/connect_button_label"
+        />
 
 </RelativeLayout>

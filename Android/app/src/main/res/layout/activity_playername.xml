@@ -10,7 +10,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="realm.io.realmpop.controller.PreGameRoomActivity">
+    tools:context="realm.io.realmpop.view.PlayerNameActivity">
 
     <TextView
         android:id="@+id/player_name_prompt"
@@ -24,8 +24,8 @@
         android:id="@+id/playerNameEditText"
         android:layout_width="260dp"
         android:layout_height="wrap_content"
-        android:hint=""
-        tools:text="Anonymous"
+        android:hint="@string/pregameroom_player_name_prompt_label"
+        tools:text="Kaiser Söze"
         android:textAppearance="@style/Text.EditText"
         android:imeOptions="flagNoExtractUi"
         android:inputType="text" />

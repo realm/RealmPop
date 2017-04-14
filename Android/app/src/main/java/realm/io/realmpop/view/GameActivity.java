@@ -1,4 +1,4 @@
-package realm.io.realmpop.controller;
+package realm.io.realmpop.view;
 
 import android.content.res.Resources;
 import android.os.Bundle;

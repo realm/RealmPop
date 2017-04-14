@@ -1,4 +1,4 @@
-package realm.io.realmpop.controller;
+package realm.io.realmpop.view;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,7 +20,7 @@ import realm.io.realmpop.R;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Side;
-import realm.io.realmpop.util.BubbleConstants;
+import realm.io.realmpop.util.BubbleUtils;
 import realm.io.realmpop.util.GameHelpers;
 
 import static realm.io.realmpop.R.style.AppTheme_RealmPopDialog;
@@ -180,7 +180,7 @@ public class GameRoomActivity extends BaseActivity {
                 Game game = bgRealm.createObject(Game.class);
 
                 // Generate numbers for the bubbles and set on game.
-                int [] numbers = generateNumbersArray(BubbleConstants.bubbleCount, 1, BubbleConstants.bubbleValueMax);
+                int [] numbers = generateNumbersArray(BubbleUtils.bubbleCount, 1, BubbleUtils.bubbleValueMax);
                 game.setNumberArray(numbers);
 
                 // Create side 1
