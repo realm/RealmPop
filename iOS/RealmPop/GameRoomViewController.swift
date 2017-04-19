@@ -23,6 +23,9 @@ class GameRoomViewController: UIViewController {
     fileprivate var playersToken: NotificationToken?
 
     private var timer: Timer?
+    private var alert: UIAlertController?
+
+    // MARK: - view/app cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,23 +40,6 @@ class GameRoomViewController: UIViewController {
         players = game.otherPlayers(than: me)
     }
 
-    var alert: UIAlertController?
-
-    func handleInvite(from: Player) {
-        alert = UIAlertController(title: "You were invited", message: "to a game by \(from.name)", preferredStyle: .alert)
-
-        if let alert = alert {
-            alert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
-                guard let game = self?.game, let me = self?.me else { return }
-                game.createGame(me: me, vs: from)
-            }))
-            alert.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
-                guard let me = self?.me else { return }
-                me.resetState(available: true)
-            }))
-            present(alert, animated: true, completion: nil)
-        }
-    }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -100,14 +86,10 @@ class GameRoomViewController: UIViewController {
 
         me.resetState(available: true)
 
-        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: { [weak self] timer in
-            if let realm = self?.me.realm, let me = self?.me {
-                print("update availability")
-                try! realm.write {
-                    me.available = true
-                }
-            }
-        })
+        resetTimer()
+
+        observeNotification(notification: NSNotification.Name.UIApplicationWillEnterForeground, selector: #selector(willEnterForeground))
+        observeNotification(notification: NSNotification.Name.UIApplicationDidEnterBackground, selector: #selector(didEnterBackground))
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -118,10 +100,49 @@ class GameRoomViewController: UIViewController {
         meToken?.stop()
         playersToken?.stop()
 
-        try! me.realm?.write {
-            me.available = false
+        me.updateAvailableIfNeeded(false)
+
+        observeNotification(notification: NSNotification.Name.UIApplicationWillEnterForeground, selector: nil)
+    }
+
+    func willEnterForeground() {
+        resetTimer()
+    }
+
+    func didEnterBackground() {
+        timer?.invalidate()
+    }
+
+    // MARK: - user
+
+    func handleInvite(from: Player) {
+        alert = UIAlertController(title: "You were invited", message: "to a game by \(from.name)", preferredStyle: .alert)
+
+        if let alert = alert {
+            alert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
+                guard let game = self?.game, let me = self?.me else { return }
+                game.createGame(me: me, vs: from)
+            }))
+            alert.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
+                guard let me = self?.me else { return }
+                me.resetState(available: true)
+            }))
+            present(alert, animated: true, completion: nil)
         }
     }
+    
+    func resetTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: { [weak self] timer in
+            print("timer fire")
+            if let me = self?.me {
+                me.updateAvailableIfNeeded(true)
+            }
+        })
+        timer!.fire()
+    }
+
+    // MARK: - navigation
 
     private func showGameViewController(with challenge: Game) {
         navigationController!.pushViewController(storyboard!.instantiateViewController(ofType: GameViewController.self).then { gameVC in
@@ -134,6 +155,8 @@ class GameRoomViewController: UIViewController {
         navigationController!.popViewController(animated: true)
     }
 }
+
+// MARK: - table view
 
 extension GameRoomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -27,10 +27,18 @@ class Player: Object {
     }
 
     func resetState(available: Bool = false) {
-        try? realm?.write {
-            self.available = available
+        try! realm?.write {
             challenger = nil
             currentGame = nil
+        }
+        updateAvailableIfNeeded(available)
+    }
+
+    func updateAvailableIfNeeded(_ value: Bool) {
+        guard available != value else { return }
+
+        try! realm?.write {
+            available = value
         }
     }
 }
