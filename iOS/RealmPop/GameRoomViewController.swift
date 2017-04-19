@@ -22,6 +22,8 @@ class GameRoomViewController: UIViewController {
     fileprivate var players: Results<Player>!
     fileprivate var playersToken: NotificationToken?
 
+    private var timer: Timer?
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -97,10 +99,21 @@ class GameRoomViewController: UIViewController {
         }
 
         me.resetState(available: true)
+
+        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: { [weak self] timer in
+            if let realm = self?.me.realm, let me = self?.me {
+                print("update availability")
+                try! realm.write {
+                    me.available = true
+                }
+            }
+        })
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+
+        timer?.invalidate()
 
         meToken?.stop()
         playersToken?.stop()
