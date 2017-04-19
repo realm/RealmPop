@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import Then
 
 class GameRoomViewController: UIViewController {
 
@@ -25,8 +26,9 @@ class GameRoomViewController: UIViewController {
         super.viewDidLoad()
 
         guard let game = GameModel() else {
-            fatalError("Couldn't create game model")
+            return alert(message: "Could not initialize the game model. Try turning it off an on again", completion: { fatalError() })
         }
+
         self.game = game
 
         me = game.currentPlayer()
@@ -37,32 +39,46 @@ class GameRoomViewController: UIViewController {
 
     func handleInvite(from: Player) {
         alert = UIAlertController(title: "You were invited", message: "to a game by \(from.name)", preferredStyle: .alert)
-        alert?.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
-            guard let game = self?.game, let me = self?.me else { return }
-            game.createGame(me: me, vs: from)
-        }))
-        alert?.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
-            self?.me.resetState(available: true)
-        }))
-        present(alert!, animated: true, completion: nil)
+
+        if let alert = alert {
+            alert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { [weak self] _ in
+                guard let game = self?.game, let me = self?.me else { return }
+                game.createGame(me: me, vs: from)
+            }))
+            alert.addAction(UIAlertAction(title: "No, thanks", style: .default, handler: { [weak self] _ in
+                guard let me = self?.me else { return }
+                me.resetState(available: true)
+            }))
+            present(alert, animated: true, completion: nil)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        meToken = me.addNotificationBlock {[weak self] change in
+        let meId = me.id
+        meToken = me.addNotificationBlock { [weak self] change in
+
             switch change {
             case .change(let properties):
                 if properties.first(where: { $0.name == "challenger"}) != nil,
-                    let challenger = self?.me.challenger {
-                    self?.handleInvite(from: challenger)
-                }
-                if properties.first(where: { $0.name == "currentGame"}) != nil,
-                    let challenge = self?.me.currentGame {
-                    self?.showGameViewController(with: challenge)
+                    let strongSelf = self,
+                    let challenger = strongSelf.me.challenger {
+                        strongSelf.handleInvite(from: challenger)
                 }
 
-            case .error, .deleted:
+                if properties.first(where: { $0.name == "currentGame"}) != nil,
+                    let strongSelf = self,
+                    let challenge = strongSelf.me.currentGame {
+                        strongSelf.showGameViewController(with: challenge)
+                }
+
+            case .error(let e):
+                print("[error] observing me \(e.localizedDescription)")
+                _ = self?.navigationController?.popViewController(animated: true)
+
+            case .deleted:
+                print("[error] observing me \(meId) was deleted")
                 _ = self?.navigationController?.popViewController(animated: true)
             }
         }
@@ -73,7 +89,8 @@ class GameRoomViewController: UIViewController {
             switch changes {
             case .update(_, let del, let ins, let mod):
                 strongSelf.tableView.applyChanges(deletions: del, insertions: ins, updates: mod)
-                //strongSelf.tableView.reloadData()
+            case .error(let e):
+                print("[error] observing players \(e.localizedDescription)")
             default:
                 strongSelf.tableView.reloadData()
             }
@@ -84,6 +101,7 @@ class GameRoomViewController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+
         meToken?.stop()
         playersToken?.stop()
 
@@ -93,10 +111,10 @@ class GameRoomViewController: UIViewController {
     }
 
     private func showGameViewController(with challenge: Game) {
-        let gameVC = storyboard!.instantiateViewController(withIdentifier: "GameViewController") as! GameViewController
-        gameVC.game = game
-        gameVC.challenge = challenge
-        navigationController!.pushViewController(gameVC, animated: true)
+        navigationController!.pushViewController(storyboard!.instantiateViewController(ofType: GameViewController.self).then { gameVC in
+            gameVC.game = game
+            gameVC.challenge = challenge
+        }, animated: true)
     }
 
     @IBAction func back(_ sender: Any) {

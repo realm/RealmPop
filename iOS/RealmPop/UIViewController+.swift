@@ -10,10 +10,10 @@ import Foundation
 import UIKit
 
 extension UIViewController {
-    func alert(message: String) {
+    func alert(message: String, completion: (()->Void)? = nil) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Close", style: .default, handler: {[weak self] _ in
-            self?.dismiss(animated: true, completion: nil)
+            self?.dismiss(animated: true, completion: completion)
         }))
         present(alert, animated: true, completion: nil)
     }

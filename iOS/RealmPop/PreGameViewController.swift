@@ -19,7 +19,7 @@ class PreGameRoomViewController: UIViewController {
 
         guard let game = GameModel() else {
             //total disaster
-            return alert(message: "Could not initialize the game. Try turning it off an on again")
+            return alert(message: "Could not initialize the game. Try turning it off an on again", completion: { fatalError() })
         }
         
         me = game.currentPlayer()
@@ -34,7 +34,11 @@ class PreGameRoomViewController: UIViewController {
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         switch identifier {
         case "ShowGameRoom":
-            return playerName.text?.isEmpty == false
+            if playerName.text?.isEmpty == true {
+                alert(message: "You need to pick a game handle first")
+                return false
+            }
+            return true
         default:
             return true
         }

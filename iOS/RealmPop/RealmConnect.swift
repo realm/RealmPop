@@ -9,7 +9,7 @@
 import Foundation
 import RealmSwift
 
-var host = "asd45.55.167.56"
+var host = "192.168.178.172"
 
 let user = "default@realm"
 let pass = "password"
