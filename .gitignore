@@ -1,0 +1,4 @@
+JS/node_modules
+JS/realm-object-server
+*.tgz
+*.sh

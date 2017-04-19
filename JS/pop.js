@@ -1,16 +1,33 @@
 'use strict';
 
 //
-// TODO: 1. replace with your own admin token before starting the app
-// 2. replace the server IP
+// imports
 //
-
-const REALM_ADMIN_TOKEN = "ewoJImlkZW50aXR5IjogIl9fYXV0aCIsCgkiYWNjZXNzIjogWyJ1cGxvYWQiLCAiZG93bmxvYWQiLCAibWFuYWdlIl0KfQo=:JrlE/EenpDV8n8a6UZd3ybmIEsVobO+eblIuVT+g+GEzgX1JSXmMe5qDot6TapEshQkq5k2NUGsxXKug8eIW277ijjN9Vh7teJbau9HykkUQHGG238kdBn+jlUhJbgRy5wQ7Om0ft/A9qSxtueYoEGXZtJZHFtvs/6dIoK7KuVSy1BMsh19b6164z2ZX8dZv/kqQRbC4luU/9HbK1IGyUevD9pgS8Am010PC9dRimfO1mdxekgTTCaaYAVicWmIEw44wNrNOMKVzJg0xnv9VtCTdDBLPdcDc8JEOQPuaaThO2eGCBCKJQMD//WtFf2z9IfTFeRRc7Jrfl8o4PKOH7Q==";
-
-const IP = '192.168.0.42';
 
 var fs = require('fs');
 var Realm = require('realm');
+var Admin = require('./token.js');
+
+//
+// parse command line arguments
+//
+global.print = function (line) { console.log('[pop] ' + line); }
+
+const args = process.argv.slice(2);
+
+if (args.length < 4) {
+  print("start the pop server app with 4 parameters like so:\n  node pop.js IP PORT ADMIN_TOKEN_PATH ACCESS_TOKEN_PATH");
+  process.exit(1);
+}
+
+const config = {
+  host: args[0],
+  port: args[1]
+};
+
+const token = new Admin.Token();
+token.load('admin', args[2]);
+token.load('access', args[3]);
 
 function isRealmObject(x) {
   return x !== null && x !== undefined && x.constructor === Realm.Object
@@ -22,16 +39,20 @@ function isRealmObject(x) {
  * Connects to Realm Object Server, installs event listener, processes Score object insertions
  */
 
-function Pop(url, path) {
-  this.url = url;
-  this.path = path;
+function Pop(config) {
+  Pop.config = config;
+  Pop.serverUrl = 'realm://' + Pop.config.host + ':' + Pop.config.port;
+  Pop.adminUser = null;
+  this.path = '.*/game';
 }
 
-Pop.prototype.connect = function(token) {
-  var admin = Realm.Sync.User.adminUser(token);
+Pop.prototype.connect = function(adminToken, accessToken) {
+  // get access to ros
+  Realm.Sync.setAccessToken(accessToken);
+  Pop.adminUser = Realm.Sync.User.adminUser(adminToken);
 
-  Realm.Sync.addListener(this.url, admin, this.path, 'change', Pop.changeCallback);
-  console.log('Pop app at: ' + this.url + " observing changes at: " + this.path);
+  Realm.Sync.addListener(Pop.serverUrl, Pop.adminUser, this.path, 'change', Pop.changeCallback);
+  console.log('Pop app at: ' + Pop.serverUrl + " observing changes at: " + this.path);
 }
 
 Pop.changeCallback = function(event) {
@@ -86,5 +107,5 @@ Board.addScore = function(score, success) {
 // initialize and start the Pop app
 //
 
-var pop = new Pop('realm://'+IP+':9080', '.*/game')
-pop.connect(REALM_ADMIN_TOKEN)
+let pop = new Pop(config);
+pop.connect(token.get('admin'), token.get('access'));
