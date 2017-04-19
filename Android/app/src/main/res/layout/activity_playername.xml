@@ -20,12 +20,13 @@
         android:text="@string/pregameroom_player_name_prompt_label"/>
 
     <EditText
-        style="@style/Text.EditText"
         android:id="@+id/playerNameEditText"
+        style="@style/Text.EditText"
         android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:hint="@string/pregameroom_player_name_prompt_label"
         tools:text="Kaiser Söze"
+        android:textAlignment="center"
         android:textAppearance="@style/Text.EditText"
         android:imeOptions="flagNoExtractUi"
         android:inputType="text" />

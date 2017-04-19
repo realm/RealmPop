@@ -11,7 +11,7 @@ import realm.io.realmpop.BuildConfig;
 public class SharedPrefsUtils {
 
     private static final String USER_KEY = "io.realm.realmpop.userKey";
-    private static final String LAST_ROS_IP_KEY = "io.realm.realmpop.userKey";
+    private static final String LAST_ROS_IP_KEY = "io.realm.realmpop.rosIp";
     private static SharedPrefsUtils privateInstance;
 
     private SharedPreferences sharedPreferences;

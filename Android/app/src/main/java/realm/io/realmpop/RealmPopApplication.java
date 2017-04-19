@@ -14,7 +14,7 @@ public class RealmPopApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
-        RealmLog.setLevel(LogLevel.TRACE);
+//        RealmLog.setLevel(LogLevel.TRACE);
         SharedPrefsUtils.init(this);
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/PressStart2P.ttf")

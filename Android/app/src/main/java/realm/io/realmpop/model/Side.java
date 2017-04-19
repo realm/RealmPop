@@ -14,6 +14,14 @@ public class Side extends RealmObject {
     private double time;
     private boolean failed;
 
+    public Side() {}
+
+    public Side(Player representedPlayer, int initialBubbleCount) {
+        playerId = representedPlayer.getId();
+        name = representedPlayer.getName();
+        left = initialBubbleCount;
+    }
+
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; } 

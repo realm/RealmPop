@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_splash"
     android:layout_width="match_parent"
@@ -8,15 +8,16 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:gravity="center"
     tools:context=".view.SplashActivity">
 
     <TextView
         android:id="@+id/biglyTextView"
         style="@style/SalmonTextViewBigly"
-        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="18dp"
         android:text="@string/app_name"
         />
 
@@ -26,10 +27,10 @@
         style="@style/Text.EditText"
         android:layout_below="@id/biglyTextView"
         android:layout_centerHorizontal="true"
-        android:layout_width="160dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:imeOptions="flagNoExtractUi"
-        android:hint="@string/pregameroom_player_name_prompt_label"
+        android:hint="@string/ros_ip_prompt_label"
         android:text="@string/defaultObjectServerIp"
         android:textAlignment="center"
         android:inputType="text" />
@@ -45,4 +46,4 @@
         android:text="@string/connect_button_label"
         />
 
-</RelativeLayout>
+</LinearLayout>

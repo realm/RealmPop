@@ -3,6 +3,7 @@ package realm.io.realmpop.view;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.MainThread;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -20,8 +21,11 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.ObjectChangeSet;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmObject;
+import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
@@ -31,7 +35,7 @@ import realm.io.realmpop.util.GameHelpers;
 
 import static realm.io.realmpop.util.RandomNumberUtils.generateNumber;
 
-public class GameActivity extends BaseActivity {
+public class GameActivity extends BaseAuthenticatedActivity {
 
     @BindView(R.id.playerLabel1) public TextView player1;
     @BindView(R.id.playerLabel2) public TextView player2;
@@ -39,17 +43,12 @@ public class GameActivity extends BaseActivity {
     @BindView(R.id.timer)        public TextView timerLabel;
     @BindView(R.id.bubbleBoard)  public RelativeLayout bubbleBoard;
 
-    private Realm realm;
     private Game challenge;
     private Side mySide;
     private Side otherSide;
-    private Timer timer;
-    private Date startedAt;
     private Player me;
 
-    private Score pendingScore;
-
-    private static String TAG = GameActivity.class.getName();
+    private GameTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,63 +57,62 @@ public class GameActivity extends BaseActivity {
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
         message.setText("");
-        startedAt = new Date();
+        timer = new GameTimer(1);
 
-        realm = Realm.getDefaultInstance();
-        me = GameHelpers.currentPlayer(realm);
-        challenge = me.getCurrentgame();
+        me = Player.byId(getRealm(), getPlayerId());
+        challenge = me.getCurrentGame();
         mySide = challenge.getPlayer1().getPlayerId().equals(me.getId()) ? challenge.getPlayer1() : challenge.getPlayer2();
         otherSide = challenge.getPlayer1().getPlayerId().equals(me.getId()) ? challenge.getPlayer2() : challenge.getPlayer1();
-
-        me.addChangeListener(new RealmChangeListener<Player>() {
-            @Override
-            public void onChange(Player me) {
-                if(me.getCurrentgame() == null) {
-                    if(realm != null) {
-                        logScoreAndFinish();
-                    }
-                }
-            }
-        });
-
-        RealmChangeListener<Side> onSideChangeListener = new RealmChangeListener<Side>() {
-            @Override
-            public void onChange(Side element) {
-            if(isGameOver()) {
-                mySide.removeChangeListeners();
-                otherSide.removeChangeListeners();
-            }
-            update();
-            }
-        };
-        mySide.addChangeListener(onSideChangeListener);
-        otherSide.addChangeListener(onSideChangeListener);
 
         setupBubbleBoard();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
-        startTimer();
+
+        me.addChangeListener(MeChangeListener);
+        challenge.addChangeListener(GameChangeListener);
+        mySide.addChangeListener(SideChangeListener);
+        otherSide.addChangeListener(SideChangeListener);
+
+        timer.startTimer(new GameTimer.TimerDelegate() {
+            @Override
+            public void onTimerUpdate(final GameTimer.TimerEvent timerEvent) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        timerLabel.setText(timerEvent.timeElapsedString);
+                    }
+                });
+            }
+
+            @Override
+            public void onTimeExpired(GameTimer.TimeExpiredEvent timeExpiredEvent) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        timerLabel.setText("60.0");
+                        update();
+                    }
+                });
+            }
+        });
+
         update();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        stopTimer();
-    }
+        timer.stopTimer();
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(realm != null) {
-            realm.removeAllChangeListeners();
-            realm.close();
-            realm = null;
-        }
+        if(me != null) { me.removeChangeListener(MeChangeListener); }
+        if(challenge != null) { me.removeChangeListener(GameChangeListener); }
+        if(mySide != null) { me.removeChangeListener(SideChangeListener); }
+        if(otherSide != null) { me.removeChangeListener(SideChangeListener); }
+
+
     }
 
     @Override
@@ -122,58 +120,15 @@ public class GameActivity extends BaseActivity {
         exitGameAfterDelay(0);
     }
 
-    public void exitGameAfterDelay(int delay) {
-
+    public void exitGameAfterDelay(final int delay) {
         Handler handler = new Handler(getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                if(realm != null) {
-
-                    final String mySidePlayerId = mySide.getPlayerId();
-                    final String otherSidePlayerId = otherSide.getPlayerId();
-
-                    realm.executeTransactionAsync(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm bgRealm) {
-
-                            Player me = GameHelpers.playerWithId(mySidePlayerId, bgRealm);
-                            Player other = GameHelpers.playerWithId(otherSidePlayerId, bgRealm);
-
-                            other.setChallenger(null);
-                            me.setChallenger(null);
-                            other.setCurrentgame(null);
-                            me.setCurrentgame(null);
-
-                        }
-                    });
-                }
+                Player.assignAvailability(true, mySide.getPlayerId());
+                Player.assignAvailability(true, otherSide.getPlayerId());
             }
         }, delay);
-    }
-
-    private void logScoreAndFinish() {
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm bgRealm) {
-                if (pendingScore != null) {
-                    bgRealm.copyToRealm(pendingScore);
-                    pendingScore = null;
-                }
-            }
-        }, new Realm.Transaction.OnSuccess() {
-            @Override
-            public void onSuccess() {
-                finish();
-            }
-        }, new Realm.Transaction.OnError() {
-            @Override
-            public void onError(Throwable error) {
-                Log.e(TAG, error.getMessage());
-                finish();
-            }
-        });
     }
 
     public void onBubbleTap(final long numberTapped) {
@@ -188,10 +143,10 @@ public class GameActivity extends BaseActivity {
         final String mySidePlayerId = mySide.getPlayerId();
 
         if(bubble == numberTapped) {
-            realm.executeTransactionAsync(new Realm.Transaction() {
+            getRealm().executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
-                    Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentgame();
+                    Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentGame();
                     Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
                     mySide.setLeft(currLeft - 1);
                 }
@@ -199,10 +154,10 @@ public class GameActivity extends BaseActivity {
 
         } else {
 
-            realm.executeTransactionAsync(new Realm.Transaction() {
+            getRealm().executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
-                    Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentgame();
+                    Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentGame();
                     Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
                     mySide.setFailed(true);
                 }
@@ -217,13 +172,7 @@ public class GameActivity extends BaseActivity {
         }
     }
 
-    private void setScore(Score score) {
-        if(this.pendingScore == null) {
-            this.pendingScore = score;
-        }
-    }
-
-    private void setupBubbleBoard() {
+        private void setupBubbleBoard() {
 
         Resources res = getResources();
         DisplayMetrics display = res.getDisplayMetrics();
@@ -260,18 +209,18 @@ public class GameActivity extends BaseActivity {
 
     private void update() {
 
-        if(realm == null || me.getCurrentgame() == null) {
+        if(me.getCurrentGame() == null) {
             return;
         }
 
         final String mySidePlayerId = mySide.getPlayerId();
         final String otherSidePlayerId = otherSide.getPlayerId();
 
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        getRealm().executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
 
-                Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentgame();
+                Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentGame();
                 Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
                 Side otherSide = currentGame.sideWithPlayerId(otherSidePlayerId);
 
@@ -279,16 +228,7 @@ public class GameActivity extends BaseActivity {
 
                     // MySide finished but time hasn't been recorded yet, so let's do that.
                     if (mySide.getTime() == 0) {
-                        mySide.setTime(Double.valueOf(timeElapsedString()));
-                    }
-
-                    // Log score right away if mySide is the winner, but let both sides continue
-                    // until something ends the game.
-                    if(otherSide.getTime() == 0 || otherSide.getTime() > mySide.getTime()) {
-                        Score score = new Score();
-                        score.setName(mySide.getName());
-                        score.setTime(mySide.getTime());
-                        setScore(score);
+                        mySide.setTime(Double.valueOf(timerLabel.getText().toString()));
                     }
 
                     // Both side times have been recorded, the game is over.
@@ -309,128 +249,81 @@ public class GameActivity extends BaseActivity {
                 player1.setText(challenge.getPlayer1().getName() + " : " + challenge.getPlayer1().getLeft());
                 player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getLeft());
 
-                if(isGameOver()) {
-                    stopTimer();
-                    if(otherSide.isFailed()) {
+                if(challenge.isGameOver()) {
+                    timer.stopTimer();
+                    if (otherSide.isFailed()) {
                         showMessage("You win! Sweet");
-                    } else if(mySide.isFailed()) {
-                        if(TextUtils.isEmpty(message.getText())) {
+                    } else if (mySide.isFailed()) {
+                        if (TextUtils.isEmpty(message.getText())) {
                             message.setText("You lost!");
                         }
                         message.setVisibility(View.VISIBLE);
                     }
                     exitGameAfterDelay(5000);
 
-                } else if(timeHasExpired()) {
-                    // If time is expired and I have not got a time yet, I'm out of time.
-                    if (mySide.getTime() == 0) {
-                        stopTimer();
-                        showMessage("You're out of time!");
-                        exitGameAfterDelay(5000);
-
-                    // Time expired and I've got time then I must have one.
-                    } else {
-                        stopTimer();
-                        showMessage("You win! Sweet");
-                        exitGameAfterDelay(5000);
-                    }
-
-                } else if(pendingScore != null) {
-                    stopTimer();
-                    timerLabel.setText(String.valueOf(pendingScore.getTime()));
-                    showMessage(String.format("Your time: %s", String.valueOf(pendingScore.getTime())));
-                    Handler handler = new Handler(getMainLooper());
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            failPlayer(otherSide.getPlayerId(), new Realm.Transaction.OnSuccess() {
-                                @Override
-                                public void onSuccess() {
-                                    update();
-                                }
-                            });
-                        }
-                    }, 20000);
+//                } else if(timeHasExpired()) {
+//                    // If time is expired and I have not got a time yet, I'm out of time.
+//                    if (mySide.getTime() == 0) {
+//                        showMessage("You're out of time!");
+//                        exitGameAfterDelay(5000);
+//
+//                    // Time expired and I've got time then I must have one.
+//                    } else {
+//                        showMessage("You win! Sweet");
+//                        exitGameAfterDelay(5000);
+//                    }
+//                }
+                }
                }
-            }
         });
     }
 
+    @MainThread
     private void showMessage(String text) {
         message.setText(text);
         message.setVisibility(View.VISIBLE);
     }
 
-    private void failPlayer(final String playerId, Realm.Transaction.OnSuccess onSuccess) {
+    private RealmObjectChangeListener<Game> GameChangeListener = new RealmObjectChangeListener<Game>() {
+        @Override
+        public void onChange(Game game, ObjectChangeSet objectChangeSet) {
+            if (objectChangeSet.isDeleted() || !game.isValid()) {
+                //                finish(); // TODO: Go back to finish() instead of a specific Activity when https://github.com/realm/realm-java/issues/4502 gets resolved.
+                goTo(GameRoomActivity.class);
 
-        if(onSuccess == null) {
-            onSuccess = new Realm.Transaction.OnSuccess() { public void onSuccess() {} };
-        }
-
-        if(realm != null) {
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm bgRealm) {
-                    Game currentGame = GameHelpers.playerWithId(playerId, bgRealm).getCurrentgame();
-                    if(currentGame != null) {
-                        Side side = currentGame.sideWithPlayerId(playerId);
-                        if(side != null) {
-                            side.setFailed(true);
-                        }
-                    }
-                }
-            }, onSuccess);
-        }
-    }
-
-    private boolean isGameOver() {
-        return mySide.isFailed() || otherSide.isFailed();
-    }
-
-    private Period timeElapsed() {
-        return new Interval(startedAt.getTime(), new Date().getTime()).toPeriod();
-    }
-
-    private String timeElapsedString() {
-        Period period = timeElapsed();
-        return String.format( Locale.US, "%.1f", period.getSeconds() + ((period.getMillis() / 1000d) % 60) );
-    }
-
-    private boolean timeHasExpired() {
-        return timeElapsed().getMinutes() >= 1;
-    }
-
-    private void stopTimer() {
-        if(timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-    }
-
-    private void startTimer() {
-        if(timer != null) {
-            stopTimer();
-        }
-        timer = new Timer();
-        startedAt = new Date();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String timerText = timeElapsedString();
-                        if(timeHasExpired()) {
-                            timerText = "60.0";
-                            stopTimer();
-                            update();
-                        }
-                        timerLabel.setText(timerText);
-                    }
-                });
             }
-        }, new Date(), 100);
-    }
+        }
+    };
+
+    private RealmObjectChangeListener<Side> SideChangeListener = new RealmObjectChangeListener<Side>() {
+        @MainThread
+        @Override
+        public void onChange(Side side, ObjectChangeSet objectChangeSet) {
+            if(objectChangeSet.isDeleted() || !side.isValid()) {
+                //                finish(); // TODO: Go back to finish() instead of a specific Activity when https://github.com/realm/realm-java/issues/4502 gets resolved.
+                goTo(GameRoomActivity.class);
+
+            }
+            if(challenge.isGameOver()) {
+                mySide.removeAllChangeListeners();
+                otherSide.removeAllChangeListeners();
+            }
+            update();
+        }
+    };
+
+    private RealmObjectChangeListener<Player> MeChangeListener = new RealmObjectChangeListener<Player>() {
+        @MainThread
+        @Override
+        public void onChange(Player player, ObjectChangeSet objectChangeSet) {
+            if(objectChangeSet.isDeleted() || !player.isValid()) {
+                //                finish(); // TODO: Go back to finish() instead of a specific Activity when https://github.com/realm/realm-java/issues/4502 gets resolved.
+                goTo(SplashActivity.class);
+            } else if(me.getCurrentGame() == null) {
+                goTo(GameRoomActivity.class);
+            }
+        }
+    };
 
 }
 

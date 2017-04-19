@@ -2,46 +2,74 @@ package realm.io.realmpop.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
+import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+
+import com.jakewharton.rxbinding.widget.RxTextView;
+import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.realm.ObjectChangeSet;
 import io.realm.Realm;
+import io.realm.RealmModel;
+import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.util.GameHelpers;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
-public class PlayerNameActivity extends BaseActivity implements TextWatcher {
+public class PlayerNameActivity extends BaseAuthenticatedActivity  {
 
     private static final String TAG = PlayerNameActivity.class.getName();
 
-    @BindView(R.id.playerNameEditText)
-    public EditText playerNameEditText;
+    private Subscription nameTextViewSubscription;
+    private Player me;
 
-    private Realm realm;
+    @BindView(R.id.playerNameEditText) public EditText playerNameEditText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playername);
         ButterKnife.bind(this);
-        realm = Realm.getDefaultInstance();
-        playerNameEditText.setText(GameHelpers.currentPlayer(realm).getName());
-        playerNameEditText.addTextChangedListener(this);
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(realm != null) {
-            realm.removeAllChangeListeners();
-            realm.close();
-            realm = null;
+    protected void onResume() {
+        super.onResume();
+
+        me = Player.byId(getRealm(), getPlayerId());
+
+        if(me != null) {
+            me.addChangeListener(onMeChanged);
+            playerNameEditText.setText(me.getName());
+            nameTextViewSubscription = RxTextView.textChangeEvents(playerNameEditText)
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    // .debounce(500, TimeUnit.MILLISECONDS) // Slows down the updates, might want to in a production app.
+                    .observeOn(Schedulers.io())
+                    .subscribe(onTextChangeHandler);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(me != null) {
+            me.removeChangeListener(onMeChanged);
+        }
+        if(nameTextViewSubscription != null) {
+            nameTextViewSubscription.unsubscribe();
         }
     }
 
@@ -54,60 +82,71 @@ public class PlayerNameActivity extends BaseActivity implements TextWatcher {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        closeRealm();
+        super.onBackPressed();
+    }
+
     private void moveToGameRoom() {
 
-       if(realm != null) {
+       final String nameText = playerNameEditText.getText().toString();
 
-           final String nameText = playerNameEditText.getText().toString();
-
-           realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm bgRealm) {
-                    Player me = GameHelpers.currentPlayer(bgRealm);
-                    me.setName(nameText);
-                }
+       getRealm().executeTransactionAsync(new Realm.Transaction() {
+           @Override
+           public void execute(Realm bgRealm) {
+               Player me = Player.byId(bgRealm, getPlayerId());
+               me.setName(nameText);
+           }
 
            // afterward, on the foreground, lauch the GameRoomActivity.
-           }, new Realm.Transaction.OnSuccess() {
-                @Override
-                public void onSuccess() {
-                    Intent gameRoomIntent = new Intent(PlayerNameActivity.this, GameRoomActivity.class);
-                    startActivity(gameRoomIntent);
+       }, new Realm.Transaction.OnSuccess() {
+           @Override
+           public void onSuccess() {
+               goTo(GameRoomActivity.class);
+           }
+       }, new Realm.Transaction.OnError() {
+           @Override
+           public void onError(Throwable error) {
+               goTo(SplashActivity.class);
+//               finish();
+           }
+       });
+    }
+
+
+    private Action1<TextViewTextChangeEvent> onTextChangeHandler = new Action1<TextViewTextChangeEvent>() {
+        @WorkerThread
+        @Override
+        public void call(final TextViewTextChangeEvent textViewTextChangeEvent) {
+            try (Realm bgRealm = Realm.getDefaultInstance()) {
+                bgRealm.beginTransaction();
+                String nameText = textViewTextChangeEvent.text().toString();
+                Player bgMe = Player.byId(bgRealm, getPlayerId());
+                if(bgMe != null) {
+                    bgMe.setName(nameText);
                 }
-           });
+                bgRealm.commitTransaction();
+            }
         }
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-        if(realm != null) {
-            final String nameText = playerNameEditText.getText().toString();
-
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm bgRealm) {
-                    Player me = GameHelpers.currentPlayer(bgRealm);
-                    me.setName(nameText);
-                }
-
-                // afterward, on the foreground, lauch the GameRoomActivity.
-            });
-        }
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-    }
+    };
 
     private void shakeText() {
-        // do nothing for now.
+        playerNameEditText.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake));
     }
 
     private boolean isPlayerNameValid() {
         return !TextUtils.isEmpty(playerNameEditText.getText());
     }
+
+    private RealmObjectChangeListener<Player> onMeChanged = new RealmObjectChangeListener<Player>() {
+        @Override
+        public void onChange(Player player, ObjectChangeSet objectChangeSet) {
+            if (objectChangeSet.isDeleted() || !player.isValid()) {
+//                finish(); // TODO: Go back to finish() instad of SplashActivity when https://github.com/realm/realm-java/issues/4502 gets resolved.
+                goTo(SplashActivity.class);
+            }
+        }
+    };
+
 }

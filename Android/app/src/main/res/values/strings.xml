@@ -1,9 +1,15 @@
 <resources>
     <string name="app_name">Realm Pop</string>
 
+    <string name="ros_ip_prompt_label">Object Server IP</string>
+
     <string name="pregameroom_enter_button_label">Enter</string>
     <string name="pregameroom_player_name_prompt_label">Player Name</string>
     <string name="end_game_button_label">End Game</string>
     <string name="connect_button_label">Connect</string>
+
+    <string name="game_challenge_proposition">You were invited to a game by %s</string>
+    <string name="game_challenge_accept">Accept</string>
+    <string name="game_challenge_decline">No, thanks!</string>
 
 </resources>

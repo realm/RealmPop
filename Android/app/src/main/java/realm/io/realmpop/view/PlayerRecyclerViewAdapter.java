@@ -31,21 +31,24 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final Player player = getData().get(position);
-        holder.playerId = player.getId();
-        holder.titleView.setText(player.getName());
-        if (player.isAvailable()) {
-            holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.playerAvailableColor));
-        } else {
-            holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.playerUnavailableColor));
-        }
-
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            gameRoomActivity.challengePlayer(player);
+        OrderedRealmCollection data = getData();
+        if(data != null) {
+            final Player player = getData().get(position);
+            holder.playerId = player.getId();
+            holder.titleView.setText(player.getName());
+            if (player.isAvailable()) {
+                holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.playerAvailableColor));
+            } else {
+                holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.playerUnavailableColor));
             }
-        });
+
+            holder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    gameRoomActivity.challengePlayer(player);
+                }
+            });
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

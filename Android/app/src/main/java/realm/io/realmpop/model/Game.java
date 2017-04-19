@@ -1,9 +1,15 @@
 package realm.io.realmpop.model;
 
 import java.util.Arrays;
+import java.util.UUID;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.Required;
+import realm.io.realmpop.util.BubbleUtils;
+import realm.io.realmpop.util.GameHelpers;
+
+import static realm.io.realmpop.util.RandomNumberUtils.generateNumbersArray;
 
 public class Game extends RealmObject {
 
@@ -12,6 +18,14 @@ public class Game extends RealmObject {
 
     @Required
     private String numbers;
+
+    public Game() {}
+
+    public Game(Player me, Player challenger, int[] numberArray) {
+        player1 = new Side(me, numberArray.length);
+        player2 = new Side(challenger, numberArray.length);
+        numbers = numberArrayToString(numberArray);
+    }
 
     public Side getPlayer1() { return player1; }
 
@@ -24,12 +38,6 @@ public class Game extends RealmObject {
     public String getNumbers() { return numbers; }
 
     public void setNumbers(String numbers) { this.numbers = numbers; } 
-
-    public void setNumberArray(int[] numArray) {
-        String numStr = Arrays.toString(numArray);
-        numStr = numStr.replaceAll("\\[|\\]|\\s", "");
-        setNumbers(numStr);
-    }
 
     public int[] getNumberArray() {
         if(getNumbers() == null) {
@@ -44,6 +52,10 @@ public class Game extends RealmObject {
         }
     }
 
+    public boolean isGameOver() {
+        return player1.isFailed() || player2.isFailed();
+    }
+
     public Side sideWithPlayerId(final String playerId) {
         if(player1 != null && player1.getPlayerId().equals(playerId)) {
             return player1;
@@ -52,6 +64,34 @@ public class Game extends RealmObject {
         } else {
             return null;
         }
+    }
+
+    private static String numberArrayToString(int[] numArray) {
+        String numStr = Arrays.toString(numArray);
+        return numStr.replaceAll("\\[|\\]|\\s", "");
+    }
+
+    public static void startNewGame(final String meId, final String challengerId) {
+
+        try(Realm r = Realm.getDefaultInstance()) {
+
+            r.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm r) {
+                    Player me = Player.byId(r, meId);
+                    Player challenger = Player.byId(r, challengerId);
+
+                    if(me != null && challenger != null) {
+                        int [] numbers = generateNumbersArray(BubbleUtils.bubbleCount, 1, BubbleUtils.bubbleValueMax);
+                        Game game = new Game(me, challenger, numbers);
+                        game = r.copyToRealm(game);
+                        me.setCurrentGame(game);
+                        challenger.setCurrentGame(game);
+                    }
+                }
+            });
+        }
+
     }
 
 }

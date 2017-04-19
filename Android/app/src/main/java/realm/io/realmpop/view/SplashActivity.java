@@ -1,14 +1,17 @@
 package realm.io.realmpop.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.ObjectServerError;
 import io.realm.Realm;
@@ -18,11 +21,11 @@ import io.realm.SyncUser;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.util.SharedPrefsUtils;
-import realm.io.realmpop.viewmodel.SplashVm;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends AppCompatActivity {
 
-    private static final String TAG = SplashVm.class.getName();
+    private static final String TAG = SplashActivity.class.getName();
     private static final String ID = "default@realm";
     private static final String PASSWORD = "password";
     private static final long SCHEMA_VERSION = 1L;
@@ -32,12 +35,18 @@ public class SplashActivity extends BaseActivity {
     private static SharedPrefsUtils sharedPrefs = SharedPrefsUtils.getInstance();
 
     @BindView(R.id.hostIpTextView)
-    private TextView rosIpTextView;
+    public TextView rosIpTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @OnClick(R.id.connectToRosButton)
@@ -72,7 +81,7 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    public void postLogin(SyncUser user) {
+    private void postLogin(SyncUser user) {
 
         setRealmDefaultConfig(user);
 
@@ -109,6 +118,7 @@ public class SplashActivity extends BaseActivity {
 
     private void setRealmDefaultConfig(SyncUser user) {
         Log.d(TAG, "Connecting to Sync Server at : ["  + realmUrl().replaceAll("~", user.getIdentity()) + "]");
+        Realm.removeDefaultConfiguration();
         final SyncConfiguration syncConfiguration = new SyncConfiguration.Builder(user, realmUrl()).schemaVersion(SCHEMA_VERSION).build();
         Realm.setDefaultConfiguration(syncConfiguration);
     }
