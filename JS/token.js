@@ -10,7 +10,7 @@ class Token {
   }
 
   load(name, filePath) {
-    this.current[name] = fs.readFileSync(filePath, 'utf-8').toString();
+    this.current[name] = fs.readFileSync(filePath, 'utf-8').toString().trim();
   }
 
   get(name) {

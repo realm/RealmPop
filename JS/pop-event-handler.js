@@ -1,4 +1,5 @@
 var Realm = require('realm');
+var { Board } = require('./board.js');
 
 function isRealmObject(x) {
   return x !== null && x !== undefined && x.constructor === Realm.Object
@@ -79,25 +80,6 @@ Pop.changeCallback = function(event) {
       })
     }
   }
-}
-
-/**
- * Score board class
- *
- * Saves scores to a text file
- */
-
-var Board = {
-  file: 'board.txt'
-}
-
-Board.addScore = function(score, success) {
-  fs.appendFile(this.file, score.name+"\t"+score.time+"\n", function (err) {
-    if (err) {
-      return console.error(err);
-    }
-    success()
-  })
 }
 
 exports.Pop = Pop;

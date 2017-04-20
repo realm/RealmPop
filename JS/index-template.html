@@ -1,0 +1,35 @@
+<html>
+<head>
+  <title>Realm Pop Score Board</title>
+  <style>
+    body {font-family: Helvetica; text-align: center; padding-top: 30px;}
+    div {width: 600px; margin-top: 20px; padding: 10px; border: 1px solid #3366cc; border-radius: 10px; background-color: #efefef; margin-left: auto; margin-right: auto; text-align: left;}
+    a  {padding-top: 50px; text-decoration: none; font-size: 3.2em; font-weight: bold; color: #3366cc; display: block; height: 120px; } 
+    p { clear: both; height: 15px;}
+    .nr { margin-left: 10px; width: 100px; display: block; float: left;}
+    .name { margin-left: 10px; width: 200px; display: block; float: left;}
+    .time { margin-left: 10px; width: 100px; display: block; float: left;}
+    .date { font-size: 0.8em; text-align: center;}
+  </style>
+</head>
+<body>
+<img src="Icon_256x256.png" width="150" height="150">
+
+<div>
+  <p><span class="nr">Position</span><span class="name">Name</span><span class="time">Time</span></p>
+  <hr>
+  ##results##
+</div>
+
+<div class="date">
+  <script>document.write(new Date());</script>
+</div>
+
+<script>
+  setTimeout(() => {
+    window.location.reload();
+  }, 5000);
+</script>
+
+</body>
+</html>
