@@ -10,14 +10,21 @@ var {
   Player, Score, Game, Side,
 } = require('./server-schema');
 
-function Server(config, adminToken) {
+function Server(config, adminToken, credentials) {
   this.minutesToExpire = 2.0;
   this.callbackMinutesInterval = 1.0;
 
   this.config = config;
+  let creds = credentials.split(':');
+  this.config.uid = creds[0];
+  this.config.username = creds[1];
+  this.config.password = creds[2];
+
   this.timer = null;
   Server.adminUser = Realm.Sync.User.adminUser(adminToken);
   Server.instance = this;
+
+  this.resetAvailability();
 }
 
 Server.prototype.start = function() {
@@ -55,7 +62,7 @@ Server.prototype.callback = function() {
   //available
   if (expired.length > 0) {
 
-    Realm.Sync.User.login('http://' + this.config.host + ':' + this.config.port, 'default@realm', 'password', (error, user) => {
+    Realm.Sync.User.login('http://' + this.config.host + ':' + this.config.port, this.config.username, this.config.password, (error, user) => {
       //print('connected');
 
       if (!error) {
@@ -100,6 +107,27 @@ Server.prototype.callback = function() {
       }
     });
   }
+}
+
+Server.prototype.resetAvailability = function() {
+  Realm.Sync.User.login('http://' + this.config.host + ':' + this.config.port, this.config.username, this.config.password, (error, user) => {
+      if (!error) {
+        let gameUrl = 'realm://' + this.config.host + ':' + this.config.port + '/~/game';
+
+        let realm = new Realm({
+          sync: { user: user, url: gameUrl },
+          schema: [Player.schema, Score.schema, Game.schema, Side.schema]
+        });
+
+        let players = realm.objects("Player");
+        realm.write(() => {
+          for (var i in players) {
+            print('reset: ' + players[i].id);
+            players[i].available = false;
+          }
+        });
+      }
+  });
 }
 
 Server.prototype.didUpdateAvailability = function(userId, available) {

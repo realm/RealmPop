@@ -11,13 +11,14 @@ function isRealmObject(x) {
  * Connects to Realm Object Server, installs event listener, processes Score object insertions
  */
 
-function Pop(config) {
+function Pop(config, credentials) {
   Pop.config = config;
   Pop.serverUrl = 'realm://' + Pop.config.host + ':' + Pop.config.port;
   Pop.adminUser = null;
   Pop.instance = this;
+  this.uid = credentials.split(':')[0];
   this.didUpdateAvailability = null;
-  this.path = '.*game';
+  this.path = '.*'+this.uid+'\/game';
 }
 
 Pop.prototype.connect = function(adminToken) {
