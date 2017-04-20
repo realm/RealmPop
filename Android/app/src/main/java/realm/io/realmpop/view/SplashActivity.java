@@ -85,35 +85,36 @@ public class SplashActivity extends AppCompatActivity {
 
         setRealmDefaultConfig(user);
 
-        Realm realm = Realm.getDefaultInstance();
-
-        realm.executeTransactionAsync(new Realm.Transaction() {
-                                          @Override
-                                          public void execute(Realm bgRealm) {
-                                              String playerId = SharedPrefsUtils.getInstance().idForCurrentPlayer();
-                                              Player me = Player.byId(bgRealm, playerId);
-                                              if(me == null) {
-                                                  me = new Player();
-                                                  me.setId(playerId);
-                                                  me.setName("");
-                                                  me = bgRealm.copyToRealmOrUpdate(me);
+        try(Realm realm = Realm.getDefaultInstance()) {
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                                              @Override
+                                              public void execute(Realm bgRealm) {
+                                                  String playerId = SharedPrefsUtils.getInstance().idForCurrentPlayer();
+                                                  Player me = Player.byId(bgRealm, playerId);
+                                                  if(me == null) {
+                                                      me = new Player();
+                                                      me.setId(playerId);
+                                                      me.setName("");
+                                                      me = bgRealm.copyToRealmOrUpdate(me);
+                                                  }
+                                                  me.setAvailable(false);
+                                                  me.setChallenger(null);
+                                                  me.setCurrentGame(null);
                                               }
-                                              me.setAvailable(false);
-                                              me.setChallenger(null);
-                                              me.setCurrentGame(null);
-                                          }
-                                      },
-                new Realm.Transaction.OnSuccess() {
-                    @Override
-                    public void onSuccess() { goTo(PlayerNameActivity.class);
-                    }
-                },
-                new Realm.Transaction.OnError() {
-                    @Override
-                    public void onError(Throwable error) {
-                        logError(error);
-                    }
-                });
+                                          },
+                    new Realm.Transaction.OnSuccess() {
+                        @Override
+                        public void onSuccess() { goTo(PlayerNameActivity.class);
+                        }
+                    },
+                    new Realm.Transaction.OnError() {
+                        @Override
+                        public void onError(Throwable error) {
+                            logError(error);
+                        }
+                    });
+        }
+
     }
 
     private void setRealmDefaultConfig(SyncUser user) {

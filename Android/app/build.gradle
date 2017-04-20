@@ -68,12 +68,12 @@ dependencies {
 
     compile 'io.realm:android-adapters:2.0.0'
 
-    compile 'joda-time:joda-time:2.9.9'
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'io.reactivex:rxjava:1.1.0'
     compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    testCompile 'junit:junit:4.12'
 }
 
 

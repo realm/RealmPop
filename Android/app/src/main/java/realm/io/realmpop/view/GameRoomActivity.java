@@ -24,17 +24,22 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-public class GameRoomActivity extends BaseAuthenticatedActivity {
+public class GameRoomActivity extends BaseAuthenticatedActivity implements PlayerRecyclerViewAdapter.PlayerChallengeDelegate {
 
     @BindView(R.id.player_list) public RecyclerView recyclerView;
     private Player me;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gameroom);
         ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         RealmResults<Player> otherPlayers = getRealm()
                 .where(Player.class)
                 .notEqualTo("id", getPlayerId())
@@ -42,13 +47,7 @@ public class GameRoomActivity extends BaseAuthenticatedActivity {
         recyclerView.setAdapter(new PlayerRecyclerViewAdapter(this, otherPlayers));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-
         me = Player.byId(getRealm(), getPlayerId());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         me.addChangeListener(onMeChanged);
         Player.assignAvailability(true);
     }
@@ -57,6 +56,7 @@ public class GameRoomActivity extends BaseAuthenticatedActivity {
     protected void onPause() {
         super.onPause();
         me.removeChangeListener(onMeChanged);
+        recyclerView.setAdapter(null);
         Player.assignAvailability(false);
     }
 
@@ -64,6 +64,20 @@ public class GameRoomActivity extends BaseAuthenticatedActivity {
     public void onBackPressed() {
         goTo(PlayerNameActivity.class);
     }
+
+    @Override
+    public void onChallengePlayer(String playerId) {
+        Player.challengePlayer(playerId);
+    }
+
+    public void onChallengeResponse(boolean isChallengeAccepted, String challengerId) {
+        if (isChallengeAccepted) {
+            Game.startNewGame(getPlayerId(), challengerId);
+        } else {
+            Player.assignAvailability(true);
+        }
+    }
+
 
     private RealmObjectChangeListener<Player> onMeChanged = new RealmObjectChangeListener<Player>() {
         @Override
@@ -89,18 +103,6 @@ public class GameRoomActivity extends BaseAuthenticatedActivity {
         //extras.put(Game.class.getName(), me.getCurrentGame().getId());
         extras.put(Side.class.getName(), me.getId());
         goTo(GameActivity.class, extras);
-    }
-
-    public void onChallengeResponse(boolean isChallengeAccepted, String challengerId) {
-        if (isChallengeAccepted) {
-            Game.startNewGame(getPlayerId(), challengerId);
-        } else {
-            Player.assignAvailability(true);
-        }
-    }
-
-    public void challengePlayer(Player playerToChallenge) {
-        Player.challengePlayer(playerToChallenge.getId());
     }
 
 }

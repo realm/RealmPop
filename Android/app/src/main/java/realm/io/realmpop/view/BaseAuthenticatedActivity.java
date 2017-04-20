@@ -25,18 +25,18 @@ abstract public class BaseAuthenticatedActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onStart() {
+        super.onStart();
         realm = Realm.getDefaultInstance();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
         closeRealm();
     }
 
-    protected void closeRealm() {
+    private void closeRealm() {
         if (realm != null) {
             realm.removeAllChangeListeners();
             if (realm.isInTransaction()) {
@@ -68,7 +68,6 @@ abstract public class BaseAuthenticatedActivity extends AppCompatActivity {
                 intent.putExtra(extra, extras.get(extra));
             }
         }
-        closeRealm();
         startActivity(intent);
         finish();
     }

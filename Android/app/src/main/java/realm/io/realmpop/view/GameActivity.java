@@ -6,32 +6,21 @@ import android.os.Handler;
 import android.support.annotation.MainThread;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import org.joda.time.Interval;
-import org.joda.time.Period;
-
-import java.util.Date;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.ObjectChangeSet;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
-import io.realm.RealmObject;
 import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
-import realm.io.realmpop.model.Score;
 import realm.io.realmpop.model.Side;
 import realm.io.realmpop.util.GameHelpers;
+import realm.io.realmpop.util.GameTimer;
 
 import static realm.io.realmpop.util.RandomNumberUtils.generateNumber;
 
@@ -50,14 +39,30 @@ public class GameActivity extends BaseAuthenticatedActivity {
 
     private GameTimer timer;
 
+    private boolean hasTimeExpired;
+
+    public void setTimeExpired(String finalDisplayTime) {
+        this.hasTimeExpired = true;
+        timerLabel.setText(finalDisplayTime);
+        if(!challenge.isGameOver()) {
+            challenge.failUnfinishedSides();
+        }
+        update();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
         message.setText("");
-        timer = new GameTimer(1);
+        timer = new GameTimer(60);
 
         me = Player.byId(getRealm(), getPlayerId());
         challenge = me.getCurrentGame();
@@ -88,12 +93,11 @@ public class GameActivity extends BaseAuthenticatedActivity {
             }
 
             @Override
-            public void onTimeExpired(GameTimer.TimeExpiredEvent timeExpiredEvent) {
+            public void onTimeExpired(final GameTimer.TimeExpiredEvent timeExpiredEvent) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        timerLabel.setText("60.0");
-                        update();
+                        setTimeExpired(timeExpiredEvent.timeElapsedString);
                     }
                 });
             }
@@ -108,11 +112,9 @@ public class GameActivity extends BaseAuthenticatedActivity {
         timer.stopTimer();
 
         if(me != null) { me.removeChangeListener(MeChangeListener); }
-        if(challenge != null) { me.removeChangeListener(GameChangeListener); }
-        if(mySide != null) { me.removeChangeListener(SideChangeListener); }
-        if(otherSide != null) { me.removeChangeListener(SideChangeListener); }
-
-
+        if(challenge != null) { challenge.removeChangeListener(GameChangeListener); }
+        if(mySide != null) { mySide.removeChangeListener(SideChangeListener); }
+        if(otherSide != null) { otherSide.removeChangeListener(SideChangeListener); }
     }
 
     @Override
@@ -229,6 +231,7 @@ public class GameActivity extends BaseAuthenticatedActivity {
                     // MySide finished but time hasn't been recorded yet, so let's do that.
                     if (mySide.getTime() == 0) {
                         mySide.setTime(Double.valueOf(timerLabel.getText().toString()));
+                        timer.expireInSeconds(20);
                     }
 
                     // Both side times have been recorded, the game is over.
@@ -249,6 +252,10 @@ public class GameActivity extends BaseAuthenticatedActivity {
                 player1.setText(challenge.getPlayer1().getName() + " : " + challenge.getPlayer1().getLeft());
                 player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getLeft());
 
+                if(mySide.getTime() > 0) {
+                    showMessage(String.format("Your time: %s", String.valueOf(mySide.getTime())));
+                }
+
                 if(challenge.isGameOver()) {
                     timer.stopTimer();
                     if (otherSide.isFailed()) {
@@ -261,18 +268,18 @@ public class GameActivity extends BaseAuthenticatedActivity {
                     }
                     exitGameAfterDelay(5000);
 
-//                } else if(timeHasExpired()) {
-//                    // If time is expired and I have not got a time yet, I'm out of time.
-//                    if (mySide.getTime() == 0) {
-//                        showMessage("You're out of time!");
-//                        exitGameAfterDelay(5000);
-//
-//                    // Time expired and I've got time then I must have one.
-//                    } else {
-//                        showMessage("You win! Sweet");
-//                        exitGameAfterDelay(5000);
-//                    }
-//                }
+                } else if(hasTimeExpired) {
+
+                    // If time is expired and I have not got a time yet, I'm out of time.
+                    if (mySide.getTime() == 0) {
+                        showMessage("You're out of time!");
+                        exitGameAfterDelay(5000);
+
+                    // Time expired and I've got time then I must have one.
+                    } else {
+                        showMessage("You win! Sweet");
+                        exitGameAfterDelay(5000);
+                    }
                 }
                }
         });

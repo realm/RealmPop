@@ -1,6 +1,5 @@
 package realm.io.realmpop.view;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
@@ -10,19 +9,14 @@ import android.widget.EditText;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.ObjectChangeSet;
 import io.realm.Realm;
-import io.realm.RealmModel;
 import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Player;
-import realm.io.realmpop.util.GameHelpers;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -36,7 +30,6 @@ public class PlayerNameActivity extends BaseAuthenticatedActivity  {
     private Player me;
 
     @BindView(R.id.playerNameEditText) public EditText playerNameEditText;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,12 +73,6 @@ public class PlayerNameActivity extends BaseAuthenticatedActivity  {
         } else {
             moveToGameRoom();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        closeRealm();
-        super.onBackPressed();
     }
 
     private void moveToGameRoom() {
