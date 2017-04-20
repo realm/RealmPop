@@ -30,10 +30,10 @@ Pop.prototype.connect = function(adminToken) {
   print('Pop app at: ' + Pop.serverUrl + " observing changes at: " + this.path);
 }
 
-Pop.changeCallback = function(event) {
+Pop.handlePlayerEvents = function(event) {
   let realm = event.realm;
 
-  // Player
+   // Player
   let changesPlayer = event.changes.Player;
   if (changesPlayer == undefined) { 
     return
@@ -53,7 +53,10 @@ Pop.changeCallback = function(event) {
       Pop.instance.didUpdateAvailability(player.id, player.available);
     }
   }
+}
 
+Pop.handleScoreEvents = function(event) {
+  let realm = event.realm;
 
   // Score
   let changes = event.changes.Score;
@@ -80,6 +83,11 @@ Pop.changeCallback = function(event) {
       })
     }
   }
+}
+
+Pop.changeCallback = function(event) {
+  Pop.handlePlayerEvents(event);
+  Pop.handleScoreEvents(event);
 }
 
 exports.Pop = Pop;

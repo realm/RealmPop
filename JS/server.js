@@ -1,5 +1,9 @@
 var Realm = require('realm');
 
+function isRealmObject(x) {
+  return x !== null && x !== undefined && x.constructor === Realm.Object
+}
+
 var users = new Object();
 
 var {
@@ -7,8 +11,8 @@ var {
 } = require('./server-schema');
 
 function Server(config, adminToken) {
-  this.minutesToExpire = 1.0;
-  this.callbackMinutesInterval = 0.1;
+  this.minutesToExpire = 2.0;
+  this.callbackMinutesInterval = 1.0;
 
   this.config = config;
   this.timer = null;
@@ -78,8 +82,10 @@ Server.prototype.callback = function() {
                 let expiredId = expired[i];
                 print('find player with ID: ' + expiredId);
                 let player = realm.objectForPrimaryKey('Player', expiredId);
-                player.available = false;
-                this.didUpdateAvailability(player.id, false);
+                if (isRealmObject(player)) {
+                  player.available = false;
+                  this.didUpdateAvailability(player.id, false);
+                }
               }
             });
             
