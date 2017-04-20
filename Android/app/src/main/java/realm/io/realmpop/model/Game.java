@@ -1,13 +1,11 @@
 package realm.io.realmpop.model;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.Required;
-import realm.io.realmpop.util.BubbleUtils;
-import realm.io.realmpop.util.GameHelpers;
+import realm.io.realmpop.util.PopUtils;
 
 import static realm.io.realmpop.util.RandomNumberUtils.generateNumbersArray;
 
@@ -66,11 +64,6 @@ public class Game extends RealmObject {
         }
     }
 
-    private static String numberArrayToString(int[] numArray) {
-        String numStr = Arrays.toString(numArray);
-        return numStr.replaceAll("\\[|\\]|\\s", "");
-    }
-
     public void failUnfinishedSides() {
 
         final String p1id = getPlayer1().getPlayerId();
@@ -81,7 +74,7 @@ public class Game extends RealmObject {
             r.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
-                    Game currentGame = GameHelpers.playerWithId(p1id, bgRealm).getCurrentGame();
+                    Game currentGame = Player.byId(bgRealm, p1id).getCurrentGame();
                     Side p1Side = currentGame.sideWithPlayerId(p1id);
                     Side p2Side = currentGame.sideWithPlayerId(p2id);
 
@@ -109,7 +102,7 @@ public class Game extends RealmObject {
                     Player challenger = Player.byId(r, challengerId);
 
                     if(me != null && challenger != null) {
-                        int [] numbers = generateNumbersArray(BubbleUtils.bubbleCount, 1, BubbleUtils.bubbleValueMax);
+                        int [] numbers = generateNumbersArray(PopUtils.BUBBLE_COUNT, 1, PopUtils.BUBBLE_VALUE_MAX);
                         Game game = new Game(me, challenger, numbers);
                         game = r.copyToRealm(game);
                         me.setCurrentGame(game);
@@ -119,6 +112,11 @@ public class Game extends RealmObject {
             });
         }
 
+    }
+
+    private static String numberArrayToString(int[] numArray) {
+        String numStr = Arrays.toString(numArray);
+        return numStr.replaceAll("\\[|\\]|\\s", "");
     }
 
 }

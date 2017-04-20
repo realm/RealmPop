@@ -18,13 +18,14 @@ import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
+import realm.io.realmpop.model.Score;
 import realm.io.realmpop.model.Side;
-import realm.io.realmpop.util.GameHelpers;
 import realm.io.realmpop.util.GameTimer;
+import realm.io.realmpop.util.PopUtils;
 
 import static realm.io.realmpop.util.RandomNumberUtils.generateNumber;
 
-public class GameActivity extends BaseAuthenticatedActivity {
+public class GameActivity extends BaseAuthenticatedActivity implements GameTimer.TimerDelegate {
 
     @BindView(R.id.playerLabel1) public TextView player1;
     @BindView(R.id.playerLabel2) public TextView player2;
@@ -39,17 +40,6 @@ public class GameActivity extends BaseAuthenticatedActivity {
 
     private GameTimer timer;
 
-    private boolean hasTimeExpired;
-
-    public void setTimeExpired(String finalDisplayTime) {
-        this.hasTimeExpired = true;
-        timerLabel.setText(finalDisplayTime);
-        if(!challenge.isGameOver()) {
-            challenge.failUnfinishedSides();
-        }
-        update();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +52,7 @@ public class GameActivity extends BaseAuthenticatedActivity {
         super.onStart();
 
         message.setText("");
-        timer = new GameTimer(60);
+        timer = new GameTimer(PopUtils.GAME_LENGTH_SECONDS);
 
         me = Player.byId(getRealm(), getPlayerId());
         challenge = me.getCurrentGame();
@@ -81,28 +71,7 @@ public class GameActivity extends BaseAuthenticatedActivity {
         mySide.addChangeListener(SideChangeListener);
         otherSide.addChangeListener(SideChangeListener);
 
-        timer.startTimer(new GameTimer.TimerDelegate() {
-            @Override
-            public void onTimerUpdate(final GameTimer.TimerEvent timerEvent) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        timerLabel.setText(timerEvent.timeElapsedString);
-                    }
-                });
-            }
-
-            @Override
-            public void onTimeExpired(final GameTimer.TimeExpiredEvent timeExpiredEvent) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setTimeExpired(timeExpiredEvent.timeElapsedString);
-                    }
-                });
-            }
-        });
-
+        timer.startTimer(this);
         update();
     }
 
@@ -133,6 +102,35 @@ public class GameActivity extends BaseAuthenticatedActivity {
         }, delay);
     }
 
+    @Override
+    public void onTimerUpdate(final GameTimer.TimerEvent timerEvent) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                timerLabel.setText(timerEvent.timeElapsedString);
+            }
+        });
+    }
+
+    @Override
+    public void onTimeExpired(final GameTimer.TimeExpiredEvent timeExpiredEvent) {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                timerLabel.setText(timeExpiredEvent.timeElapsedString);
+
+                if (TextUtils.isEmpty(message.getText())) {
+                    message.setText(R.string.game_outcome_message_timeout);
+                }
+
+                if(!challenge.isGameOver()) {
+                    challenge.failUnfinishedSides();
+                }
+            }
+        });
+    }
+
     public void onBubbleTap(final long numberTapped) {
 
         // Just to make sure, if there are none left to tap, exit.
@@ -140,15 +138,15 @@ public class GameActivity extends BaseAuthenticatedActivity {
             return;
         }
 
-        final int bubble = challenge.getNumberArray()[(int)mySide.getLeft() - 1];
+        final int numberThatShouldBeTapped = challenge.getNumberArray()[(int)mySide.getLeft() - 1];
         final long currLeft = mySide.getLeft();
         final String mySidePlayerId = mySide.getPlayerId();
 
-        if(bubble == numberTapped) {
+        if(numberThatShouldBeTapped == numberTapped) {
             getRealm().executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
-                    Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentGame();
+                    Game currentGame = Player.byId(bgRealm, mySidePlayerId).getCurrentGame();
                     Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
                     mySide.setLeft(currLeft - 1);
                 }
@@ -159,7 +157,7 @@ public class GameActivity extends BaseAuthenticatedActivity {
             getRealm().executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
-                    Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentGame();
+                    Game currentGame = Player.byId(bgRealm, mySidePlayerId).getCurrentGame();
                     Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
                     mySide.setFailed(true);
                 }
@@ -167,8 +165,7 @@ public class GameActivity extends BaseAuthenticatedActivity {
             }, new Realm.Transaction.OnSuccess() {
                 @Override
                 public void onSuccess() {
-                    message.setText("You tapped " + numberTapped + " instead of " + bubble);
-                    message.setVisibility(View.VISIBLE);
+                    showMessage(getString(R.string.game_outcome_message_popoutoforder, numberTapped, numberThatShouldBeTapped));
                 }
             });
         }
@@ -222,7 +219,7 @@ public class GameActivity extends BaseAuthenticatedActivity {
             @Override
             public void execute(Realm bgRealm) {
 
-                Game currentGame = GameHelpers.playerWithId(mySidePlayerId, bgRealm).getCurrentGame();
+                Game currentGame = Player.byId(bgRealm, mySidePlayerId).getCurrentGame();
                 Side mySide = currentGame.sideWithPlayerId(mySidePlayerId);
                 Side otherSide = currentGame.sideWithPlayerId(otherSidePlayerId);
 
@@ -253,33 +250,26 @@ public class GameActivity extends BaseAuthenticatedActivity {
                 player2.setText(challenge.getPlayer2().getName() + " : " + challenge.getPlayer2().getLeft());
 
                 if(mySide.getTime() > 0) {
-                    showMessage(String.format("Your time: %s", String.valueOf(mySide.getTime())));
+                    String finishTimeMsg = getString(R.string.game_outcome_message_finishtime, String.valueOf(mySide.getTime()));
+                    showMessage(finishTimeMsg);
                 }
 
                 if(challenge.isGameOver()) {
                     timer.stopTimer();
-                    if (otherSide.isFailed()) {
-                        showMessage("You win! Sweet");
-                    } else if (mySide.isFailed()) {
+
+                    if (mySide.isFailed()) {
                         if (TextUtils.isEmpty(message.getText())) {
-                            message.setText("You lost!");
+                            message.setText(R.string.game_outcome_message_lose);
                         }
                         message.setVisibility(View.VISIBLE);
+
+                    } else if (otherSide.isFailed()) {
+                        showMessage(getString(R.string.game_outcome_message_win));
+                        Score.addNewScore(mySide.getName(), mySide.getTime());
                     }
+
                     exitGameAfterDelay(5000);
 
-                } else if(hasTimeExpired) {
-
-                    // If time is expired and I have not got a time yet, I'm out of time.
-                    if (mySide.getTime() == 0) {
-                        showMessage("You're out of time!");
-                        exitGameAfterDelay(5000);
-
-                    // Time expired and I've got time then I must have one.
-                    } else {
-                        showMessage("You win! Sweet");
-                        exitGameAfterDelay(5000);
-                    }
                 }
                }
         });

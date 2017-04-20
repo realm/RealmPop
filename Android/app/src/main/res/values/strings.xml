@@ -12,4 +12,10 @@
     <string name="game_challenge_accept">Accept</string>
     <string name="game_challenge_decline">No, thanks!</string>
 
+    <string name="game_outcome_message_lose">You lost!</string>
+    <string name="game_outcome_message_timeout">You\'re out of time!</string>
+    <string name="game_outcome_message_finishtime">Your time: %s</string>
+    <string name="game_outcome_message_win">You win! Sweet</string>
+    <string name="game_outcome_message_popoutoforder">You tapped %1$d instead of %2$d</string>
+
 </resources>

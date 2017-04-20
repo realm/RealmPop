@@ -26,8 +26,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = SplashActivity.class.getName();
-    private static final String ID = "default@realm";
-    private static final String PASSWORD = "password";
+    private static final String ID = "paul@realm"; // "default@realm";
+    private static final String PASSWORD = "poqeng09481hg"; // "password";
     private static final long SCHEMA_VERSION = 1L;
     private static String authUrl() { return "http://" + sharedPrefs.getRosAddress() + ":9080/auth"; }
     private static String realmUrl() { return "realm://" + sharedPrefs.getRosAddress() + ":9080/~/game"; }
