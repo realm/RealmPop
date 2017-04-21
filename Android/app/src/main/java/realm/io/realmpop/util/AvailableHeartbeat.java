@@ -7,7 +7,7 @@ import realm.io.realmpop.model.Player;
 
 public class AvailableHeartbeat {
 
-    private static final String TAG = AvailableHeartbeat.class.getName();
+    private static final String TAG = "AvailableHeartbeat";
 
     private static final int HEARTBEAT_AVAIL_REFRESH_RATE = 20 * 1000; // 20 seconds.
     private boolean isAvailable;

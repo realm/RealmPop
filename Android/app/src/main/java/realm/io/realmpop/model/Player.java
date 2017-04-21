@@ -49,7 +49,7 @@ public class Player extends RealmObject {
                 public void execute(Realm realm) {
                     Player me = Player.byId(realm, myId());
                     Player theChallenged = Player.byId(realm, playerId);
-                    if(me != null && theChallenged != null) {
+                    if(me != null && theChallenged != null && theChallenged.getChallenger() == null) { //don't want to double challenge.
                         theChallenged.setChallenger(me);
                     }
 

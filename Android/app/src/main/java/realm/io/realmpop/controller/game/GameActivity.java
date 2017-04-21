@@ -18,6 +18,8 @@ import io.realm.RealmObject;
 import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.controller.BaseAuthenticatedActivity;
+import realm.io.realmpop.controller.gameroom.GameRoomActivity;
+import realm.io.realmpop.controller.login.SplashActivity;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Score;
@@ -169,7 +171,13 @@ public class GameActivity extends BaseAuthenticatedActivity implements GameTimer
         }
     }
 
-        private void setupBubbleBoard() {
+    private void setupBubbleBoard() {
+
+        if(bubbleBoard.getChildCount() > 0) {
+            // Bubbles are drawn onStart.  If we have gone away from this view and comeback,
+            // the game can still be in progress so we don't want to redraw bubbles.
+            return;
+        }
 
         Resources res = getResources();
         DisplayMetrics display = res.getDisplayMetrics();

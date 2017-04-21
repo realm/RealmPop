@@ -26,8 +26,6 @@ import rx.schedulers.Schedulers;
 
 public class PlayerNameActivity extends BaseAuthenticatedActivity {
 
-    private static final String TAG = PlayerNameActivity.class.getName();
-
     private Subscription nameTextViewSubscription;
     private Player me;
 

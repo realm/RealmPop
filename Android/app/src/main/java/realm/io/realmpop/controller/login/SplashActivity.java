@@ -1,12 +1,17 @@
 package realm.io.realmpop.controller.login;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,18 +31,20 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final String TAG = SplashActivity.class.getName();
+    private static final String TAG = "SplashActivity";
     private static final long SCHEMA_VERSION = 1L;
-    private static String username() { return sharedPrefs.getPopUsername(); }
-    private static String password() { return sharedPrefs.getPopPassword(); }
-    private static String serverUrl() { return "http://" + sharedPrefs.getObjectServerHost() + ":9080"; }
-    private static String realmUrl() { return "realm://" + sharedPrefs.getObjectServerHost() + ":9080/~/game"; }
+    private String username() { return sharedPrefs.getPopUsername(); }
+    private String password() { return sharedPrefs.getPopPassword(); }
+    private String serverUrl() { return "http://" + sharedPrefs.getObjectServerHost() + ":9080"; }
+    private String realmUrl() { return "realm://" + sharedPrefs.getObjectServerHost() + ":9080/~/game"; }
 
-    private static SharedPrefsUtils sharedPrefs = SharedPrefsUtils.getInstance();
+    private SharedPrefsUtils sharedPrefs = SharedPrefsUtils.getInstance();
 
-    @BindView(R.id.hostIpTextView) public TextView rosIpTextView;
-    @BindView(R.id.userTextView) public TextView userTextView;
-    @BindView(R.id.passTextView) public TextView passTextView;
+    @BindView(R.id.hostIpTextView)     public TextView rosIpTextView;
+    @BindView(R.id.userTextView)       public TextView userTextView;
+    @BindView(R.id.passTextView)       public TextView passTextView;
+    @BindView(R.id.connectToRosButton) public Button loginButton;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +52,12 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
         updateUIFromCachedRosConnectionInfo();
+
+        progressDialog = new ProgressDialog(this, R.style.AppTheme_RealmPopDialog);//, R.style.CardView_Dark);//, R.style.AppTheme_Dark_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage(getString(R.string.login_connecting_text));
     }
 
     @Override
@@ -54,7 +67,7 @@ public class SplashActivity extends AppCompatActivity {
 
     @OnClick(R.id.connectToRosButton)
     public void login() {
-
+        showProgress();
         logoutExistingUser();
         updateRosConnectionInfoFromUI();
         final SyncCredentials syncCredentials = SyncCredentials.usernamePassword(username(), password(), false);
@@ -95,35 +108,31 @@ public class SplashActivity extends AppCompatActivity {
         setRealmDefaultConfig(user);
 
         try(Realm realm = Realm.getDefaultInstance()) {
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                                              @Override
-                                              public void execute(Realm bgRealm) {
-                                                  String playerId = SharedPrefsUtils.getInstance().idForCurrentPlayer();
-                                                  Player me = Player.byId(bgRealm, playerId);
-                                                  if(me == null) {
-                                                      me = new Player();
-                                                      me.setId(playerId);
-                                                      me.setName("");
-                                                      me = bgRealm.copyToRealmOrUpdate(me);
-                                                  }
-                                                  me.setAvailable(false);
-                                                  me.setChallenger(null);
-                                                  me.setCurrentGame(null);
-                                              }
-                                          },
-                    new Realm.Transaction.OnSuccess() {
+            realm.executeTransactionAsync(
+                    new Realm.Transaction() {
                         @Override
-                        public void onSuccess() { goTo(PlayerNameActivity.class);
+                        public void execute(Realm bgRealm) {
+                            String playerId = SharedPrefsUtils.getInstance().idForCurrentPlayer();
+                            Player me = Player.byId(bgRealm, playerId);
+                            if (me == null) {
+                                me = new Player();
+                                me.setId(playerId);
+                                me.setName("");
+                                me = bgRealm.copyToRealmOrUpdate(me);
+                            }
+                            me.setAvailable(false);
+                            me.setChallenger(null);
+                            me.setCurrentGame(null);
                         }
                     },
-                    new Realm.Transaction.OnError() {
+                    new Realm.Transaction.OnSuccess() {
                         @Override
-                        public void onError(Throwable error) {
-                            logError(error);
+                        public void onSuccess() {
+                            hideProgress();
+                            goTo(PlayerNameActivity.class);
                         }
                     });
         }
-
     }
 
     private void setRealmDefaultConfig(SyncUser user) {
@@ -141,10 +150,35 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     @MainThread
-    private void logError(Throwable error) {
+    private void logError(ObjectServerError error) {
+
         Log.e(TAG, "Error connecting", error);
-        Toast.makeText(this, "Error connecting", Toast.LENGTH_SHORT).show();
+        hideProgress();
+
+        switch (error.getErrorCode()) {
+            case INVALID_CREDENTIALS:
+               showConnectionError("Error: Invalid Credentials...");
+                break;
+            default:
+                showConnectionError("Error: Could not connect, check host...");
+                break;
+        }
     }
 
+    private void showConnectionError(String error) {
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.snackbar_container), error, Snackbar.LENGTH_LONG);
+        snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorBlack));
+        snackbar.show();
+    }
+
+    private void showProgress() {
+        loginButton.setEnabled(false);
+        progressDialog.show();
+    }
+
+    private void hideProgress() {
+        loginButton.setEnabled(true);
+        progressDialog.dismiss();
+    }
 
 }

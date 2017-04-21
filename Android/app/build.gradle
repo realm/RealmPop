@@ -30,7 +30,6 @@ android {
 
     buildTypes {
 
-        //def host = getIP()
         def host = "45.55.167.56";  // Digital Ocean IP address.
 
         debug {
