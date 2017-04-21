@@ -1,4 +1,4 @@
-package realm.io.realmpop.controller;
+package realm.io.realmpop.controller.gameroom;
 
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -15,11 +15,15 @@ import realm.io.realmpop.model.Player;
 
 public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, PlayerRecyclerViewAdapter.ViewHolder> {
 
-    private GameRoomActivity gameRoomActivity;
+    public interface PlayerChallengeDelegate {
+        void onChallengePlayer(String playerId);
+    }
 
-    public PlayerRecyclerViewAdapter(@NonNull GameRoomActivity gameRoomActivity, @NonNull OrderedRealmCollection<Player> players) {
+    private PlayerChallengeDelegate playerChallengeDelegate;
+
+    public PlayerRecyclerViewAdapter(@NonNull PlayerChallengeDelegate delegate, @NonNull OrderedRealmCollection<Player> players) {
         super(players, true);
-        this.gameRoomActivity = gameRoomActivity;
+        this.playerChallengeDelegate = delegate;
     }
 
     @Override
@@ -31,21 +35,26 @@ public class PlayerRecyclerViewAdapter extends RealmRecyclerViewAdapter<Player, 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final Player player = getData().get(position);
-        holder.playerId = player.getId();
-        holder.titleView.setText(player.getName());
-        if (player.isAvailable()) {
-            holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.playerAvailableColor));
-        } else {
-            holder.titleView.setTextColor(ContextCompat.getColor(gameRoomActivity, R.color.playerUnavailableColor));
-        }
+        OrderedRealmCollection data = getData();
+        if(data != null) {
+            final Player player = getData().get(position);
+            holder.playerId = player.getId();
 
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            gameRoomActivity.challengePlayer(player);
+            TextView tv = holder.titleView;
+            tv.setText(player.getName());
+            if (player.isAvailable()) {
+                tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.playerAvailableColor));
+            } else {
+                tv.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.playerUnavailableColor));
             }
-        });
+
+            holder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playerChallengeDelegate.onChallengePlayer(player.getId());
+                }
+            });
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

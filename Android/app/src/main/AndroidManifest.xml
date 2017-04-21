@@ -9,23 +9,22 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".controller.SplashActivity"
+        <activity android:name=".controller.login.SplashActivity"
                   android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".controller.PreGameRoomActivity"
+            android:name=".controller.playername.PlayerNameActivity"
             android:screenOrientation="landscape">
         </activity>
         <activity
-            android:name=".controller.GameRoomActivity"
+            android:name=".controller.gameroom.GameRoomActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".controller.GameActivity"
+            android:name=".controller.game.GameActivity"
             android:screenOrientation="landscape" />
     </application>
 
