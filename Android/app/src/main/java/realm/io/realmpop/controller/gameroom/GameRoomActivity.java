@@ -87,17 +87,21 @@ public class GameRoomActivity extends BaseAuthenticatedActivity implements Playe
         @Override
         public void onChange(Player player, ObjectChangeSet objectChangeSet) {
             if(objectChangeSet.isDeleted() || !player.isValid()) {
-//                finish(); // TODO: Go back to finish() instad of SplashActivity when https://github.com/realm/realm-java/issues/4502 gets resolved.
+//                finish(); // TODO: Go back to finish() instead of SplashActivity when https://github.com/realm/realm-java/issues/4502 gets resolved.
                 goTo(SplashActivity.class);
                 return;
             }
 
             if(objectChangeSet.isFieldChanged("currentGame") && player.getCurrentGame() != null) {
+
                 goToGame();
+
             } else if (objectChangeSet.isFieldChanged("challenger") && player.getChallenger() != null) {
+
                 final String challengerName = player.getChallenger().getName();
                 final String challengerId = player.getChallenger().getId();
                 ChallengeDialog.presentChallenge(GameRoomActivity.this, challengerName, challengerId);
+
             }
         }
     };

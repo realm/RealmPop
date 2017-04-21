@@ -1,6 +1,7 @@
 package realm.io.realmpop.controller.gameroom;
 
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 
 import realm.io.realmpop.R;
@@ -25,7 +26,7 @@ public class ChallengeDialog {
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(gameRoomActivity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(gameRoomActivity, R.style.AppTheme_RealmPopDialog);
         builder.setMessage(gameRoomActivity.getString(R.string.game_challenge_proposition, challengerName))
                 .setPositiveButton(gameRoomActivity.getString(R.string.game_challenge_accept), dialogClickListener)
                 .setNegativeButton(gameRoomActivity.getString(R.string.game_challenge_decline), dialogClickListener)

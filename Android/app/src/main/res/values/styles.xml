@@ -11,8 +11,10 @@
 
 
     <style name="AppTheme.RealmPopDialog">
-        <!-- Customize your theme here. -->
         <item name="android:background">@android:color/background_light</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsFloating">true</item>
     </style>
 
     <style name="Text" parent="@android:style/TextAppearance">
