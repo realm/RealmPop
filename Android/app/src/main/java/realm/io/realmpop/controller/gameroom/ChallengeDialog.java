@@ -1,7 +1,6 @@
 package realm.io.realmpop.controller.gameroom;
 
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 
 import realm.io.realmpop.R;

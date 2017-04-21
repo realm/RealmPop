@@ -14,11 +14,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.ObjectChangeSet;
 import io.realm.Realm;
+import io.realm.RealmObject;
 import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.controller.BaseAuthenticatedActivity;
-import realm.io.realmpop.controller.gameroom.GameRoomActivity;
-import realm.io.realmpop.controller.login.SplashActivity;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Score;
@@ -82,11 +81,7 @@ public class GameActivity extends BaseAuthenticatedActivity implements GameTimer
     protected void onPause() {
         super.onPause();
         timer.stopTimer();
-
-        if(me != null) { me.removeChangeListener(MeChangeListener); }
-        if(challenge != null) { challenge.removeChangeListener(GameChangeListener); }
-        if(mySide != null) { mySide.removeChangeListener(SideChangeListener); }
-        if(otherSide != null) { otherSide.removeChangeListener(SideChangeListener); }
+        removeAllChangeListenersFrom(me, challenge, mySide, otherSide);
     }
 
     @Override
@@ -287,11 +282,9 @@ public class GameActivity extends BaseAuthenticatedActivity implements GameTimer
     private RealmObjectChangeListener<Game> GameChangeListener = new RealmObjectChangeListener<Game>() {
         @Override
         public void onChange(Game game, ObjectChangeSet objectChangeSet) {
-            if (objectChangeSet.isDeleted() || !game.isValid()) {
-                //                finish(); // TODO: Go back to finish() instead of a specific Activity when https://github.com/realm/realm-java/issues/4502 gets resolved.
-                goTo(GameRoomActivity.class);
-
-            }
+        if (objectChangeSet.isDeleted() || !game.isValid()) {
+            finish();
+        }
         }
     };
 
@@ -300,9 +293,7 @@ public class GameActivity extends BaseAuthenticatedActivity implements GameTimer
         @Override
         public void onChange(Side side, ObjectChangeSet objectChangeSet) {
             if(objectChangeSet.isDeleted() || !side.isValid()) {
-                //                finish(); // TODO: Go back to finish() instead of a specific Activity when https://github.com/realm/realm-java/issues/4502 gets resolved.
-                goTo(GameRoomActivity.class);
-
+                finish();
             }
             if(challenge.isGameOver()) {
                 mySide.removeAllChangeListeners();
@@ -316,14 +307,25 @@ public class GameActivity extends BaseAuthenticatedActivity implements GameTimer
         @MainThread
         @Override
         public void onChange(Player player, ObjectChangeSet objectChangeSet) {
+
             if(objectChangeSet.isDeleted() || !player.isValid()) {
-                //                finish(); // TODO: Go back to finish() instead of a specific Activity when https://github.com/realm/realm-java/issues/4502 gets resolved.
-                goTo(SplashActivity.class);
+               restartApp();
+
             } else if(me.getCurrentGame() == null) {
-                goTo(GameRoomActivity.class);
+                finish();
             }
         }
     };
+
+    private void removeAllChangeListenersFrom(RealmObject... realmObjects) {
+        if(realmObjects != null) {
+            for(RealmObject o : realmObjects) {
+                if(o != null) {
+                    o.removeAllChangeListeners();
+                }
+            }
+        }
+    }
 
 }
 

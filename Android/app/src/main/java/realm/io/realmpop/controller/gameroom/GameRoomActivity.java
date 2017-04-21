@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.ObjectChangeSet;
@@ -16,11 +13,8 @@ import io.realm.Sort;
 import realm.io.realmpop.R;
 import realm.io.realmpop.controller.BaseAuthenticatedActivity;
 import realm.io.realmpop.controller.game.GameActivity;
-import realm.io.realmpop.controller.login.SplashActivity;
-import realm.io.realmpop.controller.playername.PlayerNameActivity;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
-import realm.io.realmpop.model.Side;
 import realm.io.realmpop.util.AvailableHeartbeat;
 
 public class GameRoomActivity extends BaseAuthenticatedActivity implements PlayerRecyclerViewAdapter.PlayerChallengeDelegate {
@@ -59,14 +53,9 @@ public class GameRoomActivity extends BaseAuthenticatedActivity implements Playe
     protected void onPause() {
         super.onPause();
         availableHeartbeat.stop();
-        me.removeChangeListener(onMeChanged);
+        me.removeAllChangeListeners();
         recyclerView.setAdapter(null);
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        goTo(PlayerNameActivity.class);
     }
 
     @Override
@@ -76,6 +65,7 @@ public class GameRoomActivity extends BaseAuthenticatedActivity implements Playe
 
     public void onChallengeResponse(boolean isChallengeAccepted, String challengerId) {
         if (isChallengeAccepted) {
+            availableHeartbeat.stop();
             Game.startNewGame(getPlayerId(), challengerId);
         } else {
             Player.assignAvailability(true);
@@ -86,31 +76,21 @@ public class GameRoomActivity extends BaseAuthenticatedActivity implements Playe
     private RealmObjectChangeListener<Player> onMeChanged = new RealmObjectChangeListener<Player>() {
         @Override
         public void onChange(Player player, ObjectChangeSet objectChangeSet) {
+
             if(objectChangeSet.isDeleted() || !player.isValid()) {
-//                finish(); // TODO: Go back to finish() instead of SplashActivity when https://github.com/realm/realm-java/issues/4502 gets resolved.
-                goTo(SplashActivity.class);
-                return;
-            }
+               restartApp();
 
-            if(objectChangeSet.isFieldChanged("currentGame") && player.getCurrentGame() != null) {
+            } else {
+                if (objectChangeSet.isFieldChanged("currentGame") && player.getCurrentGame() != null) {
+                    goTo(GameActivity.class);
 
-                goToGame();
-
-            } else if (objectChangeSet.isFieldChanged("challenger") && player.getChallenger() != null) {
-
-                final String challengerName = player.getChallenger().getName();
-                final String challengerId = player.getChallenger().getId();
-                ChallengeDialog.presentChallenge(GameRoomActivity.this, challengerName, challengerId);
-
+                } else if (objectChangeSet.isFieldChanged("challenger") && player.getChallenger() != null) {
+                    final String challengerName = player.getChallenger().getName();
+                    final String challengerId = player.getChallenger().getId();
+                    ChallengeDialog.presentChallenge(GameRoomActivity.this, challengerName, challengerId);
+                }
             }
         }
     };
-
-    private void goToGame() {
-        Map<String, String> extras = new HashMap<>();
-        //extras.put(Game.class.getName(), me.getCurrentGame().getId());
-        extras.put(Side.class.getName(), me.getId());
-        goTo(GameActivity.class, extras);
-    }
 
 }

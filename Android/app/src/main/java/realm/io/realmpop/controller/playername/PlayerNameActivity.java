@@ -18,7 +18,6 @@ import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.controller.BaseAuthenticatedActivity;
 import realm.io.realmpop.controller.gameroom.GameRoomActivity;
-import realm.io.realmpop.controller.login.SplashActivity;
 import realm.io.realmpop.model.Player;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -46,27 +45,20 @@ public class PlayerNameActivity extends BaseAuthenticatedActivity {
         super.onResume();
 
         me = Player.byId(getRealm(), getPlayerId());
-
-        if(me != null) {
-            me.addChangeListener(onMeChanged);
-            playerNameEditText.setText(me.getName());
-            nameTextViewSubscription = RxTextView.textChangeEvents(playerNameEditText)
-                    .subscribeOn(AndroidSchedulers.mainThread())
-                    // .debounce(500, TimeUnit.MILLISECONDS) // Slows down the updates, might want to in a production app.
-                    .observeOn(Schedulers.io())
-                    .subscribe(onTextChangeHandler);
-        }
+        me.addChangeListener(onMeChanged);
+        playerNameEditText.setText(me.getName());
+        nameTextViewSubscription = RxTextView.textChangeEvents(playerNameEditText)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                // .debounce(500, TimeUnit.MILLISECONDS) // Slows down the updates, might want to in a production app.
+                .observeOn(Schedulers.io())
+                .subscribe(onTextChangeHandler);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if(me != null) {
-            me.removeChangeListener(onMeChanged);
-        }
-        if(nameTextViewSubscription != null) {
-            nameTextViewSubscription.unsubscribe();
-        }
+        me.removeAllChangeListeners();
+        nameTextViewSubscription.unsubscribe();
     }
 
     @OnClick(R.id.playerEnteredButton)
@@ -95,11 +87,11 @@ public class PlayerNameActivity extends BaseAuthenticatedActivity {
            public void onSuccess() {
                goTo(GameRoomActivity.class);
            }
-       }, new Realm.Transaction.OnError() {
+       },
+     new Realm.Transaction.OnError() {
            @Override
            public void onError(Throwable error) {
-               goTo(SplashActivity.class);
-//               finish();
+               restartApp();
            }
        });
     }
@@ -133,8 +125,7 @@ public class PlayerNameActivity extends BaseAuthenticatedActivity {
         @Override
         public void onChange(Player player, ObjectChangeSet objectChangeSet) {
             if (objectChangeSet.isDeleted() || !player.isValid()) {
-//                finish(); // TODO: Go back to finish() instad of SplashActivity when https://github.com/realm/realm-java/issues/4502 gets resolved.
-                goTo(SplashActivity.class);
+                restartApp();
             }
         }
     };

@@ -3,8 +3,6 @@ package realm.io.realmpop;
 import android.app.Application;
 
 import io.realm.Realm;
-import io.realm.log.LogLevel;
-import io.realm.log.RealmLog;
 import realm.io.realmpop.util.SharedPrefsUtils;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 

@@ -56,9 +56,7 @@ public class SplashActivity extends AppCompatActivity {
     public void login() {
 
         logoutExistingUser();
-
         updateRosConnectionInfoFromUI();
-
         final SyncCredentials syncCredentials = SyncCredentials.usernamePassword(username(), password(), false);
 
         SyncUser.loginAsync(syncCredentials, serverUrl(), new SyncUser.Callback() {

@@ -10,7 +10,7 @@ import realm.io.realmpop.BuildConfig;
 
 public class SharedPrefsUtils {
 
-    private static final String USER_KEY = "io.realm.realmpop.userKey";
+    private static final String PLAYER_KEY = "io.realm.realmpop.playerKey";
     private static final String LAST_ROS_HOST_KEY = "io.realm.realmpop.ros.host";
     private static final String LAST_ROS_USER_KEY = "io.realm.realmpop.ros.user";
     private static final String LAST_ROS_PASS_KEY = "io.realm.realmpop.ros.pass";
@@ -41,11 +41,11 @@ public class SharedPrefsUtils {
      */
     public String idForCurrentPlayer() {
 
-        String idForCurrentUser = sharedPreferences.getString(USER_KEY, null);
+        String idForCurrentUser = sharedPreferences.getString(PLAYER_KEY, null);
 
         if (idForCurrentUser == null) {
             idForCurrentUser = UUID.randomUUID().toString();
-            sharedPreferences.edit().putString(USER_KEY, idForCurrentUser).apply();
+            sharedPreferences.edit().putString(PLAYER_KEY, idForCurrentUser).apply();
         }
 
         return idForCurrentUser;

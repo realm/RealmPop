@@ -7,9 +7,8 @@ import android.content.Intent;
 import android.support.annotation.MainThread;
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.Map;
-
 import io.realm.Realm;
+import realm.io.realmpop.controller.login.SplashActivity;
 import realm.io.realmpop.util.SharedPrefsUtils;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -55,20 +54,16 @@ abstract public class BaseAuthenticatedActivity extends AppCompatActivity {
 
     @MainThread
     protected void goTo(Class<? extends Activity> activity) {
-        goTo(activity, null);
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
     }
 
     @MainThread
-    protected void goTo(Class<? extends Activity> activity, Map<String, String> extras) {
-        Intent intent = new Intent(this, activity);
-        if (extras != null) {
-            for (String extra : extras.keySet()) {
-                intent.putExtra(extra, extras.get(extra));
-            }
-        }
+    protected void restartApp() {
+        Intent intent = new Intent(this, SplashActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }
-
 
 }
