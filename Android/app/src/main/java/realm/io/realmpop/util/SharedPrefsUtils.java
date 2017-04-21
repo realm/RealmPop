@@ -11,7 +11,9 @@ import realm.io.realmpop.BuildConfig;
 public class SharedPrefsUtils {
 
     private static final String USER_KEY = "io.realm.realmpop.userKey";
-    private static final String LAST_ROS_IP_KEY = "io.realm.realmpop.rosIp";
+    private static final String LAST_ROS_HOST_KEY = "io.realm.realmpop.ros.host";
+    private static final String LAST_ROS_USER_KEY = "io.realm.realmpop.ros.user";
+    private static final String LAST_ROS_PASS_KEY = "io.realm.realmpop.ros.pass";
     private static SharedPrefsUtils privateInstance;
 
     private SharedPreferences sharedPreferences;
@@ -49,20 +51,28 @@ public class SharedPrefsUtils {
         return idForCurrentUser;
     }
 
-    /**
-     * Returns the saved ROS Address the app on this device connected to.
-     * @return String The IP or URL of the last ROS server, or the default otherwise.
-     */
-    public String getRosAddress() {
-        return sharedPreferences.getString(LAST_ROS_IP_KEY, BuildConfig.DEFAULT_OBJECT_SERVER_IP);
+    public String getObjectServerHost() {
+        return sharedPreferences.getString(LAST_ROS_HOST_KEY, BuildConfig.DEFAULT_OBJECT_SERVER_IP);
     }
 
-    /**
-     * Saves the ROS Address to SharedPreferences.
-     */
-    public void setRosAddress(String rosAddress) {
-        sharedPreferences.edit().putString(LAST_ROS_IP_KEY, rosAddress).apply();
+    public void setObjectServerHost(String value) {
+        sharedPreferences.edit().putString(LAST_ROS_HOST_KEY, value).apply();
     }
 
+    public String getPopUsername() {
+        return sharedPreferences.getString(LAST_ROS_USER_KEY, "");
+    }
+
+    public void setPopUsername(String value) {
+        sharedPreferences.edit().putString(LAST_ROS_USER_KEY, value).apply();
+    }
+
+    public String getPopPassword() {
+        return sharedPreferences.getString(LAST_ROS_PASS_KEY, "");
+    }
+
+    public void setPopPassword(String value) {
+        sharedPreferences.edit().putString(LAST_ROS_PASS_KEY, value).apply();
+    }
 
 }

@@ -1,4 +1,4 @@
-package realm.io.realmpop.view;
+package realm.io.realmpop.controller.playername;
 
 import android.os.Bundle;
 import android.support.annotation.WorkerThread;
@@ -16,13 +16,16 @@ import io.realm.ObjectChangeSet;
 import io.realm.Realm;
 import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
+import realm.io.realmpop.controller.BaseAuthenticatedActivity;
+import realm.io.realmpop.controller.gameroom.GameRoomActivity;
+import realm.io.realmpop.controller.login.SplashActivity;
 import realm.io.realmpop.model.Player;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class PlayerNameActivity extends BaseAuthenticatedActivity  {
+public class PlayerNameActivity extends BaseAuthenticatedActivity {
 
     private static final String TAG = PlayerNameActivity.class.getName();
 

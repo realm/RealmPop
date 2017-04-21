@@ -1,4 +1,4 @@
-package realm.io.realmpop.view;
+package realm.io.realmpop.controller.login;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,6 +19,7 @@ import io.realm.SyncConfiguration;
 import io.realm.SyncCredentials;
 import io.realm.SyncUser;
 import realm.io.realmpop.R;
+import realm.io.realmpop.controller.playername.PlayerNameActivity;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.util.SharedPrefsUtils;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -26,22 +27,24 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = SplashActivity.class.getName();
-    private static final String ID = "paul@realm"; // "default@realm";
-    private static final String PASSWORD = "poqeng09481hg"; // "password";
     private static final long SCHEMA_VERSION = 1L;
-    private static String authUrl() { return "http://" + sharedPrefs.getRosAddress() + ":9080/auth"; }
-    private static String realmUrl() { return "realm://" + sharedPrefs.getRosAddress() + ":9080/~/game"; }
+    private static String username() { return sharedPrefs.getPopUsername(); }
+    private static String password() { return sharedPrefs.getPopPassword(); }
+    private static String serverUrl() { return "http://" + sharedPrefs.getObjectServerHost() + ":9080"; }
+    private static String realmUrl() { return "realm://" + sharedPrefs.getObjectServerHost() + ":9080/~/game"; }
 
     private static SharedPrefsUtils sharedPrefs = SharedPrefsUtils.getInstance();
 
-    @BindView(R.id.hostIpTextView)
-    public TextView rosIpTextView;
+    @BindView(R.id.hostIpTextView) public TextView rosIpTextView;
+    @BindView(R.id.userTextView) public TextView userTextView;
+    @BindView(R.id.passTextView) public TextView passTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
+        updateUIFromCachedRosConnectionInfo();
     }
 
     @Override
@@ -54,11 +57,11 @@ public class SplashActivity extends AppCompatActivity {
 
         logoutExistingUser();
 
-        updateRosServerUrlFromUI();
+        updateRosConnectionInfoFromUI();
 
-        final SyncCredentials syncCredentials = SyncCredentials.usernamePassword(ID, PASSWORD, false);
+        final SyncCredentials syncCredentials = SyncCredentials.usernamePassword(username(), password(), false);
 
-        SyncUser.loginAsync(syncCredentials, authUrl(), new SyncUser.Callback() {
+        SyncUser.loginAsync(syncCredentials, serverUrl(), new SyncUser.Callback() {
             @Override
             public void onSuccess(SyncUser user) { postLogin(user); }
 
@@ -70,8 +73,16 @@ public class SplashActivity extends AppCompatActivity {
 
     }
 
-    private void updateRosServerUrlFromUI() {
-        sharedPrefs.setRosAddress(rosIpTextView.getText().toString());
+    private void updateUIFromCachedRosConnectionInfo() {
+        rosIpTextView.setText(sharedPrefs.getObjectServerHost());
+        userTextView.setText(sharedPrefs.getPopUsername());
+        passTextView.setText(sharedPrefs.getPopPassword());
+    }
+
+    private void updateRosConnectionInfoFromUI() {
+        sharedPrefs.setObjectServerHost(rosIpTextView.getText().toString());
+        sharedPrefs.setPopUsername(userTextView.getText().toString());
+        sharedPrefs.setPopPassword(passTextView.getText().toString());
     }
 
     private void logoutExistingUser() {

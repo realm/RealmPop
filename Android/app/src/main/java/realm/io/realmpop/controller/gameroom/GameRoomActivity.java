@@ -1,4 +1,4 @@
-package realm.io.realmpop.view;
+package realm.io.realmpop.controller.gameroom;
 
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -10,35 +10,37 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.ObjectChangeSet;
-import io.realm.RealmChangeListener;
-import io.realm.RealmModel;
-import io.realm.RealmObject;
 import io.realm.RealmObjectChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import realm.io.realmpop.R;
+import realm.io.realmpop.controller.BaseAuthenticatedActivity;
+import realm.io.realmpop.controller.game.GameActivity;
+import realm.io.realmpop.controller.login.SplashActivity;
+import realm.io.realmpop.controller.playername.PlayerNameActivity;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Side;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.functions.Func1;
+import realm.io.realmpop.util.AvailableHeartbeat;
 
 public class GameRoomActivity extends BaseAuthenticatedActivity implements PlayerRecyclerViewAdapter.PlayerChallengeDelegate {
 
     @BindView(R.id.player_list) public RecyclerView recyclerView;
     private Player me;
+    private AvailableHeartbeat availableHeartbeat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gameroom);
         ButterKnife.bind(this);
+        availableHeartbeat = new AvailableHeartbeat();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        availableHeartbeat.start();
 
         RealmResults<Player> otherPlayers = getRealm()
                 .where(Player.class)
@@ -52,12 +54,14 @@ public class GameRoomActivity extends BaseAuthenticatedActivity implements Playe
         Player.assignAvailability(true);
     }
 
+
     @Override
     protected void onPause() {
         super.onPause();
+        availableHeartbeat.stop();
         me.removeChangeListener(onMeChanged);
         recyclerView.setAdapter(null);
-        Player.assignAvailability(false);
+
     }
 
     @Override

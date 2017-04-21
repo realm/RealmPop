@@ -9,7 +9,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.SplashActivity"
+        <activity android:name=".controller.login.SplashActivity"
                   android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,14 +17,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".view.PlayerNameActivity"
+            android:name=".controller.playername.PlayerNameActivity"
             android:screenOrientation="sensorLandscape">
         </activity>
         <activity
-            android:name=".view.GameRoomActivity"
+            android:name=".controller.gameroom.GameRoomActivity"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name=".view.GameActivity"
+            android:name=".controller.game.GameActivity"
             android:screenOrientation="sensorLandscape" />
     </application>
 

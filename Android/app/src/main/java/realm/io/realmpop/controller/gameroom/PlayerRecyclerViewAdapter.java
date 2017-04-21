@@ -1,4 +1,4 @@
-package realm.io.realmpop.view;
+package realm.io.realmpop.controller.gameroom;
 
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;

@@ -1,4 +1,4 @@
-package realm.io.realmpop.view;
+package realm.io.realmpop.controller.game;
 
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -16,6 +16,9 @@ import io.realm.ObjectChangeSet;
 import io.realm.Realm;
 import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
+import realm.io.realmpop.controller.BaseAuthenticatedActivity;
+import realm.io.realmpop.controller.gameroom.GameRoomActivity;
+import realm.io.realmpop.controller.login.SplashActivity;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Score;

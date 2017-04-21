@@ -10,7 +10,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="realm.io.realmpop.view.PlayerNameActivity">
+    tools:context="realm.io.realmpop.controller.playername.PlayerNameActivity">
 
     <TextView
         android:id="@+id/player_name_prompt"
