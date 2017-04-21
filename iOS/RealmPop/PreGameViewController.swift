@@ -48,6 +48,11 @@ class PreGameRoomViewController: UIViewController {
 
 extension PreGameRoomViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if string == "\n" {
+            performSegue(withIdentifier: "ShowGameRoom", sender: nil)
+            return false
+        }
+
         let text = (textField.text ?? "") as NSString
         let name = String(text.replacingCharacters(in: range, with: string))!
 
