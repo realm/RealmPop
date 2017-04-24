@@ -21,13 +21,15 @@ Once on the game screen, players need to clear the level by always tapping the h
 
 ## Contents
 
-### iOS
-
-An iPhone multi-player game with full source.
+![Repo contents](etc/contents.png)
 
 ### Android
 
 An Android version of the game, implementing the same logic as the iOS one.
+
+### iOS
+
+An iPhone multi-player game with full source.
 
 ### JS
 
