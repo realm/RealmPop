@@ -60,7 +60,7 @@ public class SharedPrefsUtils {
     }
 
     public String getPopUsername() {
-        return sharedPreferences.getString(LAST_ROS_USER_KEY, "");
+        return sharedPreferences.getString(LAST_ROS_USER_KEY, "default@realm");
     }
 
     public void setPopUsername(String value) {
@@ -68,7 +68,7 @@ public class SharedPrefsUtils {
     }
 
     public String getPopPassword() {
-        return sharedPreferences.getString(LAST_ROS_PASS_KEY, "");
+        return sharedPreferences.getString(LAST_ROS_PASS_KEY, "password");
     }
 
     public void setPopPassword(String value) {
