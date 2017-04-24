@@ -1,6 +1,5 @@
 //
 //  RealmConnect.swift
-//  Inboxly
 //
 //  Created by Marin Todorov on 12/14/16.
 //  Copyright © 2016 Realm. All rights reserved.
@@ -9,7 +8,7 @@
 import Foundation
 import RealmSwift
 
-var host = "192.168.178.172"
+var host = "127.0.0.1"
 
 let user = "default@realm"
 let pass = "password"
