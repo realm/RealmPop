@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import AVFoundation
 
 class GameViewController: UIViewController {
 
@@ -37,6 +38,12 @@ class GameViewController: UIViewController {
     private var staredAt: Date!
     private var timer: Timer?
 
+    private var audio: AVAudioPlayer = {
+        return try! AVAudioPlayer(data:
+            try! Data(contentsOf: Bundle.main.url(forResource: "pop", withExtension: "m4a")!)
+        )
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -56,6 +63,8 @@ class GameViewController: UIViewController {
         view.bringSubview(toFront: player1)
         view.bringSubview(toFront: player2)
         view.bringSubview(toFront: message)
+
+        audio.prepareToPlay()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -89,6 +98,8 @@ class GameViewController: UIViewController {
     }
 
     func didPop(number: Int) {
+        audio.stop()
+        audio.play()
         if let last = numbers.last, last == number {
             numbers.removeLast()
             game.updateBubbles(side: mySide, count: numbers.count)

@@ -1,8 +1,8 @@
-'use strict';
+//
+// RealmPop server app
+//
 
-//
-// imports
-//
+'use strict';
 
 var fs = require('fs');
 var Realm = require('realm');
@@ -12,11 +12,10 @@ var { Pop } = require('./pop-event-handler');
 var { Server } = require('./server.js');
 var { Board, ScoreRecord } = require('./board.js');
 
-//
-// parse command line arguments
-//
+// global debug function
 global.print = function (line) { console.log('[pop] ' + line); }
 
+// discard first two command line arguments
 const args = process.argv.slice(2);
 
 if (args.length < 6) {
@@ -24,26 +23,28 @@ if (args.length < 6) {
   process.exit(1);
 }
 
+// bundle host and port in a config object
 const config = {
   host: args[0],
   port: args[1]
 };
 
+// read admin, access, and credential tokens
 const token = new Token();
 token.load('admin', args[2]);
 token.load('access', args[3]);
 token.load('credentials', args[4]);
 
-// Set up score board 
-Board.targetFilePath = args[5];
-Board.updateHtmlFile();
+// Set up the score board
+Board.targetFolderPath = args[5];
+Board.updateHtmlFile(null);
 
-// authorize ROS
+// Authorize Realm Object Server
 Realm.Sync.setAccessToken(token.get('access'));
 Realm.Sync.setLogLevel('error');
 
 //
-// initialize and start the Pop app 🚀
+// Initialize and start the Pop app 🚀
 //
 
 let server = new Server(config, token.get('admin'), token.get('credentials'));

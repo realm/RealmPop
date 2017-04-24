@@ -134,7 +134,6 @@ class GameRoomViewController: UIViewController {
     func resetTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true, block: { [weak self] timer in
-            print("timer fire")
             if let me = self?.me {
                 me.updateAvailableIfNeeded(true)
             }

@@ -1,7 +1,8 @@
 //
-// realm server schema
+// RealmPop server schema
 //
 
+// Player object, contains data about each connected game player
 function Player() { }
 
 Player.schema = {
@@ -16,6 +17,7 @@ Player.schema = {
   }
 };
 
+// Game object, containing data about each match
 function Game() { }
 
 Game.schema = {
@@ -27,6 +29,7 @@ Game.schema = {
   }
 }
 
+// Side object, data about each "side" in a multiplayer game
 function Side() { }
 
 Side.schema = {
@@ -40,6 +43,7 @@ Side.schema = {
   }
 }
 
+// Score object, used to submit high scores to the server
 function Score() { }
 
 Score.schema = {

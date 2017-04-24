@@ -2,5 +2,5 @@ use_frameworks!
 
 target 'RealmPop' do
   pod 'RealmSwift', '~> 2.4'
-  pod 'Then'
+  pod 'Then', '2.1.0'
 end
