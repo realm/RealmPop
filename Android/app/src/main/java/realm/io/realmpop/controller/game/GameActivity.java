@@ -18,8 +18,6 @@ import io.realm.RealmObject;
 import io.realm.RealmObjectChangeListener;
 import realm.io.realmpop.R;
 import realm.io.realmpop.controller.BaseAuthenticatedActivity;
-import realm.io.realmpop.controller.gameroom.GameRoomActivity;
-import realm.io.realmpop.controller.login.SplashActivity;
 import realm.io.realmpop.model.Game;
 import realm.io.realmpop.model.Player;
 import realm.io.realmpop.model.Score;
@@ -43,12 +41,14 @@ public class GameActivity extends BaseAuthenticatedActivity implements GameTimer
     private Player me;
 
     private GameTimer timer;
+    private PopSound popSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         ButterKnife.bind(this);
+        popSound = new PopSound(this, R.raw.pop);
     }
 
     @Override
@@ -203,6 +203,7 @@ public class GameActivity extends BaseAuthenticatedActivity implements GameTimer
             bubbleView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    popSound.playSound();
                     bubbleBoard.removeView(v);
                     onBubbleTap(bubbleNumber);
                 }
