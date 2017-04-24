@@ -1,8 +1,24 @@
 <resources>
     <string name="app_name">Realm Pop</string>
 
+    <string name="login_host_hint">Host</string>
+    <string name="login_username_hint">User</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_connecting_text">Connecting...</string>
+
     <string name="pregameroom_enter_button_label">Enter</string>
     <string name="pregameroom_player_name_prompt_label">Player Name</string>
     <string name="end_game_button_label">End Game</string>
+    <string name="connect_button_label">Connect</string>
+
+    <string name="game_challenge_proposition">You were invited to a game by %s</string>
+    <string name="game_challenge_accept">Accept</string>
+    <string name="game_challenge_decline">Decline</string>
+
+    <string name="game_outcome_message_lose">You lost!</string>
+    <string name="game_outcome_message_timeout">You\'re out of time!</string>
+    <string name="game_outcome_message_finishtime">Your time: %s</string>
+    <string name="game_outcome_message_win">You win! Sweet</string>
+    <string name="game_outcome_message_popoutoforder">You tapped %1$d instead of %2$d</string>
 
 </resources>

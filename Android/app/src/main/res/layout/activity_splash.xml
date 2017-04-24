@@ -1,40 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_splash"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:layout_gravity="center"
-    tools:context="realm.io.realmpop.controller.SplashActivity">
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".controller.login.SplashActivity">
 
     <TextView
-        android:id="@+id/biglyTextView"
         style="@style/SalmonTextViewBigly"
-        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="18dp"
         android:text="@string/app_name"
         />
 
-    <TextView
-        android:id="@+id/splashText"
-        android:layout_below="@id/biglyTextView"
-        android:layout_centerHorizontal="true"
-        style="@style/Text.WhiteTextView"
+    <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
+        <EditText
+            android:id="@+id/hostIpTextView"
+            style="@style/Text.EditText.FixedWidth"
+            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content"
+            android:imeOptions="flagNoExtractUi"
+            android:hint="@string/login_host_hint"
+            android:text="@string/defaultObjectServerIp"
+            android:textAlignment="center"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
+        <EditText
+            android:id="@+id/userTextView"
+            style="@style/Text.EditText.FixedWidth"
+            android:layout_height="wrap_content"
+            android:imeOptions="flagNoExtractUi"
+            android:hint="@string/login_username_hint"
+            tools:text="user@demo.io"
+            android:textAlignment="center"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
+        <EditText
+            android:id="@+id/passTextView"
+            style="@style/Text.EditText.FixedWidth"
+            android:layout_height="wrap_content"
+            android:imeOptions="flagNoExtractUi"
+            android:hint="@string/login_password_hint"
+            tools:text="password"
+            android:textAlignment="center"
+            android:inputType="text" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/connectToRosButton"
+        style="@style/Text.Button.AccentColor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loading..."
+        android:text="@string/connect_button_label"
         />
 
-    <TextView
-        style="@style/Text.WhiteTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="@string/objectServerIp" />
+    <View
+        android:id="@+id/snackbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-</RelativeLayout>
+</LinearLayout>

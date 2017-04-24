@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 25
@@ -12,7 +13,7 @@ android {
 
         defaultConfig {
         applicationId "realm.io.realmpop"
-        minSdkVersion 17
+        minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -29,17 +30,14 @@ android {
 
     buildTypes {
 
-        //def host = InetAddress.getLocalHost().getCanonicalHostName() // "192.168.1.79"
-        def host = getIP()
-        def cloudHost = "45.55.167.56";  // Digital Ocean IP address.
-        def marinEuIp = "192.168.0.42";  // Marins UI IP address.
+        def host = "45.55.167.56";  // Digital Ocean IP address.
 
         debug {
             // This will automatically detect the IP address of the machine building RealmTasks.
             // It is assumed that this machine is also running the Object Server.
             // If not, replace 'host' with the IP of the machine hosting the server.
-            buildConfigField "String", "OBJECT_SERVER_IP", "\"${host}\""
-            resValue "string", "objectServerIp", "${host}"
+            buildConfigField "String", "DEFAULT_OBJECT_SERVER_IP", "\"${host}\""
+            resValue "string", "defaultObjectServerIp", "${host}"
         }
 
         release {
@@ -50,52 +48,35 @@ android {
             // This will automatically detect the IP address of the machine building RealmTasks.
             // It is assumed that this machine is also running the Object Server.
             // If not, replace 'host' with the IP of the machine hosting the server.
-            buildConfigField "String", "OBJECT_SERVER_IP", "\"${host}\""
-            resValue "string", "objectServerIp", "\${host}\""
+            buildConfigField "String", "DEFAULT_OBJECT_SERVER_IP", "\"${host}\""
+            resValue "string", "defaultObjectServerIp", "${host}"
         }
-
-        cloudRelease {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            buildConfigField "String", "OBJECT_SERVER_IP", "\"${cloudHost}\""
-            resValue "string", "objectServerIp", "\"${cloudHost}\""
-        }
-
-        marinEuIpRelease {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            buildConfigField "String", "OBJECT_SERVER_IP", "\"${marinEuIp}\""
-            resValue "string", "objectServerIp", "\"${marinEuIp}\""
-        }
-
     }
 }
-
-apply plugin: 'realm-android'
 
 realm {
     syncEnabled = true;
 }
 
 dependencies {
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:cardview-v7:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.jakewharton:butterknife:8.5.1'
-    compile 'io.realm:android-adapters:2.0.0'
-    compile 'joda-time:joda-time:2.9.9'
-    compile 'uk.co.chrisjenx:calligraphy:2.2.0'
 
+    compile 'io.realm:android-adapters:2.0.0'
+
+    compile 'uk.co.chrisjenx:calligraphy:2.2.0'
+    compile 'io.reactivex:rxandroid:1.1.0'
+    compile 'io.reactivex:rxjava:1.1.0'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    testCompile 'junit:junit:4.12'
 }
 
 
-def getIP() {
+static getIP() {
     InetAddress result = null;
     Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
     while (interfaces.hasMoreElements()) {
