@@ -4,7 +4,7 @@
   "description": "Play RealmPop with friends",
   "main": "pop.js",
   "dependencies": {
-	"realm": "file:realm-1.4.1-professional.tgz"
+	"realm": "file:realm-1.4.2-professional.tgz"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,6 +13,6 @@
     "realm",
     "pop"
   ],
-  "author": "MT",
+  "author": "Marin Todorov",
   "license": "MIT"
 }

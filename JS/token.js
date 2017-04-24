@@ -1,21 +1,24 @@
 //
-// Class to get the access token
+// Configuration files
 //
 
 var fs = require('fs');
 
-class Token {
-  constructor() {
-    this.current = { };
-  }
+/**
+ * Class to read tokens and confuration saved in files
+ */ 
+function Token() {
+  this.contents = { };
+}
 
-  load(name, filePath) {
-    this.current[name] = fs.readFileSync(filePath, 'utf-8').toString().trim();
-  }
+// loads file's contents
+Token.prototype.load = function(name, filePath) {
+    this.contents[name] = fs.readFileSync(filePath, 'utf-8').toString().trim();
+}
 
-  get(name) {
-    return this.current[name];
-  }
+// returns file's contents
+Token.prototype.get = function(name) {
+    return this.contents[name];
 }
 
 exports.Token = Token;
