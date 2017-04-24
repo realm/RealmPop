@@ -119,7 +119,7 @@ d) open the high score board in your web browser by navigating to `http://localh
  
 ### 6. Running the Android app:
 
-a) for the Android app use the provided gradle script, more details here: [See Android Sub-project](Android#installation-instructions)
+a) Open the Project level build.gradle file with Android Studio, build the app, and deploy it to an Android device.
 
 Enjoy and have fun with RealmPop!
 
