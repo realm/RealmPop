@@ -4,3 +4,6 @@ JS/realm-object-server
 *.sh
 board.txt
 index.html
+.DS_Store
+.Podfile.lock
+
