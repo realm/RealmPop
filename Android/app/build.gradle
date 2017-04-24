@@ -30,7 +30,7 @@ android {
 
     buildTypes {
 
-        def host = "45.55.167.56";  // Digital Ocean IP address.
+        def host = getIP()
 
         debug {
             // This will automatically detect the IP address of the machine building RealmTasks.
