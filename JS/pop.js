@@ -19,7 +19,7 @@ global.print = function (line) { console.log('[pop] ' + line); }
 const args = process.argv.slice(2);
 
 if (args.length < 6) {
-  print("start the pop server app with 6 parameters like so:\n  node pop.js [IP] [PORT] [ADMIN_TOKEN_PATH] [ACCESS_TOKEN_PATH] [CREDENTIALS_PATH] [BOARD_HTML_FILE]");
+  print("start the pop server app with 6 parameters like so:\n  node pop.js [IP] [PORT] [ADMIN_TOKEN_PATH] [ACCESS_TOKEN_PATH] [CREDENTIALS_PATH] [PATH_TO_WEB_FOLDER]");
   process.exit(1);
 }
 
