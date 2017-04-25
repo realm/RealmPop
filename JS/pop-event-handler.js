@@ -39,7 +39,7 @@ Pop.handlePlayerEvents = function(event) {
   
   // check if there are Player change events
   const changesPlayer = event.changes.Player;
-  if (changesPlayer == undefined) return;
+  if (!changesPlayer) return;
 
   // check if there are Player modifications
   const indexesPlayers = changesPlayer.modifications;
@@ -66,14 +66,15 @@ Pop.handleScoreEvents = function(event) {
   
   // check if there are Score change events
   const changes = event.changes.Score;
-  if (changes == undefined) return;
+  if (!changes) return;
 
   // check if there are Score insertions
   const indexes = changes.insertions;
   if (indexes.length == 0) return;
 
   // fetch the newly inserted Score objects
-  const scores = event.realm.objects("Score");
+  const realm = event.realm;
+  const scores = realm.objects("Score");
 
   // loop over the Score objects
   for (const i in indexes) {
@@ -84,10 +85,10 @@ Pop.handleScoreEvents = function(event) {
       print("score: " + score.name + " > " + score.time)
 
       // add score to the high score board
-      Board.addScore(score, function() {
+      Board.addScore(score, () => {
         // delete processed Score objects
-        event.realm.write(function() {
-          event.realm.delete(score);
+        realm.write(() => {
+          realm.delete(score);
         });
       });
     }
