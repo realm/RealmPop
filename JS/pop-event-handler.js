@@ -5,10 +5,6 @@
 var Realm = require('realm');
 var { Board } = require('./board.js');
 
-function isRealmObject(x) {
-  return x !== null && x !== undefined && x.constructor === Realm.Object
-}
-
 /**
  * A singleton RealmPop server event handler
  *
@@ -42,23 +38,22 @@ Pop.prototype.connect = function(adminToken) {
 Pop.handlePlayerEvents = function(event) {
   
   // check if there are Player change events
-  let changesPlayer = event.changes.Player;
+  const changesPlayer = event.changes.Player;
   if (changesPlayer == undefined) return;
 
   // check if there are Player modifications
-  let indexesPlayers = changesPlayer.modifications;
+  const indexesPlayers = changesPlayer.modifications;
   if (indexesPlayers.length == 0) return;
 
   // fetch Player list
-  let realm = event.realm;
-  var players = realm.objects("Player");
+  const players = event.realm.objects("Player");
 
   // loop over modified Player objects
-  for (var i = 0; i < indexesPlayers.length; i++) {
-    let index = indexesPlayers[i];
-    let player = players[index];
+  for (const i in indexesPlayers) {
+    const index = indexesPlayers[i];
+    const player = players[index];
 
-    if (isRealmObject(player)) {
+    if (!!player) {
       // update player's availability
       print("player: " + player.name + " > " + player.available)
       Pop.instance.didUpdateAvailability(player.id, player.available);
@@ -70,30 +65,29 @@ Pop.handlePlayerEvents = function(event) {
 Pop.handleScoreEvents = function(event) {
   
   // check if there are Score change events
-  let changes = event.changes.Score;
+  const changes = event.changes.Score;
   if (changes == undefined) return;
 
   // check if there are Score insertions
-  let indexes = changes.insertions;
+  const indexes = changes.insertions;
   if (indexes.length == 0) return;
 
   // fetch the newly inserted Score objects
-  let realm = event.realm;
-  var scores = realm.objects("Score");
+  const scores = event.realm.objects("Score");
 
   // loop over the Score objects
-  for (var i = 0; i < indexes.length; i++) {
-    let index = indexes[i];
-    let score = scores[index];
+  for (const i in indexes) {
+    const index = indexes[i];
+    const score = scores[index];
 
-    if (isRealmObject(score)) {
+    if (!!score) {
       print("score: " + score.name + " > " + score.time)
 
       // add score to the high score board
       Board.addScore(score, function() {
         // delete processed Score objects
-        realm.write(function() {
-          realm.delete(score);
+        event.realm.write(function() {
+          event.realm.delete(score);
         });
       });
     }

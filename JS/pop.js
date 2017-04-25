@@ -47,9 +47,9 @@ Realm.Sync.setLogLevel('error');
 // Initialize and start the Pop app 🚀
 //
 
-let server = new Server(config, token.get('admin'), token.get('credentials'));
+const server = new Server(config, token.get('admin'), token.get('credentials'));
 server.start();
 
-let pop = new Pop(config, token.get('credentials'));
+const pop = new Pop(config, token.get('credentials'));
 pop.connect(token.get('admin'));
 pop.didUpdateAvailability = server.didUpdateAvailability;

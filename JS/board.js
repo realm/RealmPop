@@ -14,9 +14,10 @@ function ScoreRecord(name, time) {
  * Score board class
  *
  * Saves scores to a text file, exports to a simple html web page
+ * demonstrates usage of "legacy" tech in conjuction with Realm
  */
 
-var Board = {
+const Board = {
   resultsFilePath: 'board.txt',
   templateFilePath: 'index-template.html',
   logoFilePath: 'PopIcon256.png',
@@ -26,13 +27,13 @@ var Board = {
 
 // reads the high scores from a text file and returns a list of objects
 Board.results = function() {
-    let content = fs.readFileSync(this.resultsFilePath, 'utf-8').toString().trim();
-    let lines = content.split("\n");
+    const content = fs.readFileSync(this.resultsFilePath, 'utf-8').toString().trim();
+    const lines = content.split("\n");
 
-    var results = new Array();
-    for (var i in lines) {
+    const results = new Array();
+    for (const i in lines) {
         if (i < 10) {
-            let components = lines[i].split("\t");
+            const components = lines[i].split("\t");
             if (components[1] > 0.0 && components[0].length > 0) {
                 results.push(
                     new ScoreRecord(components[0], components[1])
@@ -58,7 +59,7 @@ Board.sort = function(results) {
 // adds a new high score to the list of scores
 Board.addScore = function(score, success) {
 
-  if (this.targetFolderPath == null) {
+  if (this.targetFolderPath === null) {
     console.error('You need to set Board.targetFolderPath before calling Board.addScore');
     process.exit(-1);
     return;
@@ -68,7 +69,7 @@ Board.addScore = function(score, success) {
   var sortedResults = this.sort(this.results());
 
   // find the lowest high score
-  let slowestResult = sortedResults[sortedResults.length - 1];
+  const slowestResult = sortedResults[sortedResults.length - 1];
 
   // checks if the new score deserves to get on the score board
   if (sortedResults.length < 10 || score.time < slowestResult.time) {
@@ -88,7 +89,7 @@ Board.addScore = function(score, success) {
 
 // generates the web page, displaying the score board
 Board.updateHtmlFile = function(results) {
-    if (results == null) {
+    if (results === null) {
         results = this.sort(this.results());
     }
 
@@ -97,8 +98,8 @@ Board.updateHtmlFile = function(results) {
     if (results.length == 0) {
         resultsHtml = '<p>Play some games and you`ll see the high scores show up here!</p>';
     } else {
-        for (var i in results) {
-            let nr = i*1 + 1;
+        for (const i in results) {
+            const nr = i*1 + 1;
             resultsHtml += '<p><span class="nr">'+nr+'.</span><span class="name">'+results[i].name+'</span><span class="time">'+results[i].time+'</span></p>';
         }
     }
