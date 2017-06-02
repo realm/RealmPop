@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.UUID;
 
 import realm.io.realmpop.BuildConfig;
@@ -39,6 +41,7 @@ public class SharedPrefsUtils {
      * launches.  Only deleting and reinstalling the app will remove this.
      * @return String Unique UUID for the user of the app on "this" device.
      */
+    @NotNull
     public String idForCurrentPlayer() {
 
         String idForCurrentUser = sharedPreferences.getString(PLAYER_KEY, null);

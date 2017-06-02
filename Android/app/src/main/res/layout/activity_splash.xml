@@ -1,71 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_splash"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
-    android:gravity="center"
-    tools:context=".controller.login.SplashActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        style="@style/SalmonTextViewBigly"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="18dp"
-        android:text="@string/app_name"
-        />
+    <data>
+        <variable name="vm" type="realm.io.realmpop.controller.login.SplashViewModel" />
+    </data>
 
-    <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
-        <EditText
-            android:id="@+id/hostIpTextView"
-            style="@style/Text.EditText.FixedWidth"
-            android:layout_marginTop="50dp"
-            android:layout_height="wrap_content"
-            android:imeOptions="flagNoExtractUi"
-            android:hint="@string/login_host_hint"
-            android:text="@string/defaultObjectServerIp"
-            android:textAlignment="center"
-            android:inputType="text" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
-        <EditText
-            android:id="@+id/userTextView"
-            style="@style/Text.EditText.FixedWidth"
-            android:layout_height="wrap_content"
-            android:imeOptions="flagNoExtractUi"
-            android:hint="@string/login_username_hint"
-            tools:text="user@demo.io"
-            android:textAlignment="center"
-            android:inputType="text" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
-        <EditText
-            android:id="@+id/passTextView"
-            style="@style/Text.EditText.FixedWidth"
-            android:layout_height="wrap_content"
-            android:imeOptions="flagNoExtractUi"
-            android:hint="@string/login_password_hint"
-            tools:text="password"
-            android:textAlignment="center"
-            android:inputType="text" />
-    </android.support.design.widget.TextInputLayout>
-
-    <Button
-        android:id="@+id/connectToRosButton"
-        style="@style/Text.Button.AccentColor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/connect_button_label"
-        />
-
-    <View
-        android:id="@+id/snackbar_container"
+    <LinearLayout
+        android:id="@+id/activity_splash"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        android:gravity="center"
+        tools:context=".controller.login.SplashActivity">
 
-</LinearLayout>
+        <TextView
+            style="@style/SalmonTextViewBigly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="18dp"
+            android:text="@string/app_name" />
+
+        <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
+
+            <EditText
+                android:id="@+id/hostIpTextView"
+                style="@style/Text.EditText.FixedWidth"
+                android:layout_marginTop="50dp"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
+                android:hint="@string/login_host_hint"
+                android:textAlignment="center"
+                android:inputType="text"
+                tools:text="@string/defaultObjectServerIp"
+                android:text="@={vm.host}"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
+
+            <EditText
+                android:id="@+id/userTextView"
+                style="@style/Text.EditText.FixedWidth"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
+                android:hint="@string/login_username_hint"
+                tools:text="user@demo.io"
+                android:text="@={vm.username}"
+                android:textAlignment="center"
+                android:inputType="text" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout style="@style/PopLabelWrapper">
+
+            <EditText
+                android:id="@+id/passTextView"
+                style="@style/Text.EditText.FixedWidth"
+                android:layout_height="wrap_content"
+                android:imeOptions="flagNoExtractUi"
+                android:hint="@string/login_password_hint"
+                tools:text="password"
+                android:text="@={vm.password}"
+                android:textAlignment="center"
+                android:inputType="text" />
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/loginButton"
+            style="@style/Text.Button.AccentColor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{() -> vm.login()}"
+            android:text="@string/connect_button_label" />
+
+        <View
+            android:id="@+id/snackbar_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</layout>
