@@ -7,18 +7,14 @@ import io.realm.*
 import realm.io.realmpop.util.SharedPrefsUtils
 import realm.io.realmpop.util.playerDao
 
-enum class LoginState {
-    WAITING_USER, ATTEMPTING_LOGIN, AUTHENTICATED
-}
+enum class LoginState { WAITING_USER, ATTEMPTING_LOGIN, AUTHENTICATED  }
 
 class SplashViewModel : ViewModel() {
 
-    private lateinit var realm: Realm
+    private var realm: Realm? = null
     private val sharedPrefs = SharedPrefsUtils.getInstance()
-    private val serverUrl: String
-        get() = "http://${sharedPrefs.objectServerHost}:9080"
-    private val realmUrl: String
-        get() = "realm://${sharedPrefs.objectServerHost}:9080/~/game"
+    private val serverUrl = { "http://${sharedPrefs.objectServerHost}:9080" }
+    private val realmUrl = { "realm://${sharedPrefs.objectServerHost}:9080/~/game" }
 
     var host = sharedPrefs.objectServerHost
     var username = sharedPrefs.popUsername
@@ -31,12 +27,6 @@ class SplashViewModel : ViewModel() {
         error.value = ""
     }
 
-    private fun updateStoredConnectionParameters() {
-        sharedPrefs.objectServerHost = host
-        sharedPrefs.popUsername = username
-        sharedPrefs.popPassword = password
-    }
-
     fun login() {
         Log.d("Tag","Pressed login: ${host}:${username}:${password}")
 
@@ -46,7 +36,7 @@ class SplashViewModel : ViewModel() {
 
         val syncCredentials = SyncCredentials.usernamePassword(username, password, false)
 
-        SyncUser.loginAsync(syncCredentials, serverUrl, object : SyncUser.Callback {
+        SyncUser.loginAsync(syncCredentials, serverUrl(), object : SyncUser.Callback {
             override fun onSuccess(user: SyncUser) {
                 postLogin(user)
             }
@@ -70,17 +60,23 @@ class SplashViewModel : ViewModel() {
     private fun postLogin(user: SyncUser) {
         setRealmDefaultConfig(user)
         realm = Realm.getDefaultInstance()
-        realm.playerDao().initializePlayer(onSuccess = { state.postValue(LoginState.AUTHENTICATED) })
+        realm!!.playerDao().initializePlayer(onSuccess = { state.postValue(LoginState.AUTHENTICATED) })
     }
 
     private fun setRealmDefaultConfig(user: SyncUser) {
-        Log.d("Tag", "Connecting to Sync Server at : ["  + realmUrl.replace("~", user.getIdentity()) + "]");
+        Log.d("Tag", "Connecting to Sync Server at : ["  + realmUrl().replace("~", user.identity) + "]");
         Realm.removeDefaultConfiguration()
-        Realm.setDefaultConfiguration(SyncConfiguration.Builder(user, realmUrl).build())
+        Realm.setDefaultConfiguration(SyncConfiguration.Builder(user, realmUrl()).build())
     }
 
     override fun onCleared() {
-        realm.close()
+        realm?.close()
+    }
+
+    private fun updateStoredConnectionParameters() {
+        sharedPrefs.objectServerHost = host
+        sharedPrefs.popUsername = username
+        sharedPrefs.popPassword = password
     }
 
 }

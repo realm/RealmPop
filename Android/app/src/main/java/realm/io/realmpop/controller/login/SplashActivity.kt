@@ -1,23 +1,14 @@
 package realm.io.realmpop.controller.login
 
-import android.app.Activity
 import android.app.ProgressDialog
 import android.arch.lifecycle.LifecycleActivity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.annotation.MainThread
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
-import android.widget.Button
-import android.widget.TextView
-
-import butterknife.BindView
-import butterknife.ButterKnife
-import io.realm.ObjectServerError
 import kotlinx.android.synthetic.main.activity_splash.*
 import org.jetbrains.anko.startActivity
 import realm.io.realmpop.R
@@ -76,12 +67,12 @@ class SplashActivity : LifecycleActivity() {
     }
 
     private fun showProgress() {
-        loginButton.setEnabled(false);
+        loginButton.isEnabled = false;
         progressDialog.show();
     }
 
     private fun hideProgress() {
-        loginButton.setEnabled(true);
+        loginButton.isEnabled = true
         progressDialog.dismiss();
     }
 

@@ -1,18 +1,16 @@
 package realm.io.realmpop.model
 
 import io.realm.Realm
-import org.jetbrains.anko.doAsync
 import realm.io.realmpop.util.SharedPrefsUtils
 
-class PlayerDao(val realm: Realm) {
+class PlayerDao(val mRealm: Realm) {
 
-    fun initializePlayer(id:String = SharedPrefsUtils.getInstance().idForCurrentPlayer(),
+    fun initializePlayer(playerId:String = SharedPrefsUtils.getInstance().idForCurrentPlayer(),
                          onSuccess: (() -> Unit) = {},
                          onError:   (() -> Unit) = {}) {
 
-        realm.executeTransactionAsync(
+        mRealm.executeTransactionAsync(
                 { bgRealm ->
-                    val playerId = id
                     var me = byId(bgRealm, playerId)
                     if (me == null) {
                         me = Player()
@@ -30,7 +28,18 @@ class PlayerDao(val realm: Realm) {
 
     }
 
-    fun byId(realm: Realm, id: String): Player? {
+    fun updateName(id: String = SharedPrefsUtils.getInstance().idForCurrentPlayer(),
+                   name: String,
+                   onSuccess: (() -> Unit) = {},
+                   onError:   (() -> Unit) = {}) {
+        mRealm.executeTransactionAsync(
+                { bgRealm ->  byId(bgRealm)?.name = name },
+                { onSuccess() },
+                { onError() }
+        )
+    }
+
+    fun byId(realm: Realm = mRealm, id: String = SharedPrefsUtils.getInstance().idForCurrentPlayer()): Player? {
         return realm.where(Player::class.java).equalTo("id", id).findFirst()
     }
 

@@ -2,6 +2,7 @@ package realm.io.realmpop.controller;
 
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.MainThread;
@@ -12,7 +13,7 @@ import realm.io.realmpop.controller.login.SplashActivity;
 import realm.io.realmpop.util.SharedPrefsUtils;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-abstract public class BaseAuthenticatedActivity extends AppCompatActivity {
+abstract public class BaseAuthenticatedActivity extends LifecycleActivity {
 
     private Realm realm;
 
