@@ -37,26 +37,16 @@ public class Player extends RealmObject {
 
     public void setCurrentGame(Game currentGame) { this.currentGame = currentGame; }
 
-    public static Player byId(Realm realm, String id) {
-        return realm.where(Player.class).equalTo("id", id).findFirst();
+    public boolean hasChallengerAssigned() {
+        return challenger != null;
     }
 
-    public static void challengePlayer(final String playerId) {
-        try(Realm realm = Realm.getDefaultInstance()) {
+    public boolean hasGameAssigned() {
+        return currentGame != null;
+    }
 
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    Player me = Player.byId(realm, myId());
-                    Player theChallenged = Player.byId(realm, playerId);
-                    if(me != null && theChallenged != null && theChallenged.getChallenger() == null) { //don't want to double challenge.
-                        theChallenged.setChallenger(me);
-                    }
-
-                }
-            });
-
-        }
+    public static Player byId(Realm realm, String id) {
+        return realm.where(Player.class).equalTo("id", id).findFirst();
     }
 
     public static void assignAvailability(final boolean isAvailable) {

@@ -6,18 +6,15 @@ import android.text.TextUtils
 import io.realm.Realm
 import realm.io.realmpop.model.Player
 import realm.io.realmpop.util.playerDao
-import rx.Observable
-import rx.Subscription
 
 class PlayerNameViewModel : ViewModel() {
 
     private var realm = Realm.getDefaultInstance()
     private var me: Player? = realm.playerDao().byId()
-    private var playerNameTextSubscripton: Subscription? = null
 
     enum class State { WAITING_USER, APP_RESTART_NEEDED, BAD_INPUT, COMPLETED }
 
-    var playerNameText = me?.name ?: ""
+    var playerNameText = MutableLiveData<String>()
     val state = MutableLiveData<State>()
 
     init {
@@ -26,12 +23,11 @@ class PlayerNameViewModel : ViewModel() {
                 state.postValue(State.APP_RESTART_NEEDED)
             }
         }
-        playerNameTextSubscripton = Observable.just(playerNameText).subscribe{ updateName() }
+        playerNameText.value = me?.name ?: ""
     }
 
     override fun onCleared() {
         me?.removeAllChangeListeners()
-        playerNameTextSubscripton?.unsubscribe()
         realm.close()
     }
 
@@ -40,10 +36,13 @@ class PlayerNameViewModel : ViewModel() {
                            else
                                 state.postValue(State.BAD_INPUT)
 
-    fun updateName(onSuccess: () -> Unit = {}, onFailure:() -> Unit = {}) =
-            realm.playerDao().updateName(name=playerNameText)
 
+    fun updateName(onSuccess: () -> Unit = {}, onError:(e: Throwable) -> Unit = {}) =
+            realm.playerDao().updateName(
+                    name = playerNameText.value ?: "",
+                    onSuccess = onSuccess,
+                    onError = onError)
 
-    private fun isPlayerNameValid() = !TextUtils.isEmpty(playerNameText)
+    private fun isPlayerNameValid() = !TextUtils.isEmpty(playerNameText.value)
 
 }

@@ -90,30 +90,6 @@ public class Game extends RealmObject {
         }
     }
 
-
-    public static void startNewGame(final String meId, final String challengerId) {
-
-        try(Realm r = Realm.getDefaultInstance()) {
-
-            r.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm r) {
-                    Player me = Player.byId(r, meId);
-                    Player challenger = Player.byId(r, challengerId);
-
-                    if(me != null && challenger != null) {
-                        int [] numbers = generateNumbersArray(PopUtils.BUBBLE_COUNT, 1, PopUtils.BUBBLE_VALUE_MAX);
-                        Game game = new Game(me, challenger, numbers);
-                        game = r.copyToRealm(game);
-                        me.setCurrentGame(game);
-                        challenger.setCurrentGame(game);
-                    }
-                }
-            });
-        }
-
-    }
-
     private static String numberArrayToString(int[] numArray) {
         String numStr = Arrays.toString(numArray);
         return numStr.replaceAll("\\[|\\]|\\s", "");

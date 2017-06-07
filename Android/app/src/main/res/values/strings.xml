@@ -20,5 +20,6 @@
     <string name="game_outcome_message_finishtime">Your time: %s</string>
     <string name="game_outcome_message_win">You win! Sweet</string>
     <string name="game_outcome_message_popoutoforder">You tapped %1$d instead of %2$d</string>
+    <string name="players_label_game_room">Players</string>
 
 </resources>

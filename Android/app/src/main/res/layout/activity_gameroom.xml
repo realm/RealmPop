@@ -1,32 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_game"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="realm.io.realmpop.controller.game.GameActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/availablePlayers"
+    <data>
+        <variable name="vm" type="realm.io.realmpop.controller.gameroom.GameRoomViewModel"/>
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/activity_game"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/textBackground"
-        android:padding="16dp"
-        android:textAlignment="center"
-        android:text="Players"
-        />
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="realm.io.realmpop.controller.gameroom.GameRoomActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/player_list"
-        android:layout_below="@id/availablePlayers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layoutManager="LinearLayoutManager"
-        tools:context=".controller.gameroom.GameRoomActivity"
-        tools:listitem="@layout/player_item" />
+        <TextView
+            android:id="@+id/availablePlayers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textBackground"
+            android:padding="16dp"
+            android:textAlignment="center"
+            android:text="@string/players_label_game_room" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/player_list"
+            android:layout_below="@id/availablePlayers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="LinearLayoutManager"
+            tools:context=".controller.gameroom.GameRoomActivity"
+            tools:listitem="@layout/player_item" />
 
 
-</RelativeLayout>
+    </RelativeLayout>
+</layout>

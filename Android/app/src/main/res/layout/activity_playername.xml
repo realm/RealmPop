@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/pregameroom_player_name_prompt_label"
             tools:text="Kaiser Söze"
-            android:text="@={vm.playerNameText}"
+            android:text="@={vm.playerNameText.value}"
             android:textAlignment="center"
             android:textAppearance="@style/Text.EditText"
             android:imeOptions="flagNoExtractUi"

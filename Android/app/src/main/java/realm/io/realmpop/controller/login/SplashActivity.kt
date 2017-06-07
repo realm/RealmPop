@@ -28,6 +28,7 @@ class SplashActivity : LifecycleActivity() {
         binding.vm = viewModel
         bindProgressDialog()
         bindErrorSnackbar()
+        viewModel.logoutExistingUser()
     }
 
     override fun attachBaseContext(newBase: Context) {
@@ -42,9 +43,9 @@ class SplashActivity : LifecycleActivity() {
         progressDialog.setMessage(getString(R.string.login_connecting_text))
         viewModel.state.observe(this, Observer { loginState ->
             when(loginState) {
-                LoginState.WAITING_USER -> hideProgress()
-                LoginState.ATTEMPTING_LOGIN -> showProgress()
-                LoginState.AUTHENTICATED -> goToPlayerNameScreen()
+                SplashViewModel.State.WAITING_USER -> hideProgress()
+                SplashViewModel.State.ATTEMPTING_LOGIN -> showProgress()
+                SplashViewModel.State.AUTHENTICATED -> goToPlayerNameScreen()
             }
         })
     }

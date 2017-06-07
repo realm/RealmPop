@@ -1,16 +1,13 @@
 package realm.io.realmpop.model
 
 import android.arch.lifecycle.LiveData
-
-import io.realm.RealmChangeListener
-import io.realm.RealmModel
-import io.realm.RealmObject
-import io.realm.RealmResults
+import io.realm.*
 
 /**
- * Class connecting the Realm lifecycle to that of LiveData objects.
+ * Classes connecting the Realm lifecycle to that of LiveData objects.
  */
-class LiveRealmData<T : RealmModel>(private val results: RealmResults<T>) : LiveData<RealmResults<T>>() {
+
+class RealmResultsLiveData<T : RealmModel>(private val results: RealmResults<T>) : LiveData<RealmResults<T>>() {
 
     private val listener = RealmChangeListener<RealmResults<T>> { results -> value = results }
 
@@ -24,3 +21,20 @@ class LiveRealmData<T : RealmModel>(private val results: RealmResults<T>) : Live
 
 }
 
+class RealmModelLiveData<T : RealmModel>(private val mRealmModel: T) : LiveData<ObjectChangedEvent<T>>() {
+
+    private val listener = RealmObjectChangeListener<T> { results, changeSet ->
+        value = ObjectChangedEvent<T>(results, changeSet)
+    }
+
+    override fun onActive() {
+        RealmObject.addChangeListener(mRealmModel, listener)
+    }
+
+    override fun onInactive() {
+        RealmObject.removeChangeListener(mRealmModel, listener)
+    }
+
+}
+
+class ObjectChangedEvent<out T: RealmModel>(val result: T, val changeSet: ObjectChangeSet)

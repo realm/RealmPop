@@ -6,15 +6,15 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_playername.*
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.startActivity
 import realm.io.realmpop.R
 import realm.io.realmpop.controller.BaseAuthenticatedActivity
 import realm.io.realmpop.controller.gameroom.GameRoomActivity
 import realm.io.realmpop.databinding.ActivityPlayernameBinding
 
-class PlayerNameActivity : BaseAuthenticatedActivity() {
+class PlayerNameActivity : BaseAuthenticatedActivity(), AnkoLogger {
 
-    lateinit var playerNameObserver: TextListener
     lateinit var viewModel: PlayerNameViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,14 +22,15 @@ class PlayerNameActivity : BaseAuthenticatedActivity() {
         viewModel = ViewModelProviders.of(this).get(PlayerNameViewModel::class.java)
         val binding = DataBindingUtil.setContentView<ActivityPlayernameBinding>(this, R.layout.activity_playername)
         binding.vm = viewModel
-        setContentView(R.layout.activity_playername)
         bindState()
-        playerNameObserver = TextListener(this, lifecycle, playerNameEditText!!) {
-            viewModel.updateName()
-        }
+        bindNameText()
     }
 
-    fun bindState() {
+    private fun bindNameText() {
+        viewModel.playerNameText.observe(this, Observer { viewModel.updateName() })
+    }
+
+    private fun bindState() {
         viewModel.state.observe(this, Observer { state ->
             when(state) {
                 PlayerNameViewModel.State.COMPLETED -> moveToGameRoom()
@@ -46,7 +47,7 @@ class PlayerNameActivity : BaseAuthenticatedActivity() {
     private fun moveToGameRoom() {
         viewModel.updateName(
                 onSuccess={startActivity<GameRoomActivity>()},
-                onFailure = {restartApp()})
+                onError = {restartApp()})
     }
 
 }
