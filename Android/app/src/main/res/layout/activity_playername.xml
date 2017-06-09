@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="vm" type="realm.io.realmpop.controller.playername.PlayerNameViewModel" />
+        <variable name="vm" type="realm.io.realmpop.ui.playername.PlayerNameViewModel" />
     </data>
 
     <LinearLayout
@@ -16,7 +16,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context="realm.io.realmpop.controller.playername.PlayerNameActivity">
+        tools:context="realm.io.realmpop.ui.playername.PlayerNameActivity">
 
         <TextView
             android:id="@+id/player_name_prompt"

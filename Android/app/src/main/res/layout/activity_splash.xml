@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="vm" type="realm.io.realmpop.controller.login.SplashViewModel" />
+        <variable name="vm" type="realm.io.realmpop.ui.login.SplashViewModel" />
     </data>
 
     <LinearLayout
@@ -15,7 +15,7 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         android:orientation="vertical"
         android:gravity="center"
-        tools:context=".controller.login.SplashActivity">
+        tools:context=".ui.login.SplashActivity">
 
         <TextView
             style="@style/SalmonTextViewBigly"
