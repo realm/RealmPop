@@ -2,8 +2,10 @@ package realm.io.realmpop.controller.gameroom
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.support.v4.app.ShareCompat
 import android.support.v7.widget.DividerItemDecoration
 import kotlinx.android.synthetic.main.activity_gameroom.*
 import org.jetbrains.anko.alert
@@ -36,10 +38,15 @@ class GameRoomActivity : BaseAuthenticatedActivity() {
                   GameRoomViewModel.State.VIEWING -> availableHeartbeat.start()
                   GameRoomViewModel.State.CHALLENGING -> availableHeartbeat.stop()
                   GameRoomViewModel.State.CHALLENGED -> presentChallengeDialog()
-                  GameRoomViewModel.State.STARTING_GAME -> startActivity<GameActivity>()
+                  GameRoomViewModel.State.STARTING_GAME -> startActivityForResult(Intent(this, GameActivity::class.java), 0)
                   GameRoomViewModel.State.APP_RESTART_NEEDED -> restartApp()
               }
         })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        viewModel.gameFinished()
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     fun presentChallengeDialog() {

@@ -1,86 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_game"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="realm.io.realmpop.controller.game.GameActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <data>
+        <variable name="vm" type="realm.io.realmpop.controller.game.GameViewModel" />
+        <import type="android.view.View"/>
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/activity_game"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="realm.io.realmpop.controller.game.GameActivity">
 
         <LinearLayout
-            android:id="@+id/headerDisplay"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/realm_pop_status_bar_height"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/playerLabel1"
-                style="@style/Text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_weight="1"
-                android:gravity="start"
-                android:padding="6dp"
-                android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/textBackground"
-                android:textSize="18sp"
-                tools:text="Player 1" />
+            <LinearLayout
+                android:id="@+id/headerDisplay"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/realm_pop_status_bar_height"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/timer"
-                style="@style/Text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="6dp"
-                android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/textBackground"
-                android:textSize="18sp"
-                tools:text="00:00" />
+                <TextView
+                    android:id="@+id/playerLabel1"
+                    style="@style/Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:padding="6dp"
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:textColor="@color/textBackground"
+                    android:textSize="18sp"
+                    tools:text="Player 1"
+                    android:text="@{vm.leftPlayerLabel}"
+                    />
 
-            <TextView
-                android:id="@+id/playerLabel2"
-                style="@style/Text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:padding="6dp"
-                android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/textBackground"
-                android:textSize="18sp"
-                tools:text="Player 2" />
+                <TextView
+                    android:id="@+id/timer"
+                    style="@style/Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="6dp"
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:textColor="@color/textBackground"
+                    android:textSize="18sp"
+                    tools:text="00:00"
+                    android:text="@{vm.clockDisplay}"
+                    />
+
+                <TextView
+                    android:id="@+id/playerLabel2"
+                    style="@style/Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:padding="6dp"
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:textColor="@color/textBackground"
+                    android:textSize="18sp"
+                    tools:text="Player 2"
+                    android:text="@{vm.rightPlayerLabel}"
+                    />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/bubbleBoard"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/bubbleBoard"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/message"
+            style="@style/Text"
+            android:layout_width="400dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:background="@color/textBackground"
+            android:gravity="center"
+            android:textColor="@color/colorBlack"
+            android:textSize="22sp"
+            android:visibility="@{vm.message != null ? View.VISIBLE : View.INVISIBLE}"
+            android:text="@{vm.message}"
+            tools:text="You Win, Congrats!"
+            tools:visibility="visible" />
 
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/message"
-        style="@style/Text"
-        android:layout_width="400dp"
-        android:layout_height="100dp"
-        android:layout_centerInParent="true"
-        android:background="@color/textBackground"
-        android:gravity="center"
-        android:textColor="@color/colorBlack"
-        android:textSize="22sp"
-        android:visibility="invisible"
-        tools:text="You Win, Congrats!"
-        tools:visibility="visible" />
-
-</RelativeLayout>
+    </RelativeLayout>
+</layout>

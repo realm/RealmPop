@@ -2,14 +2,16 @@
 package realm.io.realmpop.util
 
 import io.realm.*
-import realm.io.realmpop.model.GameDao
-import realm.io.realmpop.model.PlayerDao
-import realm.io.realmpop.model.RealmModelLiveData
-import realm.io.realmpop.model.RealmResultsLiveData
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import realm.io.realmpop.model.*
 
 // Realm Extensions
 fun Realm.playerDao(synchronous: Boolean = false): PlayerDao = PlayerDao(this, synchronous)
 fun Realm.gameDao(synchronous: Boolean = false): GameDao = GameDao(this, synchronous)
+fun Realm.sideDao(synchronous: Boolean = false): SideDao = SideDao(this, synchronous)
+fun Realm.scoreDao(synchronous: Boolean = false): ScoreDao = ScoreDao(this, synchronous)
+
 
 // RealmResults Extensions
 fun <T:RealmModel> RealmResults<T>.asLiveData() = RealmResultsLiveData<T>(this)

@@ -18,14 +18,14 @@ class GameRoomViewModel : ViewModel(), AnkoLogger {
     private val realm = Realm.getDefaultInstance()
     private val playerDao = realm.playerDao()
     private val gameDao = realm.gameDao()
-    private var me = playerDao.byId()
+    private var me = playerDao.byId()!!
     private var currentChallegee: Player? = null
         set(value) {
             field?.removeAllChangeListeners()
             field = null
             value?.addChangeListener { theChallenged: Player ->
                 val stateComingFrom = state.value
-                val theChallengerIsMe = theChallenged.challenger?.id == me?.id
+                val theChallengerIsMe = theChallenged.challenger?.id == me.id
                 val theChallengerIsNotMe = !theChallengerIsMe
 
                 when (stateComingFrom) {
@@ -36,6 +36,7 @@ class GameRoomViewModel : ViewModel(), AnkoLogger {
                     }
                     State.CHALLENGING -> {
                         when {
+                            me.hasGameAssigned() -> moveTo(State.STARTING_GAME) // Adv to game
                             theChallengerIsNotMe -> moveTo(State.VIEWING)
                         }
                     }
@@ -49,15 +50,10 @@ class GameRoomViewModel : ViewModel(), AnkoLogger {
     val otherPlayers = playerDao.otherPlayers()
     val state = MutableLiveData<State>()
 
-    fun moveTo(nextState: State) {
-        info("Moving From: [${state.value?.name ?: "UNDEFINED"} -> ${nextState.name}]")
-        state.postValue(nextState)
-    }
-
     init {
         state.value = State.VIEWING // Initial State
 
-        me?.addChangeListener { me: Player, changeSet ->
+        me.addChangeListener { me: Player, changeSet ->
 
             if (changeSet.isDeleted || me.isInvalid) { moveTo(State.APP_RESTART_NEEDED) }
 
@@ -80,9 +76,13 @@ class GameRoomViewModel : ViewModel(), AnkoLogger {
     }
 
     override fun onCleared() {
-        me?.removeAllChangeListeners()
+        me.removeAllChangeListeners()
         currentChallegee?.removeAllChangeListeners()
         realm.close()
+    }
+
+    fun gameFinished() {
+        moveTo(State.VIEWING)
     }
 
     fun challengePlayer(challengerId: String) {
@@ -91,14 +91,16 @@ class GameRoomViewModel : ViewModel(), AnkoLogger {
     }
 
     fun acceptChallenge() {
-        if(currentChallegee != null) {
-            gameDao.startNewGame(
-                    SharedPrefsUtils.getInstance().idForCurrentPlayer(),
-                    currentChallegee!!.id)
-        }
+        gameDao.startNewGame(me.id, me.challenger.id)
     }
 
     fun declineChallenge() {
         playerDao.assignAvailability(true)
     }
+
+    private fun moveTo(nextState: State) {
+        info("Moving From: [${state.value?.name ?: "UNDEFINED"} -> ${nextState.name}]")
+        state.postValue(nextState)
+    }
+
 }

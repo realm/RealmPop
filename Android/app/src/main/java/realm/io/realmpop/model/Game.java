@@ -64,32 +64,6 @@ public class Game extends RealmObject {
         }
     }
 
-    public void failUnfinishedSides() {
-
-        final String p1id = getPlayer1().getPlayerId();
-        final String p2id = getPlayer2().getPlayerId();
-
-        try(Realm r = Realm.getDefaultInstance()) {
-
-            r.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm bgRealm) {
-                    Game currentGame = Player.byId(bgRealm, p1id).getCurrentGame();
-                    Side p1Side = currentGame.sideWithPlayerId(p1id);
-                    Side p2Side = currentGame.sideWithPlayerId(p2id);
-
-                    if(p1Side.getTime() == 0) {
-                        p1Side.setFailed(true);
-                    }
-                    if(p2Side.getTime() == 0) {
-                        p2Side.setFailed(true);
-                    }
-                }
-            });
-
-        }
-    }
-
     private static String numberArrayToString(int[] numArray) {
         String numStr = Arrays.toString(numArray);
         return numStr.replaceAll("\\[|\\]|\\s", "");

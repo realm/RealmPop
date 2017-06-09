@@ -1,4 +1,4 @@
-package realm.io.realmpop.util;
+package realm.io.realmpop.controller.game;
 
 import java.util.Date;
 import java.util.Locale;
