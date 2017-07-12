@@ -3,7 +3,7 @@
 
 buildscript {
     ext.kotlin_version = '1.1.2-2'
-    ext.android_plugin_version = "3.0.0-alpha2"
+    ext.android_plugin_version = "3.0.0-alpha6"
     ext.arch_version = "1.0.0-alpha1"
     ext.support_version = "25.3.1"
     ext.dagger_version = "2.11-rc2"

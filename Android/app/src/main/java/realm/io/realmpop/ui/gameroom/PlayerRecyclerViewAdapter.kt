@@ -42,7 +42,7 @@ class PlayerRecyclerViewAdapter(private val viewModel: GameRoomViewModel) :
         val titleView: TextView
 
         init {
-            titleView = view.findViewById(R.id.title) as TextView
+            titleView = view.findViewById<TextView>(R.id.title)
         }
     }
 

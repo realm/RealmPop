@@ -8,12 +8,12 @@ realm {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "realm.io.realmpop"
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }
@@ -45,7 +45,7 @@ android {
 
     buildTypes {
 
-        def host = getIP()
+        def host = '45.55.81.82' //getIP()
 
         debug {
             // This will automatically detect the IP address of the machine building RealmTasks.
